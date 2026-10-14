@@ -1,0 +1,25 @@
+{
+  "name": "cafe-con-dos-editor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Editor de artículos de Café Con Dos (Sanity Studio)",
+  "type": "module",
+  "scripts": {
+    "dev": "node sincronizar.mjs && sanity dev",
+    "build": "node sincronizar.mjs && sanity build",
+    "deploy": "node sincronizar.mjs && sanity deploy",
+    "deploy:ci": "node sincronizar.mjs --ci && sanity deploy --yes"
+  },
+  "dependencies": {
+    "@sanity/icons": "^5.2.3",
+    "@sanity/locale-es-es": "^1.2.39",
+    "@sanity/ui": "^4.4.4",
+    "react": "^19.2.2",
+    "react-dom": "^19.2.2",
+    "sanity": "^6.19.0",
+    "styled-components": "^6.1.15"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

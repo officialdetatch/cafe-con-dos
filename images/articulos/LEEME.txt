@@ -1,0 +1,2 @@
+Pon aquí las fotos de portada de los artículos (mejor horizontales, de menos de 400 KB).
+En el writer escribe la ruta así: images/articulos/nombre-de-la-foto.jpg

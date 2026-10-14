@@ -1,0 +1,47 @@
+# OPCIONAL. Vuelve a publicar el editor (Sanity Studio) cuando cambia algo
+# que el editor usa: la carpeta studio/ o config.js (secciones, temas, hosts).
+# Así, si agregas un tema nuevo en config.js, aparece solo en el editor.
+#
+# Solo corre si ya hiciste esto (README, "Editor de artículos", paso opcional):
+#   1. sanity.studioAppId lleno en config.js (lo da "npm run deploy" la primera vez).
+#   2. Un secret SANITY_AUTH_TOKEN en Settings > Secrets and variables > Actions
+#      (token de Sanity con permiso "Deploy Studio").
+# Sin eso, este workflow solo deja un aviso y termina sin error.
+
+name: Publicar editor
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "studio/**"
+      - "assets/js/config.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  editor:
+    runs-on: ubuntu-latest
+    env:
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
+    steps:
+      - name: Sin token, no se publica el editor
+        if: env.SANITY_AUTH_TOKEN == ''
+        run: echo "::notice::Falta el secret SANITY_AUTH_TOKEN. Publica el editor desde tu computadora con 'cd studio && npm run deploy'."
+
+      - uses: actions/checkout@v4
+        if: env.SANITY_AUTH_TOKEN != ''
+
+      - uses: actions/setup-node@v4
+        if: env.SANITY_AUTH_TOKEN != ''
+        with:
+          node-version: 22
+
+      - name: Publicar el editor
+        if: env.SANITY_AUTH_TOKEN != ''
+        working-directory: studio
+        run: |
+          npm install --no-audit --no-fund
+          npm run deploy:ci

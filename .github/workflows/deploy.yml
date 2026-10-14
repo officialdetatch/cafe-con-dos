@@ -1,0 +1,75 @@
+# Publica el sitio en GitHub Pages: trae los artículos del editor (Sanity),
+# arma feed.xml + sitemap.xml y sube todo.
+# Corre:
+#   - en cada push a main,
+#   - cada vez que se publica, edita, despublica o borra un artículo en Sanity
+#     (el webhook de Sanity manda el aviso "sanity"),
+#   - cada mañana a las 6:00 am (hora de RD), para que lo programado con fecha
+#     futura entre al feed (y al correo) ese día sin subir nada,
+#   - y a mano con el botón "Run workflow".
+# Requisito: Settings > Pages > Source = "GitHub Actions".
+
+name: Publicar sitio
+# En la pestaña Actions, lo que viene del editor sale como "Editor: <título>".
+run-name: ${{ github.event_name == 'repository_dispatch' && format('Editor{0} {1}', ':', github.event.client_payload.titulo || 'cambio en un artículo') || (github.event_name == 'push' && github.event.head_commit.message) || 'Publicar sitio' }}
+
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [sanity]
+  schedule:
+    - cron: "0 10 * * *" # 10:00 UTC = 6:00 am en República Dominicana
+  workflow_dispatch: # botón "Run workflow" para correrlo a mano
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si llegan varios avisos seguidos, se publica uno detrás del otro
+# (el último siempre trae lo más nuevo de Sanity).
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      TZ: America/Santo_Domingo
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Preparar los archivos del sitio
+        run: |
+          mkdir _site
+          for f in $(ls -A); do
+            case "$f" in .git|.github|_site|scripts|studio|node_modules|README.md|firestore.rules) ;; *) cp -r "$f" _site/ ;; esac
+          done
+
+      # Si Sanity no responde, este paso falla y no se publica nada:
+      # el sitio que ya está en línea se queda igual.
+      - name: Traer los artículos del editor (Sanity)
+        run: node scripts/contenido-sanity.js _site
+        env:
+          SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }} # opcional, solo si el dataset es privado
+
+      - name: Generar feed.xml y sitemap.xml
+        run: node scripts/build-feed.js _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

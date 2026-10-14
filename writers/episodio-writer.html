@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>try{var t=localStorage.getItem("ccd-tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Writer de episodios | Café Con Dos</title>
+  <link rel="icon" type="image/png" href="../images/favicon-48.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="writer.css">
+</head>
+<body class="writer" data-base="../">
+  <header class="w-top">
+    <div class="wrap">
+      <a href="../index.html" class="logo"><img class="logo-oscuro" src="../images/logo.png" alt="Café Con Dos"><img class="logo-claro" src="../images/logo-claro.png" alt=""></a>
+      <h1>Writer de episodios</h1>
+      <nav aria-label="Writers">
+        <a href="episodio-writer.html" aria-current="page">Writer de episodios</a>
+        <a href="articulo-writer.html">Writer de artículos</a>
+        <a href="../index.html" target="_blank" rel="noopener">Ver el sitio</a>
+      </nav>
+    </div>
+  </header>
+  <div class="wrap">
+    <details class="w-ayuda">
+      <summary>Cómo publicar (léelo la primera vez)</summary>
+      <ol>
+        <li>Abre este archivo desde la carpeta del sitio (doble clic, o desde tu servidor local). Lo que ya está publicado aparece en la lista de la izquierda.</li>
+        <li>Toca <b>Nuevo episodio</b> o elige uno de la lista para editarlo. La vista previa de la derecha muestra cómo se va a ver.</li>
+        <li>Cuando termines, toca <b>Agregar a la lista</b> (o <b>Guardar cambios</b>). Puedes hacer varios seguidos.</li>
+        <li>Toca <b>Descargar episodios.js</b> en la barra de abajo y reemplaza <code>data/episodios.js</code> en la carpeta del sitio.</li>
+        <li>Haz commit y push. En un par de minutos está en vivo, y GitHub actualiza solo el feed del newsletter (feed.xml) y el sitemap.</li>
+        <li>Si cierras la página sin descargar, el writer guarda un borrador en este navegador y te ofrece recuperarlo la próxima vez.</li>
+        <li>Una fecha en el futuro sirve para programar: súbelo cuando quieras y no aparece en el sitio ni en el email hasta ese día. GitHub revisa cada mañana, así que no hay que volver a subir nada.</li>
+      </ol>
+    </details>
+  </div>
+  <div id="writer"></div>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/textos.js"></script>
+  <script src="../data/episodios.js"></script>
+  <script src="../data/articulos.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="writer.js"></script>
+  <script>
+    (function () {
+      var CFG = window.CCD_CONFIG;
+      function tiempo(l) {
+        var m = l.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s*[-–—]?\s*(.+)$/);
+        return m ? { t: m[1], texto: m[2] } : null;
+      }
+      CCDWriter({
+        tipo: "episodios",
+        variable: "CCD_EPISODIOS",
+        archivo: "episodios.js",
+        cabecera: "/* Café Con Dos — episodios\n   Generado con writers/episodio-writer.html. Puedes editarlo a mano,\n   pero es más fácil (y seguro) usar el writer. */\n",
+        textos: { nuevo: "Nuevo episodio" },
+        extraLista: function (d) {
+          var s = d.serie && (CFG.series || []).find(function (x) { return x.id === d.serie; });
+          return s ? "· " + s.nombre : (d.numero ? "· #" + d.numero : "");
+        },
+        campos: [
+          { key: "titulo", type: "text", label: "Título del episodio", required: true, max: 120, placeholder: "Ej: Pintar sin pedir permiso" },
+          { key: "id", type: "slug", desde: "titulo", label: "Link", prefijo: "episodio.html?id=", hint: "Se crea solo con el título. No lo cambies después de publicar, porque los links compartidos dejarían de funcionar." },
+          { key: "fecha", type: "date", label: "Fecha", required: true, ancho: "tercio" },
+          { key: "numero", type: "number", label: "Número", ancho: "tercio", hint: "Episodio o capítulo." },
+          { key: "duracion", type: "text", label: "Duración", ancho: "tercio", placeholder: "54 min" },
+          { key: "serie", type: "select", label: "¿Es parte de una serie?", ancho: "medio",
+            options: function () { return [{ v: "", l: "No, es un episodio normal" }].concat((CFG.series || []).map(function (s) { return { v: s.id, l: s.nombre }; })); },
+            hint: "Si eliges Entre Elementos, el número es el del capítulo dentro de la serie." },
+          { key: "youtube", type: "youtube", label: "Video de YouTube", ancho: "medio", placeholder: "https://www.youtube.com/watch?v=…", hint: "Pega el link del video. La miniatura sale sola." },
+          { key: "spotify", type: "spotify", label: "Episodio en Spotify", placeholder: "https://open.spotify.com/episode/…", hint: "En Spotify: los tres puntos del episodio › Compartir › Copiar enlace. Opcional." },
+          { key: "resumen", type: "corto", label: "Resumen corto", required: true, max: 220, placeholder: "Una o dos frases que den ganas de verlo.", hint: "Sale en las tarjetas, en el email a los suscriptores y cuando se comparte el link." },
+          { key: "temas", type: "temas", label: "Temas", required: true, hint: "Elige los que apliquen. Sirven para los filtros de episodios." },
+          { key: "invitados", type: "lineas", label: "Invitados", rows: 2, placeholder: "Nombre | A qué se dedica | link a su Instagram (opcional)",
+            hint: "Uno por línea, separando con | (la rayita vertical).",
+            parse: function (l) { var p = l.split("|").map(function (x) { return x.trim(); }); return p[0] ? { nombre: p[0], rol: p[1] || "", link: p[2] || "" } : null; },
+            format: function (i) { return [i.nombre, i.rol, i.link].filter(function (x, k) { return x || k < 2; }).join(" | ").replace(/ \| $/, ""); } },
+          { key: "momentos", type: "lineas", label: "Momentos del episodio", rows: 5, placeholder: "00:00 Bienvenida\n04:30 Cómo empezó todo\n21:15 La pregunta difícil",
+            hint: "Un momento por línea: el minuto y lo que pasa. En la página, al tocarlos el video salta a ese punto.",
+            parse: tiempo, format: function (m) { return m.t + " " + m.texto; } },
+          { key: "notas", type: "md", label: "Notas del episodio", rows: 12, hint: "Todo lo que se mencionó: libros, canciones, cuentas, links. Usa los botones de arriba para dar formato." },
+        ],
+        nuevo: function (data) {
+          var max = 0;
+          data.forEach(function (d) { if (!d.serie && d.numero > max) max = d.numero; });
+          return { numero: max + 1, temas: [] };
+        },
+        tarjeta: function (item) { return '<div class="rejilla" style="grid-template-columns:1fr">' + CCD.epCard(item) + "</div>"; },
+        cuerpo: function (item) {
+          var h = "";
+          if (item.momentos && item.momentos.length) h += "<h3>Momentos</h3><ul>" + item.momentos.map(function (m) { return "<li><b>" + CCD.esc(m.t) + "</b> " + CCD.esc(m.texto) + "</li>"; }).join("") + "</ul>";
+          if (item.notas) h += "<h3>Notas del episodio</h3>" + CCD.md(item.notas);
+          return '<div class="prosa">' + h + "</div>";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

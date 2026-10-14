@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>try{var t=localStorage.getItem("ccd-tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Writer de artículos | Café Con Dos</title>
+  <link rel="icon" type="image/png" href="../images/favicon-48.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="writer.css">
+</head>
+<body class="writer" data-base="../">
+  <header class="w-top">
+    <div class="wrap">
+      <a href="../index.html" class="logo"><img class="logo-oscuro" src="../images/logo.png" alt="Café Con Dos"><img class="logo-claro" src="../images/logo-claro.png" alt=""></a>
+      <h1>Writer de artículos</h1>
+      <nav aria-label="Writers">
+        <a href="articulo-writer.html" aria-current="page">Writer de artículos</a>
+        <a href="episodio-writer.html">Writer de episodios</a>
+        <a href="../index.html" target="_blank" rel="noopener">Ver el sitio</a>
+      </nav>
+    </div>
+  </header>
+  <div class="wrap">
+    <details class="w-ayuda">
+      <summary>Cómo publicar (léelo la primera vez)</summary>
+      <ol>
+        <li>Abre este archivo desde la carpeta del sitio (doble clic, o desde tu servidor local). Lo que ya está publicado aparece en la lista de la izquierda.</li>
+        <li>Toca <b>Nuevo artículo</b> o elige uno de la lista para editarlo. La vista previa de la derecha muestra cómo se va a ver.</li>
+        <li>Elige la <b>sección</b>: Historias y entrevistas, Cultura y descubrimientos, Opiniones y perspectivas, o Sobremesa. Todo sale en Explorar; lo de Sobremesa sale además en su propia página.</li>
+        <li>Si lo escribiste en inglés, elige <b>English</b> en Idioma: sale con la etiqueta EN y se puede filtrar.</li>
+        <li>Cuando termines, toca <b>Agregar a la lista</b> (o <b>Guardar cambios</b>). Puedes hacer varios seguidos.</li>
+        <li>Toca <b>Descargar articulos.js</b> en la barra de abajo y reemplaza <code>data/articulos.js</code> en la carpeta del sitio. Si el artículo tiene foto, copia la foto a <code>images/articulos/</code>.</li>
+        <li>Haz commit y push. En un par de minutos está en vivo, y GitHub actualiza solo el feed del newsletter (feed.xml) y el sitemap.</li>
+        <li>Si cierras la página sin descargar, el writer guarda un borrador en este navegador y te ofrece recuperarlo la próxima vez.</li>
+        <li>Una fecha en el futuro sirve para programar: súbelo cuando quieras y no aparece en el sitio ni en el email hasta ese día. GitHub revisa cada mañana, así que no hay que volver a subir nada.</li>
+      </ol>
+    </details>
+  </div>
+  <div id="writer"></div>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/textos.js"></script>
+  <script src="../data/episodios.js"></script>
+  <script src="../data/articulos.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="writer.js"></script>
+  <script>
+    (function () {
+      var CFG = window.CCD_CONFIG;
+      CCDWriter({
+        tipo: "articulos",
+        variable: "CCD_ARTICULOS",
+        archivo: "articulos.js",
+        cabecera: "/* Café Con Dos — artículos (Explorar y Sobremesa)\n   Generado con writers/articulo-writer.html. Puedes editarlo a mano,\n   pero es más fácil (y seguro) usar el writer. */\n",
+        textos: { nuevo: "Nuevo artículo" },
+        extraLista: function (d) {
+          var s = (CFG.secciones || []).find(function (x) { return x.id === d.seccion; });
+          return (s ? "· " + (s.corto || s.nombre) : "") + (d.idioma === "en" ? " · EN" : "");
+        },
+        campos: [
+          { key: "titulo", type: "text", label: "Título", required: true, max: 120 },
+          { key: "id", type: "slug", desde: "titulo", label: "Link", prefijo: "entrada.html?id=", hint: "Se crea solo con el título. No lo cambies después de publicar, porque los links compartidos dejarían de funcionar." },
+          { key: "fecha", type: "date", label: "Fecha", required: true, ancho: "tercio" },
+          { key: "seccion", type: "select", label: "Sección", ancho: "tercio",
+            options: function () { return (CFG.secciones || []).map(function (s) { return { v: s.id, l: s.nombre }; }); } },
+          { key: "idioma", type: "select", label: "Idioma", ancho: "tercio",
+            options: function () { return [{ v: "es", l: "Español" }, { v: "en", l: "English" }]; } },
+          { key: "autor", type: "select", label: "Escrito por", ancho: "medio",
+            options: function () { return (CFG.hosts || []).map(function (a) { return { v: a.id, l: a.nombre }; }); } },
+          { key: "episodio", type: "select", label: "Episodio relacionado", ancho: "medio",
+            options: function () { return [{ v: "", l: "Ninguno" }].concat((window.CCD_EPISODIOS || []).slice().sort(function (a, b) { return String(b.fecha).localeCompare(String(a.fecha)); }).map(function (e) { return { v: e.id, l: e.titulo }; })); },
+            hint: "Sale una tarjeta del episodio al final." },
+          { key: "resumen", type: "corto", label: "Resumen", required: true, max: 200, hint: "Una o dos frases. Sale en las tarjetas, en Google, en el email a los suscriptores y cuando se comparte el link." },
+          { key: "portada", type: "imagen", label: "Foto de portada (recomendada)", placeholder: "images/articulos/mi-foto.jpg", hint: "Copia la foto a la carpeta <code>images/articulos/</code> y escribe aquí su ruta. Mejor horizontal y de menos de 400 KB. Sin foto, se usa un bloque con los colores de la sección." },
+          { key: "portadaAlt", type: "text", label: "Descripción de la foto", max: 160, placeholder: "Ej: La artista pintando un mural en la Zona Colonial", hint: "Para personas que usan lectores de pantalla y para Google Imágenes. Describe lo que se ve." },
+          { key: "temas", type: "temas", label: "Temas", hint: "Sirven para los filtros de Explorar y Sobremesa." },
+          { key: "personas", type: "lineas", label: "Personas en esta historia (opcional)", rows: 2, placeholder: "Nombre | A qué se dedica | link a su Instagram o web",
+            hint: "Para entrevistas y perfiles. Una por línea, separando con | (la rayita vertical).",
+            parse: function (l) { var p = l.split("|").map(function (x) { return x.trim(); }); return p[0] ? { nombre: p[0], rol: p[1] || "", link: p[2] || "" } : null; },
+            format: function (i) { return [i.nombre, i.rol, i.link].filter(function (x, k) { return x || k < 2; }).join(" | ").replace(/ \| $/, ""); } },
+          { key: "cuerpo", type: "md", label: "Texto", rows: 18, required: true, hint: "Escribe normal. Deja una línea en blanco entre párrafos. Para fotos dentro del texto: <code>![descripción](images/articulos/foto.jpg)</code>" },
+          { key: "destacado", type: "checkbox", label: "Destacar en la portada", hint: "El más nuevo marcado sale grande arriba en Inicio. Si no marcas ninguno, sale el más reciente." },
+        ],
+        nuevo: function () { return { autor: (CFG.hosts[0] || {}).id, seccion: ((CFG.secciones || [])[0] || {}).id, idioma: "es", temas: [] }; },
+        tarjeta: function (item) { return '<div class="art-rejilla" style="grid-template-columns:1fr">' + CCD.artCard(item) + "</div>"; },
+        cuerpo: function (item) { return '<div class="prosa"' + (item.idioma === "en" ? ' lang="en"' : "") + ">" + CCD.md(item.cuerpo) + "</div>"; }
+      });
+    })();
+  </script>
+</body>
+</html>
