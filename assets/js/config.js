@@ -1,29 +1,31 @@
 /* ==========================================================================
    CAFÉ CON DOS — Configuración del sitio
    --------------------------------------------------------------------------
-   Este es el único archivo que hace falta tocar para cambiar links,
-   secciones, temas, series, la host y los servicios (newsletter, contacto,
-   comentarios, redes). Los artículos y los episodios NO van aquí:
-   los artículos se escriben en el editor de Sanity (ver "sanity" abajo)
+   Ajustes que usan el sitio, el feed, el editor (Sanity) y los writers:
+   secciones, temas, series, la host como autora y los servicios
+   (newsletter, contacto, comentarios, redes, editor).
+
+   Los TEXTOS de las páginas no están aquí: están en cada .html, y el
+   encabezado, el pie y el newsletter en la carpeta partes/ (README,
+   "Cómo editar el sitio"). Los artículos se escriben en el editor de Sanity
    y los episodios con writers/episodio-writer.html.
    ========================================================================== */
 
 window.CCD_CONFIG = {
   nombre: "Café Con Dos",
-  categoria: "Plataforma independiente",
 
-  // Dominio final del sitio (sin "/" al final). Se usa para feed.xml,
-  // sitemap.xml y los links para compartir. CÁMBIALO cuando tengas dominio.
+  // Dominio del sitio (sin "/" al final). Se usa para feed.xml, sitemap.xml,
+  // los links para compartir y el botón "Ver en la página" del editor.
   siteUrl: "https://cafecondos.com",
 
-  // El lema va en inglés a propósito (así lo usa la marca).
+  // Lema y descripción del feed (lo que leen Brevo y las apps de RSS).
+  // En las páginas están escritos en cada .html.
   lema: "Stories worth discovering. Perspectives worth sharing.",
-  // Descripción oficial (Nosotros, portada, Google y el feed).
   descripcion: "Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.",
-  descripcionLarga: "Desde creadores emergentes y descubrimientos culturales hasta opiniones y curiosidades cotidianas, abrimos espacio para voces que merecen ser escuchadas e historias que vale la pena compartir.",
-  descripcionCierre: "Con las conversaciones como punto de partida y la curiosidad como motor, Café Con Dos es un lugar para descubrir y encontrarnos en distintas perspectivas.",
-  descripcionCorta: "Una plataforma independiente para descubrir historias, explorar perspectivas y conectar a través de la cultura.",
 
+  // Redes: las usan los botones de cada episodio y la sección "En redes".
+  // Los íconos del pie, de Contacto y de Inicio tienen sus links escritos en
+  // partes/pie.html, contacto.html e index.html.
   redes: {
     instagram: "https://www.instagram.com/cafecondos",
     youtube: "https://www.youtube.com/@Caf%C3%A9ConDos",
@@ -32,43 +34,33 @@ window.CCD_CONFIG = {
     discord: "" // déjalo vacío para que no aparezca
   },
 
-  // El reproductor de "Del archivo" en la portada muestra los videos del canal,
-  // aunque todavía no hayas cargado episodios en el writer.
-  youtubeCanalId: "UCPRbU8H8o3t6AbEBQMLCSkA",
-
-  // Quién está detrás (sale en "Nosotros" y como autora de los artículos).
-  // Puedes agregar más personas copiando el bloque { ... }.
+  // La autora de los artículos (sale en cada artículo, con su foto).
+  // Su bio de "Nosotros" está en nosotros.html.
   hosts: [
     {
       id: "allie",
       nombre: "Allie Tolentino",
       rol: "Host y creadora",
-      foto: "", // ej: "images/allie.jpg" — si está vacío se usa la taza
-      bio: "Escribe aquí una bio corta y en primera persona: quién eres, por qué empezaste Café Con Dos y hacia dónde va la plataforma.",
-      instagram: "https://www.instagram.com/cafecondos"
+      foto: "" // ej: "images/allie.jpg" — si está vacío se usa la taza
     }
   ],
 
-  // Secciones de Explorar. Cada artículo va en una (se elige en el writer).
-  //   nombre: como sale en Explorar y en el artículo
-  //   corto:  la etiqueta de las tarjetas de la portada
-  //   descripcion: sale en Explorar al elegir la sección y en "Nosotros"
-  //   frase y cta: el texto de su tarjeta en "Empieza a explorar" (portada)
+  // Secciones de Explorar. Cada artículo va en una (se elige en el editor).
+  //   nombre: como sale en Explorar, en el artículo y en el editor
+  //   corto:  la etiqueta del bloque de color de un artículo sin foto
+  //   descripcion: sale en Explorar al elegir la sección
   // Sobremesa es una sección más, pero también tiene su propia página.
   // Si cambias un id, los artículos que ya lo usan dejan de encontrarlo.
+  // (Las tarjetas de "Empieza a explorar" de Inicio están en index.html.)
   secciones: [
     { id: "historias", nombre: "Historias y entrevistas", corto: "Personas",
-      descripcion: "Perfiles de creadores, historias personales y conversaciones que muestran lo que pasa detrás del trabajo.",
-      frase: "Conoce las voces que están marcando lo que viene.", cta: "Explorar perfiles" },
+      descripcion: "Perfiles de creadores, historias personales y conversaciones que muestran lo que pasa detrás del trabajo." },
     { id: "cultura", nombre: "Cultura y descubrimientos", corto: "Cultura",
-      descripcion: "Entretenimiento, tendencias, proyectos creativos y temas que vale la pena explorar.",
-      frase: "Descubre algo que no sabías que necesitabas.", cta: "Explorar cultura" },
+      descripcion: "Entretenimiento, tendencias, proyectos creativos y temas que vale la pena explorar." },
     { id: "opiniones", nombre: "Opiniones y perspectivas", corto: "Perspectivas",
-      descripcion: "Miradas pensadas sobre temas culturales y cotidianos que invitan a reflexionar y a conversar.",
-      frase: "Siempre hay más en la historia.", cta: "Leer opiniones" },
+      descripcion: "Miradas pensadas sobre temas culturales y cotidianos que invitan a reflexionar y a conversar." },
     { id: "sobremesa", nombre: "Sobremesa", corto: "Sobremesa",
-      descripcion: "Las conversaciones más personales, las reflexiones y el contenido más libre.",
-      frase: "Lo que se queda conversando cuando ya nadie se levanta.", cta: "Leer la Sobremesa" }
+      descripcion: "Las conversaciones más personales, las reflexiones y el contenido más libre." }
   ],
 
   // Temas (los "tags"). Sirven para filtrar en Explorar, Sobremesa y Episodios.
@@ -102,10 +94,10 @@ window.CCD_CONFIG = {
         pégalo abajo en action.
      Mientras action esté vacío, el formulario funciona en "modo prueba". */
   boletin: {
-    action: "",
+    action: "https://07526b8f.sibforms.com/serve/MUIFAE7pfQpeuqqSa3A840dp59Ho7wv_eP2g4TX3F6-fPjX-71I1yYogk6nADwFSNcL4c5eE5FGay1w2JFWeFHPSqxnDyxXVYB6uCqKZrt0ZzJqUfXGWnJoMdjMaNYUM_tg8hZCCoqQAeldcFzhiSd499ugg1-oBT9E1G_DPlkf_2KayDWHd8dBcE7woCL3-7umoqnSB7ccVeuJF8A==",
     campoEmail: "EMAIL",
     campoNombre: "FIRSTNAME",
-    popupEnInicio: true,    // ventanita de suscripción en la portada
+    popupEnInicio: true,    // ventanita de suscripción en Inicio
     popupSegundos: 25
   },
 
@@ -117,16 +109,15 @@ window.CCD_CONFIG = {
     email: ""
   },
 
-  /* Sección "En redes" de la portada (feed de Instagram + perfil de TikTok)
-     Está apagada (mostrar: false) porque no está en el diseño nuevo de la
-     portada. Cámbiala a true para que salga después de "Del archivo".
+  /* Sección "En redes" de Inicio (feed de Instagram + perfil de TikTok)
+     Está apagada: para mostrarla, quítale la palabra hidden a la sección
+     id="en-redes" en index.html.
      Instagram: crea una cuenta gratis en https://behold.so, conecta el
      Instagram de Café Con Dos, crea un "JSON feed" y pega aquí su link
      (se ve así: https://feeds.behold.so/XXXXXXXX). Mientras esté vacío,
      sale una tarjeta para seguir la cuenta.
      TikTok: usa el embed oficial; solo hace falta el usuario (sin @). */
   enRedes: {
-    mostrar: false,
     instagramFeed: "",
     instagramPosts: 6,
     tiktokUsuario: "cafecondos"

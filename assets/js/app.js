@@ -1,9 +1,16 @@
 /* ==========================================================================
-   CAFÉ CON DOS — lógica del sitio
-   Cada página HTML tiene <body data-page="..."> y este archivo dibuja el
-   encabezado, el pie y el contenido de esa página a partir de:
-     assets/js/config.js   (links, temas, series, host)
-     data/articulos.js     (lo genera writers/articulo-writer.html)
+   CAFÉ CON DOS — lo que se mueve en el sitio
+   Los textos y el diseño de cada página están en su archivo .html (y el
+   encabezado, el pie y el newsletter en la carpeta partes/). Este archivo
+   solo hace lo que el HTML no puede hacer solo:
+     - las listas que cambian: artículos, episodios, filtros, búsqueda,
+       la página de cada artículo y de cada episodio, el destacado de Inicio;
+     - los botones: menú del celular, tema claro/oscuro, formularios,
+       ventanita del newsletter, comentarios, burbuja "Invítanos un café".
+   Lee:
+     assets/js/config.js   (secciones, temas, series, servicios)
+     assets/js/textos.js   (los textos que usa este archivo)
+     data/articulos.js     (artículos; en el sitio publicado incluye los del editor)
      data/episodios.js     (lo genera writers/episodio-writer.html)
    ========================================================================== */
 (function () {
@@ -136,17 +143,7 @@
     '<img class="img-oscura ' + (cls || "") + '" src="' + BASE + 'images/taza.png" alt="">' +
     '<img class="img-clara ' + (cls || "") + '" src="' + BASE + 'images/taza-clara.png" alt="">';
 
-  const REDES = [
-    ["youtube", "YouTube"], ["spotify", "Spotify"], ["instagram", "Instagram"], ["tiktok", "TikTok"], ["discord", "Discord"]
-  ];
-  const redesActivas = () => REDES.filter(([k]) => CFG.redes && CFG.redes[k]);
   const icono = (k) => BASE + "images/socials/" + k + ".webp";
-
-  function redesHTML() {
-    return '<ul class="redes">' + redesActivas().map(([k, n]) =>
-      '<li><a href="' + esc(CFG.redes[k]) + '" target="_blank" rel="noopener" aria-label="' + n + '"><img src="' + icono(k) + '" alt="" width="22" height="22"></a></li>'
-    ).join("") + "</ul>";
-  }
 
   function numeroEp(ep) {
     if (ep.serie && ep.numero) return t("ep.capitulo") + " " + ep.numero;
@@ -223,8 +220,6 @@
   }
 
   /* ---------------- artículos (Explorar y Sobremesa) ---------------- */
-  const ARROW_SVG = '<svg class="flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const linkFlecha = (href, txt, cls) => '<a class="link-flecha' + (cls ? " " + cls : "") + '" href="' + href + '">' + txt + ARROW_SVG + "</a>";
   const minutos = (a) => Math.max(1, Math.round(String(a.cuerpo || "").split(/\s+/).filter(Boolean).length / 200));
   // Los artículos en inglés llevan lang="en" (lectores de pantalla, Google y traductores).
   const langAttr = (a) => (a.idioma && a.idioma !== "es" ? ' lang="' + esc(a.idioma) + '"' : "");
@@ -272,10 +267,6 @@
       (a.resumen && !(a.seccion === "sobremesa" && !a.portada) ? '<p class="art-resumen"' + langAttr(a) + ">" + esc(a.resumen) + "</p>" : "") +
       artMeta(a) + "</div></article>";
   }
-  function cabezaNum(num, kicker, titulo, sub) {
-    return '<header class="cabeza-num"><p class="kicker"><span class="kicker-num">' + num + "</span> — " + kicker + "</p>" +
-      "<h2>" + titulo + "</h2>" + (sub ? '<p class="cabeza-sub">' + sub + "</p>" : "") + "</header>";
-  }
   function jsonLD(obj) {
     const s = document.createElement("script");
     s.type = "application/ld+json";
@@ -283,89 +274,54 @@
     document.head.appendChild(s);
   }
 
-  /* ---------------- encabezado y pie ---------------- */
-  const NAV = [
-    ["inicio", "index.html", "nav.inicio"],
-    ["explorar", "explorar.html", "nav.explorar"],
-    ["episodios", "episodios.html", "nav.episodios"],
-    ["sobremesa", "sobremesa.html", "nav.sobremesa"],
-    ["nosotros", "nosotros.html", "nav.nosotros"],
-    ["contacto", "contacto.html", "nav.contacto"]
-  ];
-
-  function renderHeader(page) {
+  /* ---------------- encabezado y pie (el HTML está en partes/) ---------------- */
+  function montarEncabezado(page) {
     const el = $("#site-header");
     if (!el) return;
+    // El link de la página actual queda subrayado.
     let activo = { episodio: "episodios" }[page] || page;
     if (page === "entrada") {
       const a = ARTS.find((x) => x.id === params.get("id"));
       activo = a && a.seccion === "sobremesa" ? "sobremesa" : "explorar";
     }
-    el.className = "site-header";
-    el.innerHTML =
-      '<a class="skip" href="#main">' + t("skip") + "</a>" +
-      '<div class="wrap">' +
-      '<a class="logo" href="' + BASE + 'index.html" aria-label="Café Con Dos, ' + t("nav.inicio") + '">' +
-      '<img class="logo-oscuro" src="' + BASE + 'images/logo.png" alt="Café Con Dos" width="334" height="258">' +
-      '<img class="logo-claro" src="' + BASE + 'images/logo-claro.png" alt="" width="334" height="258"></a>' +
-      '<button class="btn-menu" type="button" aria-expanded="false" aria-controls="nav-principal" aria-label="' + t("nav.menu") + '">' +
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>' +
-      '<nav class="nav" id="nav-principal" aria-label="Principal">' +
-      NAV.map(([id, href, key]) => '<a href="' + BASE + href + '"' + (id === activo ? ' aria-current="page"' : "") + (id === "sobremesa" ? ' translate="no"' : "") + ">" + t(key) + "</a>").join("") +
-      '<a class="btn solo-movil" href="#suscribete" data-ir-boletin>' + t("nav.suscribete") + "</a>" +
-      "</nav>" +
-      '<div class="header-acciones">' +
-      '<a class="btn-redondo btn-buscar" href="' + BASE + 'explorar.html#buscar" aria-label="' + t("nav.buscar") + '" title="' + t("nav.buscar") + '">' +
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></a>' +
-      '<button class="btn-redondo btn-tema" type="button">' +
-      '<svg class="ico-luna" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>' +
-      '<svg class="ico-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
-      "</button>" +
-      '<a class="btn" href="#suscribete" data-ir-boletin>' + t("nav.suscribete") + "</a>" +
-      "</div></div>";
+    $$("[data-nav]", el).forEach((a) => { if (a.dataset.nav === activo) a.setAttribute("aria-current", "page"); });
 
+    // Menú del celular
     const btn = $(".btn-menu", el), nav = $(".nav", el);
-    btn.addEventListener("click", () => {
+    if (btn && nav) btn.addEventListener("click", () => {
       const open = nav.classList.toggle("is-open");
       btn.setAttribute("aria-expanded", open);
-      btn.setAttribute("aria-label", open ? t("nav.cerrar") : t("nav.menu"));
+      btn.setAttribute("aria-label", open ? btn.dataset.cerrar || "Cerrar menú" : btn.dataset.abrir || "Menú");
     });
+
+    // Tema claro / oscuro
     const btnTema = $(".btn-tema", el);
-    const etiquetarTema = () => {
-      const txt = temaActual() === "dark" ? t("tema.claro") : t("tema.oscuro");
-      btnTema.setAttribute("aria-label", txt);
-      btnTema.title = txt;
-      pintarColorBarra();
-    };
-    btnTema.addEventListener("click", () => {
-      const nuevo = temaActual() === "dark" ? "light" : "dark";
-      raiz.dataset.theme = nuevo;
-      store("ccd-tema", nuevo);
+    if (btnTema) {
+      const etiquetarTema = () => {
+        const txt = temaActual() === "dark" ? btnTema.dataset.aClaro : btnTema.dataset.aOscuro;
+        if (txt) { btnTema.setAttribute("aria-label", txt); btnTema.title = txt; }
+        pintarColorBarra();
+      };
+      btnTema.addEventListener("click", () => {
+        const nuevo = temaActual() === "dark" ? "light" : "dark";
+        raiz.dataset.theme = nuevo;
+        store("ccd-tema", nuevo);
+        etiquetarTema();
+      });
+      if (window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", etiquetarTema);
       etiquetarTema();
-    });
-    if (window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", etiquetarTema);
-    etiquetarTema();
+    }
     window.addEventListener("scroll", () => el.classList.toggle("is-scrolled", window.scrollY > 8), { passive: true });
   }
 
-  function renderFooter() {
-    const el = $("#site-footer");
-    if (!el) return;
-    const year = new Date().getFullYear();
-    el.className = "site-footer";
-    el.innerHTML = '<div class="wrap">' +
-      '<img class="logo-pie" src="' + BASE + 'images/logo-claro.png" alt="Café Con Dos" width="334" height="258">' +
-      '<p class="pie-lema" lang="en">' + esc(loc(CFG, "lema")) + "</p>" +
-      (CFG.categoria ? '<p class="pie-cat">' + esc(CFG.categoria) + "</p>" : "") +
-      '<p class="pie-siguenos">' + t("pie.siguenos") + "</p>" + redesHTML() +
-      '<nav aria-label="' + t("nav.menu") + '"><ul class="pie-links">' +
-      NAV.map(([id, href, key]) => '<li><a href="' + BASE + href + '"' + (id === "sobremesa" ? ' translate="no"' : "") + ">" + t(key) + "</a></li>").join("") +
-      '<li><a href="#suscribete" data-ir-boletin>' + t("bol.titulo") + "</a></li></ul></nav>" +
-      '<p class="pie-final">© ' + year + ' <span translate="no">Café Con Dos</span> · ' + t("pie.final") + "</p>" +
-      "</div>";
+  function montarPie() {
+    // El año del © se pone solo.
+    $$("[data-ano]").forEach((el) => (el.textContent = new Date().getFullYear()));
   }
 
-  /* ---------------- boletín ---------------- */
+  /* ---------------- boletín ----------------
+     El bloque de las páginas está en partes/boletin.html. Aquí se arma solo
+     el formulario de la ventanita (con los textos de textos.js). */
   function boletinHTML(opts) {
     opts = opts || {};
     return '<form class="form-boletin" novalidate>' +
@@ -385,7 +341,8 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const aviso = $(".aviso", form), btn = $("button[type=submit]", form);
-      const email = form.email.value.trim(), nombre = form.nombre.value.trim();
+      const textoBoton = btn.dataset.texto || (btn.dataset.texto = btn.textContent);
+      const email = form.email.value.trim(), nombre = (form.nombre ? form.nombre.value : "").trim();
       const mostrar = (msg, error) => { aviso.textContent = msg; aviso.hidden = false; aviso.classList.toggle("aviso--error", !!error); };
       if (form.website.value) return; // bot
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { mostrar(t("bol.invalido"), true); form.email.focus(); return; }
@@ -406,20 +363,13 @@
       } catch (err) {
         mostrar(t("bol.error"), true);
       } finally {
-        btn.disabled = false; btn.textContent = t("bol.enviar");
+        btn.disabled = false; btn.textContent = textoBoton;
       }
     });
   }
 
-  function renderBoletines() {
-    $$("[data-boletin]").forEach((el, i) => {
-      el.id = el.id || "suscribete";
-      el.innerHTML = '<div class="wrap"><div class="burbuja burbuja--naranja boletin">' +
-        '<div><img class="taza" src="' + BASE + 'images/taza.png" alt="" width="92">' +
-        "<h2>" + t("bol.titulo") + "</h2><p>" + t("bol.sub") + "</p></div>" +
-        boletinHTML({ pref: "bol" + i }) + "</div></div>";
-      montarBoletin($("form", el));
-    });
+  function montarBoletines() {
+    $$("[data-boletin] form").forEach((form) => montarBoletin(form));
     // botones "Suscríbete": baja al formulario más cercano o abre la ventanita
     $$("[data-ir-boletin]").forEach((a) => a.addEventListener("click", (e) => {
       const destino = $("[data-boletin]");
@@ -598,13 +548,13 @@
 
   function montarEnRedes(root, R) {
     const conTT = !!R.tiktokUsuario;
-    root.innerHTML = '<div class="wrap"><div class="seccion-cabeza"><div><h2>' + t("redes.titulo") + "</h2><p>" + t("redes.sub") + "</p></div></div>" +
-      '<div class="en-redes' + (conTT ? "" : " en-redes--solo") + '">' +
-      '<div class="en-redes-col"><div class="ig-caja"></div>' +
+    const caja = $(".en-redes", root);
+    if (!caja) return;
+    caja.classList.toggle("en-redes--solo", !conTT);
+    caja.innerHTML = '<div class="en-redes-col"><div class="ig-caja"></div>' +
       (R.instagramFeed ? '<a class="btn btn--hueco" href="' + esc(CFG.redes.instagram) + '" target="_blank" rel="noopener"><span class="btn-icono"><img src="' + icono("instagram") + '" alt=""></span>@' + esc(IG_USUARIO) + "</a>" : "") +
       "</div>" +
-      (conTT ? '<div class="en-redes-col"><div class="tt-caja">' + ttHTML(R.tiktokUsuario) + "</div></div>" : "") +
-      "</div></div>";
+      (conTT ? '<div class="en-redes-col"><div class="tt-caja">' + ttHTML(R.tiktokUsuario) + "</div></div>" : "");
     // Sin feed de Instagram, la tarjeta de "seguir" se muestra de una vez.
     if (!R.instagramFeed) igVacio($(".ig-caja", root));
     cuandoSeVea(root, () => {
@@ -703,79 +653,34 @@
   const PAGES = {};
 
   PAGES.inicio = function () {
-    // héroe: el lema + el artículo destacado (el más nuevo marcado como destacado)
+    // La foto de la derecha: el artículo más nuevo marcado "Destacar en la portada"
+    // (o el más nuevo, si ninguno está marcado). Sin artículos se queda lo del HTML.
     const destacado = ARTS.find((a) => a.destacado) || ARTS[0];
-    const lema = String(loc(CFG, "lema")).replace(/\.\s+/g, ".\n").split("\n");
-    const hero = $("#hero");
-    if (hero) {
-      hero.innerHTML = '<div class="wrap">' +
-        '<div class="hero-texto"><p class="kicker">' + t("hero.kicker") + "</p>" +
-        '<h1 class="hero-lema" lang="en">' + lema.map((x, i) => '<span class="lema-' + (i + 1) + '">' + esc(x) + "</span>").join(" ") + "</h1>" +
-        '<p class="lead">' + t("hero.sub") + "</p>" +
-        '<p class="hero-botones"><a class="btn" href="explorar.html">' + t("hero.cta") + ' <span aria-hidden="true">→</span></a></p></div>' +
-        (destacado
-          ? '<figure class="hero-figura"><a class="art-img" href="' + postUrl(destacado) + '" tabindex="-1" aria-hidden="true">' + artPortada(destacado, { prioridad: true, marca: true }) + "</a>" +
-            '<figcaption><span class="kicker">' + t("hero.destacado") + " · " + esc((seccionDe(destacado.seccion) || {}).nombre || "") + "</span>" +
-            '<a href="' + postUrl(destacado) + '"' + langAttr(destacado) + ">" + esc(destacado.titulo) + "</a></figcaption></figure>"
-          : '<figure class="hero-figura"><div class="art-portada"><div class="art-gen art-gen--marca">' + tazaHTML() + "</div></div></figure>") +
-        "</div>";
+    const fig = $("[data-destacado]");
+    if (fig && destacado) {
+      fig.innerHTML = '<a class="art-img" href="' + postUrl(destacado) + '" tabindex="-1" aria-hidden="true">' + artPortada(destacado, { prioridad: true, marca: true }) + "</a>" +
+        '<figcaption><span class="kicker">' + t("hero.destacado") + " · " + esc((seccionDe(destacado.seccion) || {}).nombre || "") + "</span>" +
+        '<a href="' + postUrl(destacado) + '"' + langAttr(destacado) + ">" + esc(destacado.titulo) + "</a></figcaption>";
     }
 
-    // 01 — Empieza a explorar: una puerta por sección + las conversaciones del podcast
-    const exp = $("#explorar-inicio");
-    if (exp) {
-      const puerta = (o) => '<article class="puerta">' +
-        '<a class="art-img" href="' + o.href + '" tabindex="-1" aria-hidden="true">' + o.img + "</a>" +
-        '<p class="kicker">' + esc(o.kicker) + "</p><h3>" + esc(o.frase) + "</h3>" + linkFlecha(o.href, esc(o.cta), "puerta-link") + "</article>";
-      const puertas = SECCIONES.filter((s) => s.id !== "sobremesa").map((s) => {
-        const a = ARTS.find((x) => x.seccion === s.id);
-        return puerta({
-          href: seccionUrl(s.id),
-          img: a ? artPortada(a, { conTitulo: true }) : '<div class="art-portada">' + portadaGen("sec-" + esc(s.id), '<span class="art-gen-sec">' + esc(s.corto || s.nombre) + "</span>") + "</div>",
-          kicker: s.corto || s.nombre, frase: s.frase || s.nombre, cta: s.cta || t("nav.explorar")
-        });
-      });
-      const ep = EPS[0];
-      const epImg = ep && (ep.portada || ep.youtube)
-        ? '<div class="art-portada"><img src="' + esc(ep.portada ? BASE + ep.portada : ytThumb(ep.youtube)) + '" alt="" loading="lazy" width="480" height="360">' + (ep.ejemplo ? badgeEjemplo() : "") + "</div>"
-        : '<div class="art-portada">' + portadaGen("sec-podcast", '<span class="art-gen-tit">' + esc(ep ? ep.titulo : "Café Con Dos") + "</span>") + (ep && ep.ejemplo ? badgeEjemplo() : "") + "</div>";
-      puertas.push(puerta({ href: "episodios.html", img: epImg, kicker: t("home.conversaciones"), frase: t("home.conversaciones.frase"), cta: t("home.conversaciones.cta") }));
-      exp.innerHTML = '<div class="wrap">' + cabezaNum(t("home.explorar.num"), t("home.explorar.kicker"), t("home.explorar.titulo"), t("home.explorar.sub")) +
-        '<div class="puertas">' + puertas.join("") + "</div></div>";
-    }
+    // Empieza a explorar: cada tarjeta lleva la foto del artículo más nuevo de su
+    // sección; la del podcast, la del episodio más nuevo.
+    $$("[data-puerta]").forEach((el) => {
+      const id = el.dataset.puerta;
+      if (id === "podcast") {
+        const ep = EPS[0];
+        if (ep && (ep.portada || ep.youtube)) {
+          el.innerHTML = '<div class="art-portada"><img src="' + esc(ep.portada ? BASE + ep.portada : ytThumb(ep.youtube)) + '" alt="" loading="lazy" width="480" height="360">' + (ep.ejemplo ? badgeEjemplo() : "") + "</div>";
+        }
+        return;
+      }
+      const a = ARTS.find((x) => x.seccion === id);
+      if (a) el.innerHTML = artPortada(a, { conTitulo: true });
+    });
 
-    // 02 — Del archivo: el reproductor con los videos del canal
-    const arch = $("#archivo");
-    if (arch) {
-      const uploads = CFG.youtubeCanalId ? "UU" + CFG.youtubeCanalId.slice(2) : "";
-      arch.innerHTML = '<div class="wrap">' + cabezaNum(t("home.archivo.num"), t("home.archivo.kicker"), t("home.archivo.titulo"), t("home.archivo.sub")) +
-        '<div class="archivo">' +
-        '<div class="hero-mesa"><svg class="vapor" viewBox="0 0 72 110" aria-hidden="true"><path d="M36 106c-16-14 16-24 0-42S52 34 36 4"/><path d="M52 98c-8-8 8-14 0-24"/></svg>' +
-        '<div class="burbuja"><div class="video">' +
-        (uploads ? '<iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=' + uploads + '&rel=0" title="' + t("home.archivo.reproductor") + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' : "") +
-        "</div></div></div>" +
-        '<div class="archivo-texto"><p class="kicker" translate="no">' + t("home.archivo.etiqueta") + "</p><h3>" + t("home.archivo.frase") + "</h3><p>" + t("home.archivo.texto") + "</p>" +
-        '<div class="hero-botones"><a class="btn" href="episodios.html">' + t("home.archivo.todos") + ' <span aria-hidden="true">→</span></a>' +
-        '<a class="btn btn--hueco" href="' + esc(CFG.redes.youtube) + '" target="_blank" rel="noopener"><span class="btn-icono"><img src="' + icono("youtube") + '" alt=""></span>YouTube</a>' +
-        '<a class="btn btn--hueco" href="' + esc(CFG.redes.spotify) + '" target="_blank" rel="noopener"><span class="btn-icono"><img src="' + icono("spotify") + '" alt=""></span>Spotify</a>' +
-        "</div></div></div></div>";
-    }
-
-    // 03 — Un poco más de nosotros + ¿Tienes una historia que compartir?
-    const nos = $("#nosotros-inicio");
-    if (nos) {
-      nos.innerHTML = '<div class="wrap">' +
-        '<div class="tarjeta-oscura"><p class="kicker"><span class="kicker-num">' + t("home.nosotros.num") + "</span> — " + t("home.nosotros.kicker") + "</p>" +
-        "<h2>" + t("home.nosotros.titulo") + "</h2><p>" + esc(loc(CFG, "descripcion")) + "</p>" + linkFlecha("nosotros.html", t("home.nosotros.cta")) + "</div>" +
-        '<div class="historia-cta"><h2>' + t("home.historia.titulo") + "</h2><p>" + t("home.historia.sub") + "</p>" + linkFlecha("contacto.html", t("home.historia.cta")) + "</div>" +
-        "</div>";
-    }
-
-    // En redes (opcional: config.enRedes.mostrar)
+    // En redes: solo si se le quitó "hidden" a la sección en index.html.
     const red = $("#en-redes");
-    const R = CFG.enRedes || {};
-    if (red && !R.mostrar) red.remove();
-    else if (red) montarEnRedes(red, R);
+    if (red && !red.hidden) montarEnRedes(red, CFG.enRedes || {});
 
     programarPopup();
   };
@@ -1057,67 +962,16 @@
     });
   };
 
-  PAGES.nosotros = function () {
-    const root = $("#nosotros");
-    const formatos = SECCIONES.map((s) => ({ href: seccionUrl(s.id), n: s.nombre, d: s.descripcion || s.frase || "", sob: s.id === "sobremesa" }))
-      .concat([{ href: BASE + "episodios.html", n: t("nos.formatos.audio"), d: t("nos.formatos.audio.txt") }]);
-    root.innerHTML = '<div class="wrap">' +
-      '<section class="nos-intro"><p class="manifiesto">' + esc(loc(CFG, "descripcion")) + "</p>" +
-      (CFG.descripcionLarga ? '<p class="lead">' + esc(CFG.descripcionLarga) + "</p>" : "") +
-      (CFG.descripcionCierre ? '<p class="lead">' + esc(CFG.descripcionCierre) + "</p>" : "") + "</section>" +
-
-      '<section class="nos-bloque"><div class="nos-2col"><h2>' + t("nos.historia.titulo") + '</h2><div><div class="prosa">' + md(t("nos.historia")) + "</div>" +
-      '<p class="nos-cierre">' + t("nos.historia.cierre") + "</p></div></div></section>" +
-
-      '<section class="nos-bloque"><h2>' + t("nos.nombre.titulo") + '</h2><ul class="nos-lista nos-lista--3">' +
-      ["cafe", "conv", "desc"].map((k) => "<li><h3>" + t("nos.nombre." + k) + "</h3><p>" + t("nos.nombre." + k + ".txt") + "</p></li>").join("") + "</ul></section>" +
-
-      '<section class="nos-bloque"><div class="tarjeta-oscura nos-mision">' +
-      '<div><p class="kicker">' + t("nos.proposito.titulo") + '</p><p class="nos-frase">' + t("nos.proposito") + "</p></div>" +
-      '<div><p class="kicker">' + t("nos.promesa.titulo") + '</p><p class="nos-frase">' + t("nos.promesa") + "</p></div></div></section>" +
-
-      '<section class="nos-bloque"><h2>' + t("nos.sentir.titulo") + '</h2><ul class="nos-lista nos-lista--4">' +
-      [1, 2, 3, 4].map((i) => '<li><p class="kicker">' + t("nos.sentir." + i) + '</p><p class="nos-cita">' + t("nos.sentir." + i + ".txt") + "</p></li>").join("") + "</ul></section>" +
-
-      '<section class="nos-bloque"><h2>' + t("nos.formatos.titulo") + '</h2><ul class="nos-formatos">' +
-      formatos.map((f) => '<li><a href="' + f.href + '"><b' + (f.sob ? ' translate="no"' : "") + ">" + esc(f.n) + "</b><span>" + esc(f.d) + "</span>" + ARROW_SVG + "</a></li>").join("") + "</ul></section>" +
-
-      '<section class="nos-bloque"><h2>' + t("nos.host") + "</h2>" +
-      (CFG.hosts || []).map((h) => '<div class="host">' +
-        '<div class="host-foto">' + (h.foto ? '<img src="' + esc(BASE + h.foto) + '" alt="' + esc(h.nombre) + '">' : tazaHTML("taza-mini")) + "</div>" +
-        "<div><h3>" + esc(h.nombre) + '</h3><p class="rol">' + esc(loc(h, "rol")) + '</p><div class="prosa"><p>' + esc(loc(h, "bio")) + "</p></div>" +
-        (h.instagram ? '<p><a href="' + esc(h.instagram) + '" target="_blank" rel="noopener">Instagram</a></p>' : "") + "</div></div>").join("") +
-      "</section>" +
-
-      '<section class="nos-bloque"><div class="burbuja nos-cta"><h2>' + t("nos.cta.titulo") + "</h2><p>" + t("nos.cta.sub") + '</p><a class="btn btn--naranja" href="contacto.html">' + t("nos.cta.boton") + "</a></div></section>" +
-      "</div>";
-  };
-
   PAGES.contacto = function () {
     const root = $("#contacto");
+    if (!root) return;
     const alias = { invitado: "entrevista" }; // links viejos (?motivo=invitado)
     const motivo = alias[params.get("motivo")] || params.get("motivo") || "";
     const C = CFG.contacto || {};
-    const TIPOS = ["entrevista", "propuesta", "colab"];
-    root.innerHTML = '<div class="wrap">' +
-      '<ul class="con-tipos">' + TIPOS.map((k) => '<li><button type="button" class="con-tipo" data-motivo="' + k + '" aria-pressed="' + (k === motivo) + '">' +
-        "<b>" + t("con.tipo." + k) + "</b><span>" + t("con.tipo." + k + ".txt") + "</span></button></li>").join("") + "</ul>" +
-      '<div class="contacto">' +
-      '<form class="form-contacto" novalidate>' +
-      '<div class="campo"><label for="c-nombre">' + t("con.nombre") + '</label><input type="text" id="c-nombre" name="nombre" autocomplete="name" required></div>' +
-      '<div class="campo"><label for="c-email">' + t("con.email") + '</label><input type="email" id="c-email" name="email" autocomplete="email" required></div>' +
-      '<div class="campo"><label for="c-motivo">' + t("con.motivo") + '</label><select id="c-motivo" name="motivo">' +
-      ["entrevista", "propuesta", "colab", "saludo", "otro"].map((k) => '<option value="' + k + '"' + (k === motivo ? " selected" : "") + ">" + t("con.motivo." + k) + "</option>").join("") +
-      "</select></div>" +
-      '<div class="campo"><label for="c-mensaje">' + t("con.mensaje") + '</label><textarea id="c-mensaje" name="mensaje" required></textarea></div>' +
-      '<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">' +
-      '<button class="btn" type="submit" style="justify-self:start">' + t("con.enviar") + "</button>" +
-      '<p class="aviso" role="status" hidden></p></form>' +
-      "<aside><h2>" + t("con.redes") + '</h2><ul class="redes-lista">' +
-      redesActivas().map(([k, n]) => '<li><a href="' + esc(CFG.redes[k]) + '" target="_blank" rel="noopener"><span class="ico"><img src="' + icono(k) + '" alt=""></span>' + n + "</a></li>").join("") +
-      "</ul></aside></div></div>";
-
     const form = $("form", root), aviso = $(".aviso", form), btn = $("button[type=submit]", form);
+    const textoBoton = btn.textContent;
+    // ?motivo=colab (por ejemplo) deja ese motivo elegido.
+    if (Array.from(form.motivo.options).some((o) => o.value === motivo)) form.motivo.value = motivo;
     // Las tres tarjetas de arriba eligen el motivo y llevan al formulario.
     const marcar = () => $$(".con-tipo", root).forEach((b) => b.setAttribute("aria-pressed", b.dataset.motivo === form.motivo.value));
     $$(".con-tipo", root).forEach((b) => b.addEventListener("click", () => {
@@ -1126,6 +980,7 @@
       setTimeout(() => form.nombre.focus({ preventScroll: true }), 350);
     }));
     form.motivo.addEventListener("change", marcar);
+    if (motivo) marcar();
     const mostrar = (msg, err) => { aviso.textContent = msg; aviso.hidden = false; aviso.classList.toggle("aviso--error", !!err); };
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -1142,7 +997,7 @@
           if (!r.ok) throw new Error(r.status);
           form.reset(); mostrar(t("con.ok"));
         } catch (err) { mostrar(t("con.error"), true); }
-        finally { btn.disabled = false; btn.textContent = t("con.enviar"); }
+        finally { btn.disabled = false; btn.textContent = textoBoton; }
       } else if (C.email) {
         location.href = "mailto:" + C.email + "?subject=" + encodeURIComponent("[Café Con Dos] " + motivoTxt) + "&body=" + encodeURIComponent(mensaje + "\n\n— " + nombre + " (" + email + ")");
       } else {
@@ -1151,14 +1006,24 @@
     });
   };
 
-  PAGES["404"] = function () {
-    noEncontrado($("#main"), t("404.titulo"), t("404.sub"), "index.html", t("404.cta"));
+  /* ---------------- Muy pronto (loading.html): el botón del sonido ----------------
+     Los navegadores no dejan que una página suene sola al abrirla: el sonido
+     arranca cuando la persona toca el botón. */
+  PAGES.pronto = function () {
+    const btn = $("[data-sonido]"), audio = $("#sonido-cafe");
+    if (!btn || !audio) return;
+    const etiqueta = $("span", btn);
+    audio.volume = 0.7;
+    const pintar = (sonando) => {
+      btn.setAttribute("aria-pressed", sonando);
+      if (etiqueta) etiqueta.textContent = sonando ? btn.dataset.pausa : btn.dataset.play;
+    };
+    btn.addEventListener("click", () => {
+      if (audio.paused) audio.play().then(() => pintar(true)).catch(() => pintar(false));
+      else { audio.pause(); pintar(false); }
+    });
+    audio.addEventListener("pause", () => pintar(false));
   };
-
-  /* ---------------- textos fijos con data-texto (vienen de textos.js) ---------------- */
-  function traducirFijos() {
-    $$("[data-texto]").forEach((el) => (el.textContent = t(el.dataset.texto)));
-  }
 
   /* ---------------- Burbuja "Invítanos un café" ---------------- */
   function renderApoyo() {
@@ -1220,11 +1085,10 @@
 
   const page = document.body && document.body.dataset.page;
   if (page) {
-    renderHeader(page);
-    renderFooter();
-    traducirFijos();
+    montarEncabezado(page);
+    montarPie();
     if (PAGES[page]) PAGES[page]();
-    renderBoletines();
+    montarBoletines();
     renderApoyo();
   }
 })();

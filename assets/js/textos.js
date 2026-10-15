@@ -1,59 +1,22 @@
 /* ==========================================================================
-   Todos los textos de la interfaz, en un solo lugar.
-   El sitio es en español, con el spanglish natural de la marca. El lema
-   ("Stories worth discovering...") se queda en inglés a propósito.
-   Quien quiera leerlo en otro idioma puede usar la traducción automática
-   de su navegador (Chrome y Safari la ofrecen solos).
+   Textos que usa JavaScript: filtros, búsquedas, tarjetas, la página de cada
+   artículo y episodio, mensajes de los formularios, la ventanita del
+   newsletter, los comentarios y la burbuja "Invítanos un café".
+
+   Los textos fijos de cada página NO están aquí: están en su archivo .html
+   (index.html, nosotros.html, contacto.html…). El encabezado, el pie y el
+   bloque del newsletter están en la carpeta partes/.
    ========================================================================== */
 
 window.CCD_TEXTOS = {
-  // Encabezado y menú
-  "nav.inicio": "Inicio",
+  // Migas (el camino de links arriba de un artículo o episodio)
   "nav.explorar": "Explorar",
   "nav.episodios": "Episodios",
-  "nav.sobremesa": "Sobremesa",
-  "nav.nosotros": "Nosotros",
-  "nav.contacto": "Contacto",
-  "nav.suscribete": "Suscríbete",
-  "nav.buscar": "Buscar",
-  "nav.menu": "Menú",
-  "nav.cerrar": "Cerrar menú",
-  "skip": "Saltar al contenido",
-  "tema.oscuro": "Cambiar a dark mode",
-  "tema.claro": "Cambiar a light mode",
 
-  // Portada (Inicio)
-  "hero.kicker": "Cultura · Creatividad · Personas · Ideas",
-  "hero.sub": "Un espacio para la cultura, la creatividad, las personas y las ideas.",
-  "hero.cta": "Descubre lo que te mueve",
+  // Inicio: la etiqueta del artículo destacado
   "hero.destacado": "Destacado",
-  "home.explorar.num": "01",
-  "home.explorar.kicker": "Empieza a explorar",
-  "home.explorar.titulo": "La curiosidad te queda bien.",
-  "home.explorar.sub": "Ideas, personas e historias que te invitan a mirar un poco más de cerca.",
-  "home.conversaciones": "Conversaciones",
-  "home.conversaciones.frase": "Cada voz tiene una historia.",
-  "home.conversaciones.cta": "Conoce a nuestros invitados",
-  "home.archivo.num": "02",
-  "home.archivo.kicker": "Del archivo",
-  "home.archivo.titulo": "Todavía vale la pena escucharlo.",
-  "home.archivo.sub": "Las conversaciones donde empezó todo. Vuelve a los episodios de Café Con Dos en tu plataforma favorita.",
-  "home.archivo.etiqueta": "Café Con Dos · El podcast",
-  "home.archivo.frase": "Las buenas conversaciones nunca terminan del todo.",
-  "home.archivo.texto": "Mira los episodios anteriores y elige dónde verlos o escucharlos.",
-  "home.archivo.todos": "Todos los episodios",
-  "home.archivo.reproductor": "Videos de Café Con Dos en YouTube",
-  "home.nosotros.num": "03",
-  "home.nosotros.kicker": "Un poco más de nosotros",
-  "home.nosotros.titulo": "Más que una conversación.",
-  "home.nosotros.cta": "Conócenos",
-  "home.historia.titulo": "¿Tienes una historia que compartir?",
-  "home.historia.sub": "Siempre nos da curiosidad conocer a las personas, los proyectos y las ideas que vale la pena descubrir.",
-  "home.historia.cta": "Hablemos",
 
-  // En redes (sección opcional de la portada)
-  "redes.titulo": "En redes",
-  "redes.sub": "Lo que pasa entre publicación y publicación: clips, fotos y behind the scenes.",
+  // En redes (sección opcional de Inicio): tarjetas de seguir
   "redes.ig.seguir": "Seguir en Instagram",
   "redes.ig.vacio": "Fotos, clips y behind the scenes.",
   "redes.tt.seguir": "Ver en TikTok",
@@ -62,9 +25,7 @@ window.CCD_TEXTOS = {
   "redes.carrusel": "Varias fotos",
 
   // Explorar
-  "exp.kicker": "Todo el contenido editorial",
   "exp.titulo": "Explorar",
-  "exp.sub": "Artículos, entrevistas, opiniones y descubrimientos culturales. Todo lo que publicamos, en un solo lugar.",
   "exp.todo": "Todo",
   "exp.secciones": "Secciones",
   "exp.buscar": "Buscar por título, persona o tema",
@@ -91,14 +52,11 @@ window.CCD_TEXTOS = {
   "ep.siguiente": "Episodio siguiente",
   "ep.noencontrado": "No encontramos ese episodio.",
   "ep.noencontrado.sub": "Puede que el link haya cambiado. Mira el archivo completo de episodios.",
-  "ep.video.pronto": "El video de este episodio todavía no tiene link.",
   "ep.ejemplo": "Ejemplo",
   "ep.nuevo": "Nuevo",
   "ep.verYoutube": "Ver en YouTube",
   "ep.escucharSpotify": "Escuchar en Spotify",
-  "lista.kicker": "El archivo",
   "lista.titulo": "Episodios",
-  "lista.sub": "El archivo de Café Con Dos: cada conversación que ha pasado por la mesa, con links directos a YouTube y Spotify.",
   "lista.buscar": "Buscar por título, invitado o tema",
   "lista.serie": "Serie",
   "lista.serie.todas": "Todas",
@@ -111,9 +69,7 @@ window.CCD_TEXTOS = {
   "lista.resultado": "episodio",
 
   // Sobremesa
-  "sob.kicker": "Una sección con identidad propia",
   "sob.titulo": "Sobremesa",
-  "sob.sub": "La sobremesa es ese rato después de comer en el que nadie se levanta porque la conversación está buena. Aquí van las conversaciones más personales, las reflexiones y lo que se quedó dando vueltas.",
   "sob.por": "Por",
   "sob.vacio": "Todavía no hay posts con ese tema.",
 
@@ -124,76 +80,21 @@ window.CCD_TEXTOS = {
   "art.noencontrado": "No encontramos ese post.",
   "art.volver": "Volver a Explorar",
 
-  // Nosotros
-  "nos.kicker": "Nosotros",
-  "nos.titulo": "Más que una conversación.",
-  "nos.historia.titulo": "Nuestra historia",
-  "nos.historia": "Café Con Dos nació como un podcast: conversaciones con artistas y creadores sobre lo que los inspira y cómo le dan forma a sus proyectos. Hoy crece más allá de ese formato sin dejar atrás el espíritu que lo hizo reconocible.\n\nLa marca se convierte en un hogar para historias, ideas, personas y perspectivas, contadas a través de distintos formatos.\n\nEl café es el punto de encuentro. La conversación es el intercambio de ideas. Y ese intercambio puede llevarte a descubrir a una persona, un proyecto, una historia o una perspectiva que quizás nunca habrías conocido.",
-  "nos.historia.cierre": "Café Con Dos es más que un lugar donde dos personas conversan. Es un lugar donde una conversación puede llevarte a descubrir algo nuevo.",
-  "nos.nombre.titulo": "Lo que evoca el nombre",
-  "nos.nombre.cafe": "El café",
-  "nos.nombre.cafe.txt": "Un lugar para hacer una pausa, encontrarse, sentirse bienvenido y seguir con curiosidad.",
-  "nos.nombre.conv": "La conversación",
-  "nos.nombre.conv.txt": "Un intercambio de ideas, perspectivas, preguntas y experiencias.",
-  "nos.nombre.desc": "El descubrimiento",
-  "nos.nombre.desc.txt": "Una persona, un proyecto, una historia o un punto de vista que vale la pena conocer.",
-  "nos.proposito.titulo": "Nuestro propósito",
-  "nos.proposito": "Conectar personas, ideas y cultura a través de historias y conversaciones que despierten la curiosidad.",
-  "nos.promesa.titulo": "Nuestra promesa",
-  "nos.promesa": "Cada visita debería dejarte algo para descubrir, pensar o compartir.",
-  "nos.sentir.titulo": "Lo que queremos que te lleves",
-  "nos.sentir.1": "Descubrimiento",
-  "nos.sentir.1.txt": "“Encontré algo —o a alguien— que no conocía.”",
-  "nos.sentir.2": "Conversación",
-  "nos.sentir.2.txt": "“Esto me dio algo interesante para pensar o conversar.”",
-  "nos.sentir.3": "Comunidad",
-  "nos.sentir.3.txt": "“Aquí hay personas y perspectivas con las que conecto.”",
-  "nos.sentir.4": "Cultura",
-  "nos.sentir.4.txt": "“Esto me ayuda a explorar lo que me importa desde otro ángulo.”",
-  "nos.formatos.titulo": "Lo que vas a encontrar",
-  "nos.formatos.audio": "Audio y video",
-  "nos.formatos.audio.txt": "El archivo del podcast, clips y los formatos que vengan, con el mismo espíritu editorial.",
-  "nos.host": "Quién está detrás",
-  "nos.cta.titulo": "¿Tienes una historia que compartir?",
-  "nos.cta.sub": "Creadores, propuestas editoriales y marcas: nos encanta conocer a quienes están haciendo cosas que vale la pena contar.",
-  "nos.cta.boton": "Escríbenos",
-
-  // Contacto
-  "con.kicker": "Contacto",
-  "con.titulo": "Hablemos",
-  "con.sub": "Un punto de entrada para creadores que quieren contar su historia, personas con propuestas editoriales y marcas interesadas en colaborar.",
-  "con.tipo.entrevista": "Creadores",
-  "con.tipo.entrevista.txt": "¿Estás haciendo algo que vale la pena contar? Queremos conocer tu historia.",
-  "con.tipo.propuesta": "Propuestas editoriales",
-  "con.tipo.propuesta.txt": "Una idea, un artículo o un tema que merece una mirada más de cerca.",
-  "con.tipo.colab": "Marcas",
-  "con.tipo.colab.txt": "Collabs con marcas que comparten nuestra curiosidad por la cultura y las personas.",
-  "con.nombre": "Tu nombre",
-  "con.email": "Tu email",
-  "con.motivo": "¿De qué se trata?",
-  "con.motivo.entrevista": "Soy creador/a y quiero contar mi historia",
-  "con.motivo.propuesta": "Tengo una propuesta editorial",
-  "con.motivo.colab": "Collab de marca",
-  "con.motivo.saludo": "Solo quiero saludar",
-  "con.motivo.otro": "Otra cosa",
-  "con.mensaje": "Mensaje",
+  // Contacto: mensajes del formulario
   "con.faltaNombre": "Escribe tu nombre.",
   "con.faltaMensaje": "Escribe tu mensaje.",
-  "con.enviar": "Enviar mensaje",
   "con.enviando": "Enviando…",
   "con.ok": "Mensaje enviado. Gracias por escribir.",
   "con.error": "No se pudo enviar el mensaje. Prueba de nuevo o escríbenos por Instagram.",
   "con.sinform": "El formulario todavía no está conectado. Mientras tanto, escríbenos por Instagram.",
-  "con.redes": "También en redes",
 
-  // Newsletter (Café para llevar)
-  "bol.titulo": "Café para llevar",
+  // Newsletter: la ventanita de Inicio y los mensajes del formulario
   "bol.sub": "Te llega un email cuando publicamos algo nuevo: historias, opiniones, Sobremesa o un episodio. Cero spam.",
   "bol.nombre": "Nombre",
   "bol.email": "Email",
   "bol.enviar": "Suscribirme",
   "bol.enviando": "Suscribiendo…",
-  "bol.ok": "¡Listo! Revisa tu inbox para confirmar la suscripción.",
+  "bol.ok": "¡Listo, ya estás en la lista! Te escribimos cuando haya algo nuevo.",
   "bol.error": "No se pudo completar la suscripción. Revisa el email e inténtalo otra vez.",
   "bol.invalido": "Escribe un email válido, por ejemplo nombre@gmail.com.",
   "bol.prueba": "Modo prueba: el formulario aún no está conectado a Brevo, así que no se guardó el email.",
@@ -225,14 +126,9 @@ window.CCD_TEXTOS = {
   "apoyo.dev.sub": "cmramirez.dev hizo este sitio.",
   "apoyo.cerrar": "Cerrar",
 
-  // Compartir, pie de página y otros
+  // Compartir y otros
   "comp.titulo": "Compartir",
   "comp.copiar": "Copiar link",
   "comp.copiado": "Link copiado",
-  "pie.siguenos": "Síguenos y escucha en:",
-  "pie.final": "Independiente por naturaleza.",
-  "404.titulo": "Esta taza está vacía",
-  "404.sub": "La página que buscas no existe o cambió de lugar.",
-  "404.cta": "Volver al inicio",
   "fecha.locale": "es-DO"
 };

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>try{var t=localStorage.getItem("ccd-tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <title>Café Con Dos | Stories worth discovering. Perspectives worth sharing.</title>
+  <meta name="description" content="Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.">
+  <meta name="theme-color" content="#E9CAB0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#221415" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="images/favicon-48.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Café Con Dos">
+  <meta property="og:locale" content="es_DO">
+  <meta property="og:title" content="Café Con Dos | Stories worth discovering. Perspectives worth sharing.">
+  <meta property="og:description" content="Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.">
+  <meta property="og:image" content="https://cafecondos.com/images/og-cafe-con-dos.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://cafecondos.com/#org",
+      "name": "Café Con Dos",
+      "url": "https://cafecondos.com/",
+      "logo": "https://cafecondos.com/images/logo.png",
+      "description": "Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.",
+      "sameAs": [
+        "https://www.youtube.com/@Caf%C3%A9ConDos",
+        "https://open.spotify.com/show/6z0g9lFACFnK2sxIhj7EOn",
+        "https://www.instagram.com/cafecondos",
+        "https://www.tiktok.com/@cafecondos"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://cafecondos.com/#web",
+      "name": "Café Con Dos",
+      "url": "https://cafecondos.com/",
+      "inLanguage": "es",
+      "publisher": {
+        "@id": "https://cafecondos.com/#org"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://cafecondos.com/explorar.html?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+}
+  </script>
+  <link rel="alternate" type="application/rss+xml" title="Café Con Dos" href="feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="inicio">
+  <!-- parte: encabezado (se edita en partes/encabezado.html) -->
+  <header class="site-header" id="site-header">
+    <a class="skip" href="#main">Saltar al contenido</a>
+    <div class="wrap">
+      <a class="logo" href="index.html" aria-label="Café Con Dos, Inicio">
+        <img class="logo-oscuro" src="images/logo.png" alt="Café Con Dos" width="334" height="258">
+        <img class="logo-claro" src="images/logo-claro.png" alt="" width="334" height="258">
+      </a>
+      <button class="btn-menu" type="button" aria-expanded="false" aria-controls="nav-principal" aria-label="Menú" data-abrir="Menú" data-cerrar="Cerrar menú">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </button>
+      <!-- El menú. data-nav marca el link de la página en la que estás. -->
+      <nav class="nav" id="nav-principal" aria-label="Principal">
+        <a href="index.html" data-nav="inicio">Inicio</a>
+        <a href="explorar.html" data-nav="explorar">Explorar</a>
+        <a href="episodios.html" data-nav="episodios">Episodios</a>
+        <a href="sobremesa.html" data-nav="sobremesa" translate="no">Sobremesa</a>
+        <a href="nosotros.html" data-nav="nosotros">Nosotros</a>
+        <a href="contacto.html" data-nav="contacto">Contacto</a>
+        <a class="btn solo-movil" href="#suscribete" data-ir-boletin>Suscríbete</a>
+      </nav>
+      <div class="header-acciones">
+        <a class="btn-redondo btn-buscar" href="explorar.html#buscar" aria-label="Buscar" title="Buscar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </a>
+        <button class="btn-redondo btn-tema" type="button" aria-label="Cambiar a dark mode" data-a-oscuro="Cambiar a dark mode" data-a-claro="Cambiar a light mode">
+          <svg class="ico-luna" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <svg class="ico-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <a class="btn" href="#suscribete" data-ir-boletin>Suscríbete</a>
+      </div>
+    </div>
+  </header>
+  <!-- /parte: encabezado -->
+
+  <main id="main">
+
+    <!-- ====== Portada: el lema y el artículo destacado ====== -->
+    <section class="hero" id="hero">
+      <div class="wrap">
+        <div class="hero-texto">
+          <h1 class="hero-lema" lang="en">
+            <span class="lema-1">Stories worth discovering.</span>
+            <span class="lema-2">Perspectives worth sharing.</span>
+          </h1>
+          <p class="lead">Un espacio para la cultura, la creatividad, las personas y las ideas.</p>
+          <p class="hero-botones"><a class="btn" href="explorar.html">Descubre lo que te mueve <span aria-hidden="true">→</span></a></p>
+        </div>
+
+        <!-- La foto de la derecha la pone sola el artículo más nuevo marcado
+             "Destacar en la portada" en el editor (su foto, su sección y su título).
+             Mientras no haya ninguno, se ve lo que está aquí adentro: la taza.
+             Para poner una foto fija, cambia las dos <img> por una sola, por ejemplo:
+             <img src="images/portada.jpg" alt="Descripción de la foto"> -->
+        <figure class="hero-figura" data-destacado>
+          <div class="art-portada">
+            <div class="art-gen art-gen--marca">
+              <img class="img-oscura" src="images/taza.png" alt="">
+              <img class="img-clara" src="images/taza-clara.png" alt="">
+            </div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ====== Empieza a explorar: una tarjeta por sección + el podcast ======
+         La imagen de cada tarjeta es la del artículo más nuevo de esa sección
+         (la pone el sitio solo). Mientras no haya, se ve el bloque de colores. -->
+    <section class="seccion seccion--linea" id="explorar-inicio">
+      <div class="wrap">
+        <header class="cabeza">
+          <p class="kicker">Empieza a explorar</p>
+          <h2>La curiosidad te queda bien.</h2>
+          <p class="cabeza-sub">Ideas, personas e historias que te invitan a mirar un poco más de cerca.</p>
+        </header>
+        <div class="puertas">
+          <article class="puerta">
+            <a class="art-img" href="explorar.html?seccion=historias" tabindex="-1" aria-hidden="true" data-puerta="historias">
+              <div class="art-portada"><div class="art-gen sec-historias"><svg viewBox="0 0 40 64" aria-hidden="true"><path d="M20 60c-9-8 9-14 0-24s9-16 0-32"/></svg><span class="art-gen-sec">Personas</span></div></div>
+            </a>
+            <p class="kicker">Personas</p>
+            <h3>Conoce las voces que están marcando lo que viene.</h3>
+            <a class="link-flecha puerta-link" href="explorar.html?seccion=historias">Explorar perfiles<svg class="flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </article>
+          <article class="puerta">
+            <a class="art-img" href="explorar.html?seccion=cultura" tabindex="-1" aria-hidden="true" data-puerta="cultura">
+              <div class="art-portada"><div class="art-gen sec-cultura"><svg viewBox="0 0 40 64" aria-hidden="true"><path d="M20 60c-9-8 9-14 0-24s9-16 0-32"/></svg><span class="art-gen-sec">Cultura</span></div></div>
+            </a>
+            <p class="kicker">Cultura</p>
+            <h3>Descubre algo que no sabías que necesitabas.</h3>
+            <a class="link-flecha puerta-link" href="explorar.html?seccion=cultura">Explorar cultura<svg class="flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </article>
+          <article class="puerta">
+            <a class="art-img" href="explorar.html?seccion=opiniones" tabindex="-1" aria-hidden="true" data-puerta="opiniones">
+              <div class="art-portada"><div class="art-gen sec-opiniones"><svg viewBox="0 0 40 64" aria-hidden="true"><path d="M20 60c-9-8 9-14 0-24s9-16 0-32"/></svg><span class="art-gen-sec">Perspectivas</span></div></div>
+            </a>
+            <p class="kicker">Perspectivas</p>
+            <h3>Siempre hay más en la historia.</h3>
+            <a class="link-flecha puerta-link" href="explorar.html?seccion=opiniones">Leer opiniones<svg class="flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </article>
+          <article class="puerta">
+            <!-- La imagen de esta tarjeta es la del episodio más nuevo. -->
+            <a class="art-img" href="episodios.html" tabindex="-1" aria-hidden="true" data-puerta="podcast">
+              <div class="art-portada"><div class="art-gen sec-podcast"><svg viewBox="0 0 40 64" aria-hidden="true"><path d="M20 60c-9-8 9-14 0-24s9-16 0-32"/></svg><span class="art-gen-tit">Café Con Dos</span></div></div>
+            </a>
+            <p class="kicker">Conversaciones</p>
+            <h3>Cada voz tiene una historia.</h3>
+            <a class="link-flecha puerta-link" href="episodios.html">Conoce a nuestros invitados<svg class="flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== Del archivo: el reproductor de YouTube ====== -->
+    <section class="seccion seccion--linea" id="archivo">
+      <div class="wrap">
+        <header class="cabeza">
+          <p class="kicker">Del archivo</p>
+          <h2>Todavía vale la pena escucharlo.</h2>
+          <p class="cabeza-sub">Las conversaciones donde empezó todo. Vuelve a los episodios de Café Con Dos en tu plataforma favorita.</p>
+        </header>
+        <div class="archivo">
+          <div class="hero-mesa">
+            <svg class="vapor" viewBox="0 0 72 110" aria-hidden="true"><path d="M36 106c-16-14 16-24 0-42S52 34 36 4"/><path d="M52 98c-8-8 8-14 0-24"/></svg>
+            <div class="burbuja">
+              <div class="video">
+                <!-- El reproductor muestra todos los videos del canal, del más nuevo al más viejo
+                     (list=UU… es la lista "Uploads": el ID del canal con UU en vez de UC).
+                     Para mostrar un video fijo, cambia el src por:
+                       https://www.youtube-nocookie.com/embed/ID_DEL_VIDEO?rel=0
+                     (el ID es lo que va después de watch?v= en el link del video).
+                     Nota: abierto desde tu computadora (archivo .html) YouTube muestra
+                     "Error 153"; en cafecondos.com se ve bien. -->
+                <iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=UUPRbU8H8o3t6AbEBQMLCSkA&amp;rel=0" title="Videos de Café Con Dos en YouTube" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+              </div>
+            </div>
+          </div>
+          <div class="archivo-texto">
+            <p class="kicker" translate="no">Café Con Dos · El podcast</p>
+            <h3>Las buenas conversaciones nunca terminan del todo.</h3>
+            <p>Mira los episodios anteriores y elige dónde verlos o escucharlos.</p>
+            <div class="hero-botones">
+              <a class="btn" href="episodios.html">Todos los episodios <span aria-hidden="true">→</span></a>
+              <a class="btn btn--hueco" href="https://www.youtube.com/@Caf%C3%A9ConDos" target="_blank" rel="noopener"><span class="btn-icono"><img src="images/socials/youtube.webp" alt=""></span>YouTube</a>
+              <a class="btn btn--hueco" href="https://open.spotify.com/show/6z0g9lFACFnK2sxIhj7EOn" target="_blank" rel="noopener"><span class="btn-icono"><img src="images/socials/spotify.webp" alt=""></span>Spotify</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== Un poco más de nosotros + ¿Tienes una historia que compartir? ====== -->
+    <section class="seccion seccion--linea" id="nosotros-inicio">
+      <div class="wrap">
+        <div class="tarjeta-oscura">
+          <p class="kicker">Un poco más de nosotros</p>
+          <h2>Más que una conversación.</h2>
+          <p>Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.</p>
+          <a class="link-flecha" href="nosotros.html">Conócenos<svg class="flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+        <div class="historia-cta">
+          <h2>¿Tienes una historia que compartir?</h2>
+          <p>Siempre nos da curiosidad conocer a las personas, los proyectos y las ideas que vale la pena descubrir.</p>
+          <a class="link-flecha" href="contacto.html">Hablemos<svg class="flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== En redes (apagada) ======
+         Fotos de Instagram + perfil de TikTok. Para mostrarla, borra la palabra
+         hidden de la línea de abajo y llena enRedes en config.js (README). -->
+    <section class="seccion seccion--sin-arriba" id="en-redes" hidden>
+      <div class="wrap">
+        <div class="seccion-cabeza"><div>
+          <h2>En redes</h2>
+          <p>Lo que pasa entre publicación y publicación: clips, fotos y behind the scenes.</p>
+        </div></div>
+        <div class="en-redes"></div>
+      </div>
+    </section>
+
+    <!-- parte: boletin (se edita en partes/boletin.html) -->
+    <section class="seccion seccion--boletin" id="suscribete" data-boletin>
+      <div class="wrap">
+        <div class="burbuja burbuja--naranja boletin">
+          <div>
+            <img class="taza" src="images/taza.png" alt="" width="92">
+            <h2>Café para llevar</h2>
+            <p>Te llega un email cuando publicamos algo nuevo: historias, opiniones, Sobremesa o un episodio. Cero spam.</p>
+          </div>
+          <form class="form-boletin" novalidate>
+            <div class="campos">
+              <div class="campo">
+                <label class="sr-only" for="bol-nombre">Nombre</label>
+                <input type="text" id="bol-nombre" name="nombre" autocomplete="given-name" placeholder="Nombre">
+              </div>
+              <div class="campo">
+                <label class="sr-only" for="bol-email">Email</label>
+                <input type="email" id="bol-email" name="email" autocomplete="email" required placeholder="Email">
+              </div>
+            </div>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">
+            <button class="btn" type="submit">Suscribirme</button>
+            <p class="aviso" role="status" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- /parte: boletin -->
+  </main>
+
+  <!-- parte: pie (se edita en partes/pie.html) -->
+  <footer class="site-footer" id="site-footer">
+    <div class="wrap">
+      <img class="logo-pie" src="images/logo-claro.png" alt="Café Con Dos" width="334" height="258">
+      <p class="pie-lema" lang="en">Stories worth discovering. Perspectives worth sharing.</p>
+
+      <p class="pie-siguenos">Síguenos y escucha en:</p>
+      <ul class="redes">
+        <li><a href="https://www.youtube.com/@Caf%C3%A9ConDos" target="_blank" rel="noopener" aria-label="YouTube"><img src="images/socials/youtube.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://open.spotify.com/show/6z0g9lFACFnK2sxIhj7EOn" target="_blank" rel="noopener" aria-label="Spotify"><img src="images/socials/spotify.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.instagram.com/cafecondos" target="_blank" rel="noopener" aria-label="Instagram"><img src="images/socials/instagram.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.tiktok.com/@cafecondos" target="_blank" rel="noopener" aria-label="TikTok"><img src="images/socials/tiktok.webp" alt="" width="22" height="22"></a></li>
+      </ul>
+
+      <nav aria-label="Menú del pie">
+        <ul class="pie-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="explorar.html">Explorar</a></li>
+          <li><a href="episodios.html">Episodios</a></li>
+          <li><a href="sobremesa.html" translate="no">Sobremesa</a></li>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+          <li><a href="#suscribete" data-ir-boletin>Café para llevar</a></li>
+        </ul>
+      </nav>
+
+      <!-- El año (data-ano) se actualiza solo cada enero. -->
+      <p class="pie-final">
+        <span>Independiente por naturaleza.</span>
+        <span>© <span data-ano>2026</span> <span translate="no">Café Con Dos</span></span>
+      </p>
+    </div>
+  </footer>
+  <!-- /parte: pie -->
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/textos.js"></script>
+  <script src="data/articulos.js"></script>
+  <script src="data/episodios.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

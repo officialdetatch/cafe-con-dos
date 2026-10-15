@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <script>try{var t=localStorage.getItem("ccd-tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
-  <title>Café Con Dos | Stories worth discovering. Perspectives worth sharing.</title>
-  <meta name="description" content="Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.">
+  <title>Café Con Dos | Ya casi sube el café</title>
+  <meta name="description" content="Café Con Dos está por servirse: historias, conversaciones y descubrimientos sobre cultura, creatividad, personas e ideas. Déjanos tu email y te avisamos cuando esté listo.">
   <meta name="theme-color" content="#E9CAB0" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#221415" media="(prefers-color-scheme: dark)">
   <link rel="icon" type="image/png" href="images/favicon-48.png">
@@ -14,8 +14,8 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Café Con Dos">
   <meta property="og:locale" content="es_DO">
-  <meta property="og:title" content="Café Con Dos | Stories worth discovering. Perspectives worth sharing.">
-  <meta property="og:description" content="Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.">
+  <meta property="og:title" content="Café Con Dos | Ya casi sube el café">
+  <meta property="og:description" content="Café Con Dos está por servirse: historias, conversaciones y descubrimientos sobre cultura, creatividad, personas e ideas. Déjanos tu email y te avisamos cuando esté listo.">
   <meta property="og:image" content="https://cafecondos.com/images/og-cafe-con-dos.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -62,18 +62,157 @@
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body data-page="inicio">
-  <header id="site-header"></header>
-  <main id="main">
-    <section class="hero" id="hero"></section>
-    <section class="seccion seccion--linea" id="explorar-inicio"></section>
-    <section class="seccion seccion--linea" id="archivo"></section>
-    <section class="seccion seccion--linea" id="nosotros-inicio"></section>
-    <section class="seccion" id="en-redes" style="padding-top:0"></section>
-    <section class="seccion" style="padding-top:0" data-boletin></section>
-  </main>
-  <footer id="site-footer"></footer>
+<body data-page="pronto" class="pagina-pronto">
+  <!-- Página de "muy pronto" (antes del lanzamiento).
+       Para usarla como portada: renombra el index.html de ahora (por ejemplo a
+       index-completo.html, para no perderlo) y luego renombra este archivo a index.html.
+       Para el lanzamiento, haz lo contrario. -->
 
+  <!-- Encabezado corto: solo el logo y el botón de tema (sin menú, porque el sitio
+       todavía no está abierto). -->
+  <header class="site-header" id="site-header">
+    <a class="skip" href="#main">Saltar al contenido</a>
+    <div class="wrap">
+      <span class="logo">
+        <img class="logo-oscuro" src="images/logo.png" alt="Café Con Dos" width="334" height="258">
+        <img class="logo-claro" src="images/logo-claro.png" alt="" width="334" height="258">
+      </span>
+      <div class="header-acciones">
+        <button class="btn-redondo btn-tema" type="button" aria-label="Cambiar a dark mode" data-a-oscuro="Cambiar a dark mode" data-a-claro="Cambiar a light mode">
+          <svg class="ico-luna" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <svg class="ico-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="pronto">
+      <div class="wrap">
+
+        <!-- La moka sirviendo: el dibujo está partido en capas (images/pronto/)
+             para que cada parte se mueva por su cuenta. Las -clara son para dark mode.
+             La animación está en styles.css, sección "Muy pronto". -->
+        <div class="moka-escena" role="img" aria-label="Una moka sirviendo café en una taza">
+          <div class="moka-giro">
+          <img class="capa capa--vapor img-oscura" src="images/pronto/vapor.png" alt="" width="703" height="1039">
+          <img class="capa capa--vapor img-clara" src="images/pronto/vapor-clara.png" alt="" width="703" height="1039">
+          <img class="capa capa--lineas img-oscura" src="images/pronto/lineas.png" alt="" width="703" height="1039">
+          <img class="capa capa--lineas img-clara" src="images/pronto/lineas-clara.png" alt="" width="703" height="1039">
+          <img class="capa capa--moka img-oscura" src="images/pronto/moka.png" alt="" width="703" height="1039">
+          <img class="capa capa--moka img-clara" src="images/pronto/moka-clara.png" alt="" width="703" height="1039">
+          </div>
+          <img class="capa capa--chorro img-oscura" src="images/pronto/chorro.png" alt="" width="703" height="1039">
+          <img class="capa capa--chorro img-clara" src="images/pronto/chorro-clara.png" alt="" width="703" height="1039">
+          <img class="capa capa--gota1 img-oscura" src="images/pronto/gota1.png" alt="" width="703" height="1039">
+          <img class="capa capa--gota1 img-clara" src="images/pronto/gota1-clara.png" alt="" width="703" height="1039">
+          <img class="capa capa--gota2 img-oscura" src="images/pronto/gota2.png" alt="" width="703" height="1039">
+          <img class="capa capa--gota2 img-clara" src="images/pronto/gota2-clara.png" alt="" width="703" height="1039">
+          <img class="capa capa--salpicadura img-oscura" src="images/pronto/salpicadura.png" alt="" width="703" height="1039">
+          <img class="capa capa--salpicadura img-clara" src="images/pronto/salpicadura-clara.png" alt="" width="703" height="1039">
+          <img class="capa capa--taza img-oscura" src="images/pronto/taza.png" alt="" width="703" height="1039">
+          <img class="capa capa--taza img-clara" src="images/pronto/taza-clara.png" alt="" width="703" height="1039">
+        </div>
+
+        <div class="pronto-texto">
+          <p class="kicker">Muy pronto</p>
+          <h1 class="pronto-titulo">
+            <span>Ya casi sube el café.</span>
+            <span class="pronto-titulo-2">¿Te servimos una taza?</span>
+          </h1>
+          <p class="lead">Todavia no esta listo. Pero si nos dejas tu email te avisamos en cuanto esté servido.</p>
+
+          <!-- Formulario del newsletter (Brevo): usa el mismo "action" de config.js -->
+          <div class="pronto-boletin" data-boletin>
+            <form class="form-boletin" novalidate>
+              <div class="campos">
+                <div class="campo">
+                  <label class="sr-only" for="pronto-nombre">Nombre</label>
+                  <input type="text" id="pronto-nombre" name="nombre" autocomplete="given-name" placeholder="Nombre">
+                </div>
+                <div class="campo">
+                  <label class="sr-only" for="pronto-email">Email</label>
+                  <input type="email" id="pronto-email" name="email" autocomplete="email" required placeholder="Email">
+                </div>
+              </div>
+              <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">
+              <button class="btn" type="submit">Avísame</button>
+              <p class="aviso" role="status" hidden></p>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- parte: pie (se edita en partes/pie.html) -->
+  <footer class="site-footer" id="site-footer">
+    <div class="wrap">
+      <img class="logo-pie" src="images/logo-claro.png" alt="Café Con Dos" width="334" height="258">
+      <p class="pie-lema" lang="en">Stories worth discovering. Perspectives worth sharing.</p>
+
+      <p class="pie-siguenos">Síguenos y escucha en:</p>
+      <ul class="redes">
+        <li><a href="https://www.youtube.com/@Caf%C3%A9ConDos" target="_blank" rel="noopener" aria-label="YouTube"><img src="images/socials/youtube.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://open.spotify.com/show/6z0g9lFACFnK2sxIhj7EOn" target="_blank" rel="noopener" aria-label="Spotify"><img src="images/socials/spotify.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.instagram.com/cafecondos" target="_blank" rel="noopener" aria-label="Instagram"><img src="images/socials/instagram.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.tiktok.com/@cafecondos" target="_blank" rel="noopener" aria-label="TikTok"><img src="images/socials/tiktok.webp" alt="" width="22" height="22"></a></li>
+      </ul>
+
+      <nav aria-label="Menú del pie">
+        <ul class="pie-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="explorar.html">Explorar</a></li>
+          <li><a href="episodios.html">Episodios</a></li>
+          <li><a href="sobremesa.html" translate="no">Sobremesa</a></li>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+          <li><a href="#suscribete" data-ir-boletin>Café para llevar</a></li>
+        </ul>
+      </nav>
+
+      <!-- El año (data-ano) se actualiza solo cada enero. -->
+      <p class="pie-final">
+        <span>Independiente por naturaleza.</span>
+        <span>© <span data-ano>2026</span> <span translate="no">Café Con Dos</span></span>
+      </p>
+    </div>
+  </footer>
+  <!-- /parte: pie -->
+
+  <script>
+     const playlist = [
+      "audio/whisky-on-ice.mp3",
+      "audio/iced-coffee.mp3",
+      "audio/Starbucks-girl.mp3",
+      "audio/green-tea.mp3"
+    ];
+    const music = new Audio();
+    music.volume = 0.033;
+    let lastSong = -1;
+
+    function playRandomSong() {
+    let randomSong;
+    do {
+        randomSong = Math.floor(Math.random() * playlist.length);
+    } while (playlist.length > 1 && randomSong === lastSong);
+
+    lastSong = randomSong;
+    music.src = playlist[randomSong];
+
+    music.play().catch(() => {});
+    }
+
+    music.addEventListener("ended", playRandomSong);
+
+    playRandomSong();
+    document.addEventListener("click", () => {
+      if (music.paused) {
+        music.play().catch(() => {});
+      }
+    }, { once: true });
+  </script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/textos.js"></script>
   <script src="data/articulos.js"></script>

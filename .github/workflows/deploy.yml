@@ -52,8 +52,13 @@ jobs:
         run: |
           mkdir _site
           for f in $(ls -A); do
-            case "$f" in .git|.github|_site|scripts|studio|node_modules|README.md|firestore.rules) ;; *) cp -r "$f" _site/ ;; esac
+            case "$f" in .git|.github|_site|scripts|studio|partes|node_modules|README.md|firestore.rules) ;; *) cp -r "$f" _site/ ;; esac
           done
+
+      # Copia partes/ (encabezado, pie, newsletter) dentro de cada página,
+      # por si se editaron sin correr "node scripts/partes.js" antes del push.
+      - name: Copiar el encabezado, el pie y el newsletter en cada página
+        run: node scripts/partes.js _site
 
       # Si Sanity no responde, este paso falla y no se publica nada:
       # el sitio que ya está en línea se queda igual.

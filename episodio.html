@@ -27,12 +27,109 @@
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body data-page="episodio">
-  <header id="site-header"></header>
+  <!-- parte: encabezado (se edita en partes/encabezado.html) -->
+  <header class="site-header" id="site-header">
+    <a class="skip" href="#main">Saltar al contenido</a>
+    <div class="wrap">
+      <a class="logo" href="index.html" aria-label="Café Con Dos, Inicio">
+        <img class="logo-oscuro" src="images/logo.png" alt="Café Con Dos" width="334" height="258">
+        <img class="logo-claro" src="images/logo-claro.png" alt="" width="334" height="258">
+      </a>
+      <button class="btn-menu" type="button" aria-expanded="false" aria-controls="nav-principal" aria-label="Menú" data-abrir="Menú" data-cerrar="Cerrar menú">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </button>
+      <!-- El menú. data-nav marca el link de la página en la que estás. -->
+      <nav class="nav" id="nav-principal" aria-label="Principal">
+        <a href="index.html" data-nav="inicio">Inicio</a>
+        <a href="explorar.html" data-nav="explorar">Explorar</a>
+        <a href="episodios.html" data-nav="episodios">Episodios</a>
+        <a href="sobremesa.html" data-nav="sobremesa" translate="no">Sobremesa</a>
+        <a href="nosotros.html" data-nav="nosotros">Nosotros</a>
+        <a href="contacto.html" data-nav="contacto">Contacto</a>
+        <a class="btn solo-movil" href="#suscribete" data-ir-boletin>Suscríbete</a>
+      </nav>
+      <div class="header-acciones">
+        <a class="btn-redondo btn-buscar" href="explorar.html#buscar" aria-label="Buscar" title="Buscar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </a>
+        <button class="btn-redondo btn-tema" type="button" aria-label="Cambiar a dark mode" data-a-oscuro="Cambiar a dark mode" data-a-claro="Cambiar a light mode">
+          <svg class="ico-luna" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <svg class="ico-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <a class="btn" href="#suscribete" data-ir-boletin>Suscríbete</a>
+      </div>
+    </div>
+  </header>
+  <!-- /parte: encabezado -->
+
   <main id="main">
-    <article id="episodio" style="padding-top:clamp(28px,4vw,48px)"></article>
-    <section class="seccion" style="padding-top:24px" data-boletin></section>
+    <!-- El episodio lo arma el sitio según el ?id= del link. -->
+    <article id="episodio" class="seccion-entrada"></article>
+
+    <!-- parte: boletin (se edita en partes/boletin.html) -->
+    <section class="seccion seccion--boletin" id="suscribete" data-boletin>
+      <div class="wrap">
+        <div class="burbuja burbuja--naranja boletin">
+          <div>
+            <img class="taza" src="images/taza.png" alt="" width="92">
+            <h2>Café para llevar</h2>
+            <p>Te llega un email cuando publicamos algo nuevo: historias, opiniones, Sobremesa o un episodio. Cero spam.</p>
+          </div>
+          <form class="form-boletin" novalidate>
+            <div class="campos">
+              <div class="campo">
+                <label class="sr-only" for="bol-nombre">Nombre</label>
+                <input type="text" id="bol-nombre" name="nombre" autocomplete="given-name" placeholder="Nombre">
+              </div>
+              <div class="campo">
+                <label class="sr-only" for="bol-email">Email</label>
+                <input type="email" id="bol-email" name="email" autocomplete="email" required placeholder="Email">
+              </div>
+            </div>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">
+            <button class="btn" type="submit">Suscribirme</button>
+            <p class="aviso" role="status" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- /parte: boletin -->
   </main>
-  <footer id="site-footer"></footer>
+
+  <!-- parte: pie (se edita en partes/pie.html) -->
+  <footer class="site-footer" id="site-footer">
+    <div class="wrap">
+      <img class="logo-pie" src="images/logo-claro.png" alt="Café Con Dos" width="334" height="258">
+      <p class="pie-lema" lang="en">Stories worth discovering. Perspectives worth sharing.</p>
+
+      <p class="pie-siguenos">Síguenos y escucha en:</p>
+      <ul class="redes">
+        <li><a href="https://www.youtube.com/@Caf%C3%A9ConDos" target="_blank" rel="noopener" aria-label="YouTube"><img src="images/socials/youtube.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://open.spotify.com/show/6z0g9lFACFnK2sxIhj7EOn" target="_blank" rel="noopener" aria-label="Spotify"><img src="images/socials/spotify.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.instagram.com/cafecondos" target="_blank" rel="noopener" aria-label="Instagram"><img src="images/socials/instagram.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.tiktok.com/@cafecondos" target="_blank" rel="noopener" aria-label="TikTok"><img src="images/socials/tiktok.webp" alt="" width="22" height="22"></a></li>
+      </ul>
+
+      <nav aria-label="Menú del pie">
+        <ul class="pie-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="explorar.html">Explorar</a></li>
+          <li><a href="episodios.html">Episodios</a></li>
+          <li><a href="sobremesa.html" translate="no">Sobremesa</a></li>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+          <li><a href="#suscribete" data-ir-boletin>Café para llevar</a></li>
+        </ul>
+      </nav>
+
+      <!-- El año (data-ano) se actualiza solo cada enero. -->
+      <p class="pie-final">
+        <span>Independiente por naturaleza.</span>
+        <span>© <span data-ano>2026</span> <span translate="no">Café Con Dos</span></span>
+      </p>
+    </div>
+  </footer>
+  <!-- /parte: pie -->
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/textos.js"></script>

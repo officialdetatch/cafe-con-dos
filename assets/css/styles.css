@@ -173,6 +173,7 @@ p { margin: 0 0 1em; text-wrap: pretty; }
   color: var(--ink); text-decoration: none; padding: 8px 10px; border-radius: 8px;
 }
 .nav a:hover { color: var(--accent-text); }
+.nav a.btn, .nav a.btn:hover { color: var(--brand-ink); } /* el botón Suscríbete del menú no toma el color de los links */
 .nav a[aria-current="page"] { text-decoration: underline; text-decoration-color: var(--naranja); text-decoration-thickness: 3px; text-underline-offset: 8px; }
 .header-acciones { display: flex; align-items: center; gap: 10px; }
 .btn-redondo {
@@ -199,7 +200,7 @@ p { margin: 0 0 1em; text-wrap: pretty; }
   }
   .nav.is-open { transform: none; opacity: 1; visibility: visible; }
   .nav a { font-size: 1.6rem; padding: 10px 0; border-bottom: 1px solid var(--linea); }
-  .nav .btn { margin-top: 18px; justify-content: center; border-bottom: 2px solid var(--brand); }
+  .nav .btn { margin-top: 18px; justify-content: center; border-bottom: 2px solid var(--brand); padding: 14px 22px; font-weight: 700; }
   .logo img { height: 52px; }
   .site-header .wrap { min-height: 72px; }
 }
@@ -215,7 +216,6 @@ p { margin: 0 0 1em; text-wrap: pretty; }
   color: var(--accent-text); margin: 0 0 10px; line-height: 1.35;
 }
 .kicker > span + span { margin-left: 10px; }
-.kicker-num { font-variant-numeric: tabular-nums; }
 .tag-idioma {
   display: inline-block; font-size: .78rem; letter-spacing: .06em; line-height: 1.4; padding: 0 6px;
   border: 1.5px solid currentColor; border-radius: 6px; color: var(--ink-soft); vertical-align: .08em;
@@ -277,6 +277,11 @@ p { margin: 0 0 1em; text-wrap: pretty; }
 
 /* ---------- secciones ---------- */
 .seccion { padding: clamp(56px, 8vw, 104px) 0; }
+.seccion[hidden] { display: none; }
+.seccion--boletin, .seccion--sin-arriba { padding-top: 0; }
+.seccion-lista { padding-bottom: 80px; }
+.seccion-entrada { padding-top: clamp(28px, 4vw, 48px); }
+.seccion-contacto { padding: 8px 0 104px; }
 .seccion-cabeza { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 32px; margin-bottom: 28px; }
 .seccion-cabeza h2 { margin: 0; }
 .seccion-cabeza p { margin: 8px 0 0; color: var(--ink-soft); max-width: 52ch; }
@@ -286,8 +291,8 @@ p { margin: 0 0 1em; text-wrap: pretty; }
 .page-head .kicker { margin-bottom: 4px; }
 .seccion--linea { padding: 0 0 clamp(56px, 7vw, 88px); }
 .seccion--linea > .wrap > :first-child { border-top: 1px solid var(--linea); padding-top: clamp(36px, 5vw, 56px); }
-.cabeza-num { margin-bottom: clamp(24px, 3.5vw, 36px); }
-.cabeza-num h2 { font-size: clamp(2.2rem, 4.4vw, 3.4rem); margin-bottom: 8px; }
+.cabeza { margin-bottom: clamp(24px, 3.5vw, 36px); }
+.cabeza h2 { font-size: clamp(2.2rem, 4.4vw, 3.4rem); margin-bottom: 8px; }
 .cabeza-sub { color: var(--ink-soft); max-width: 56ch; margin: 0; }
 
 /* ---------- chips de temas ---------- */
@@ -490,6 +495,7 @@ textarea { min-height: 160px; resize: vertical; }
 /* ---------- contacto ---------- */
 .contacto { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); gap: clamp(32px, 6vw, 80px); }
 .form-contacto { display: grid; gap: 18px; max-width: 640px; }
+.form-contacto .btn { justify-self: start; }
 @media (max-width: 860px) { .contacto { grid-template-columns: 1fr; } }
 
 /* ---------- redes ---------- */
@@ -509,7 +515,6 @@ textarea { min-height: 160px; resize: vertical; }
 .site-footer img.logo-pie { height: 92px; width: auto; margin-bottom: 18px; }
 .site-footer p { color: rgba(245, 228, 213, .82); font-size: 1rem; margin: 0; }
 .site-footer .pie-lema { font-family: var(--f-display); font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.7rem); line-height: 1.2; color: var(--crema); max-width: 30ch; }
-.site-footer .pie-cat { font-family: var(--f-display); text-transform: uppercase; letter-spacing: .1em; font-size: .9rem; margin-top: 8px; color: rgba(245, 228, 213, .7); }
 .site-footer .pie-siguenos { font-family: var(--f-display); font-size: 1.1rem; color: var(--crema); margin: 26px 0 10px; }
 .site-footer .redes { justify-content: center; }
 .site-footer .redes a { background: rgba(245, 228, 213, .14); }
@@ -519,6 +524,7 @@ textarea { min-height: 160px; resize: vertical; }
 .site-footer .pie-links a { font-family: var(--f-display); font-size: 1.1rem; text-decoration: none; }
 .site-footer .pie-links a:hover { text-decoration: underline; text-decoration-color: var(--naranja); }
 .site-footer .pie-final { width: 100%; border-top: 1px solid rgba(245, 228, 213, .2); padding-top: 20px; margin-top: 28px; font-size: .95rem; color: rgba(245, 228, 213, .75); }
+.site-footer .pie-final > span { display: block; }
 
 /* ---------- estados vacíos / 404 ---------- */
 .vacio { padding: 40px 0; text-align: left; }
@@ -840,3 +846,109 @@ textarea { min-height: 160px; resize: vertical; }
 
 .nos-intro .manifiesto { font-size: clamp(1.55rem, 3.2vw, 2.45rem); line-height: 1.18; max-width: 30ch; }
 .contacto aside h2 { font-size: clamp(1.8rem, 3vw, 2.3rem); }
+
+/* ---------- Muy pronto (loading.html) ----------
+   La página antes del lanzamiento: la moka sirviendo café. El dibujo está
+   partido en capas (images/pronto/) del mismo tamaño, una encima de la otra.
+   Un ciclo dura 6 s: la moka se inclina, cae el chorro, caen gotas,
+   salpica la taza y la moka vuelve a enderezarse. */
+.pagina-pronto .site-footer nav { display: none; } /* sin el menú del pie mientras el sitio no está abierto */
+.pagina-pronto .header-acciones { margin-left: auto; }
+.pronto { padding: clamp(16px, 4vw, 48px) 0 clamp(56px, 8vw, 104px); }
+.pronto .wrap { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(28px, 6vw, 88px); align-items: center; }
+.moka-escena { position: relative; width: 100%; max-width: 400px; aspect-ratio: 703 / 1039; justify-self: center; }
+.moka-giro, .moka-escena .capa { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+.pronto-titulo { font-size: clamp(2.7rem, 6vw, 5rem); line-height: 1.06; margin: 4px 0 20px; }
+.pronto-titulo span { display: block; }
+.pronto-titulo-2 { color: var(--accent-text); }
+.pronto .lead { max-width: 42ch; margin-bottom: 24px; }
+.pronto-boletin { max-width: 520px; }
+.pronto-boletin .form-boletin { align-self: start; }
+.pronto-boletin input[type="text"], .pronto-boletin input[type="email"] { background: var(--surface-2); color: var(--ink); border-color: var(--linea); }
+.pronto-boletin input:focus { border-color: var(--brand); }
+.pronto-boletin .form-boletin .btn { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.pronto-sonido {
+  display: inline-flex; align-items: center; gap: 10px; margin-top: 26px;
+  background: transparent; color: var(--ink); border: 1.5px solid var(--linea); border-radius: 999px;
+  padding: 9px 18px 9px 12px; font-family: var(--f-display); font-size: 1.05rem; cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.pronto-sonido:hover { border-color: var(--brand); }
+.pronto-sonido svg { width: 22px; height: 22px; flex: none; }
+.pronto-sonido .ondas { opacity: .35; }
+.pronto-sonido[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.pronto-sonido[aria-pressed="true"] .ondas { opacity: 1; }
+@media (max-width: 760px) {
+  .pronto .wrap { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .moka-escena { max-width: 220px; }
+  .pronto-texto { text-align: center; }
+  .pronto .lead { margin-left: auto; margin-right: auto; }
+  .pronto-boletin { margin: 0 auto; text-align: left; }
+  .pronto-boletin .campos { grid-template-columns: 1fr; }
+  .pronto-boletin .form-boletin .btn { justify-self: stretch; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .moka-giro { transform-origin: 41% 50%; animation: moka-servir 6s ease-in-out infinite; }
+  .capa--vapor { transform-origin: 54% 31%; animation: moka-vapor 2.6s ease-in-out infinite alternate; }
+  .capa--lineas { animation: moka-lineas 6s ease-in-out infinite; }
+  .capa--chorro { animation: moka-chorro 6s linear infinite; }
+  .capa--gota1 { animation: moka-gota1 6s ease-in infinite; }
+  .capa--gota2 { animation: moka-gota2 6s ease-in infinite; }
+  .capa--salpicadura { transform-origin: 74% 82%; animation: moka-salpica 6s ease-out infinite; }
+  .pronto-sonido[aria-pressed="true"] .ondas { animation: moka-ondas 1.2s ease-in-out infinite; }
+}
+/* la moka: derecha (descansa) → inclinada sirviendo → derecha otra vez */
+@keyframes moka-servir {
+  0%, 6% { transform: rotate(-14deg); }
+  20%, 78% { transform: rotate(0deg); }
+  92%, 100% { transform: rotate(-14deg); }
+}
+/* el chorro aparece de arriba hacia abajo y, al final, el último chorrito cae */
+@keyframes moka-chorro {
+  0%, 20% { clip-path: inset(46% 0 54% 0); }
+  31%, 80% { clip-path: inset(46% 0 17% 0); }
+  90%, 100% { clip-path: inset(83% 0 17% 0); }
+}
+@keyframes moka-gota1 {
+  0%, 33% { opacity: 0; transform: translateY(-8%); }
+  36% { opacity: 1; }
+  47% { opacity: 1; transform: translateY(17%); }
+  48%, 55% { opacity: 0; transform: translateY(-8%); }
+  58% { opacity: 1; }
+  69% { opacity: 1; transform: translateY(17%); }
+  70%, 100% { opacity: 0; transform: translateY(17%); }
+}
+@keyframes moka-gota2 {
+  0%, 40% { opacity: 0; transform: translateY(-6%); }
+  43% { opacity: 1; }
+  52% { opacity: 1; transform: translateY(10%); }
+  53%, 62% { opacity: 0; transform: translateY(-6%); }
+  65% { opacity: 1; }
+  74% { opacity: 1; transform: translateY(10%); }
+  75%, 100% { opacity: 0; transform: translateY(10%); }
+}
+@keyframes moka-salpica {
+  0%, 31% { opacity: 0; transform: scale(.4); }
+  35% { opacity: 1; transform: scale(1); }
+  42% { opacity: 0; transform: scale(1.1); }
+  47% { opacity: 0; transform: scale(.4); }
+  51% { opacity: 1; transform: scale(1); }
+  58% { opacity: 0; transform: scale(1.1); }
+  64% { opacity: 0; transform: scale(.4); }
+  68% { opacity: 1; transform: scale(1); }
+  76%, 100% { opacity: 0; transform: scale(1.1); }
+}
+/* las rayitas de movimiento solo se ven mientras la moka se mueve */
+@keyframes moka-lineas {
+  0%, 4% { opacity: 0; }
+  10%, 18% { opacity: 1; }
+  24%, 80% { opacity: 0; }
+  85%, 90% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+@keyframes moka-vapor {
+  from { transform: translateX(-1.5%) skewX(-4deg); opacity: .8; }
+  to { transform: translateX(1.5%) skewX(4deg); opacity: 1; }
+}
+@keyframes moka-ondas { 50% { opacity: .35; } }
