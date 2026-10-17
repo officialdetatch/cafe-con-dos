@@ -94,7 +94,7 @@ window.CCD_TEXTOS = {
   "bol.email": "Email",
   "bol.enviar": "Suscribirme",
   "bol.enviando": "Suscribiendo…",
-  "bol.ok": "¡Listo, ya estás en la lista! Te escribimos cuando haya algo nuevo.",
+  "bol.ok": "¡Listo, ya estás en la lista! Te escribimos cuando haya algo nuevo. Recuerda revisar la carpeta de spam ya que el correo pudo haber llegado allí.",
   "bol.error": "No se pudo completar la suscripción. Revisa el email e inténtalo otra vez.",
   "bol.invalido": "Escribe un email válido, por ejemplo nombre@gmail.com.",
   "bol.prueba": "Modo prueba: el formulario aún no está conectado a Brevo, así que no se guardó el email.",

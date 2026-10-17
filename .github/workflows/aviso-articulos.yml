@@ -1,0 +1,85 @@
+# Avisa por correo (Brevo) a la lista cuando se publica un artículo nuevo.
+#
+# Corre solo, justo después de que "Publicar sitio" termina bien (o sea, después
+# de cada publicación en Sanity y cada mañana a las 6:00 am para lo programado),
+# y también a mano con "Run workflow" (para probar o mandar un artículo suelto).
+#
+# Está APAGADO hasta que exista la variable AVISOS_DESDE (ver README,
+# "Avisos por correo de artículos nuevos"). Cada artículo se avisa una sola vez.
+
+name: Aviso por correo
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('Aviso ({0}){1} {2}', inputs.mode, ':', inputs.story_id) || 'Aviso automático de artículos nuevos' }}
+
+on:
+  workflow_run:
+    workflows: ["Publicar sitio"]
+    types: [completed]
+
+  workflow_dispatch:
+    inputs:
+      story_id:
+        description: "Dirección del artículo (lo que sale después de ?id= en su URL)"
+        required: true
+      mode:
+        description: "dry-run = solo una vista previa | test = lo manda solo al correo de abajo | send = lo manda a TODA la lista"
+        type: choice
+        options: [dry-run, test, send]
+        default: dry-run
+      test_email:
+        description: "Tu correo (solo para el modo test)"
+        required: false
+      force:
+        description: "Mandarlo aunque ya se haya avisado antes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aviso-correo
+  cancel-in-progress: false
+
+jobs:
+  aviso:
+    # Solo si la publicación salió bien (o si se corrió a mano).
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: America/Santo_Domingo
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Los artículos tal como quedaron en el sitio (Sanity + data/articulos.js).
+      - name: Traer los artículos
+        run: node scripts/contenido-sanity.js _aviso
+        env:
+          SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }} # opcional
+
+      - name: Mandar el aviso
+        run: node scripts/aviso-correo.js _aviso
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ vars.BREVO_LIST_ID }}
+          SENDER_EMAIL: ${{ vars.SENDER_EMAIL }}
+          SENDER_NAME: ${{ vars.SENDER_NAME }}
+          REPLY_TO: ${{ vars.REPLY_TO }}
+          AVISOS_DESDE: ${{ vars.AVISOS_DESDE }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'send' }}
+          STORY_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.story_id || '' }}
+          TEST_EMAIL: ${{ inputs.test_email }}
+          FORCE: ${{ inputs.force }}
+
+      - name: Guardar las vistas previas (dry-run)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: email-preview
+          path: email-preview-*.html
+          if-no-files-found: ignore

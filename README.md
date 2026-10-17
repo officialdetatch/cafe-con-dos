@@ -46,8 +46,10 @@ firestore.rules       Security rules for the comments (paste into Firebase)
 scripts/              partes.js: copies partes/ into every page (see below)
                       contenido-sanity.js: pulls the editor's articles into the site
                       build-feed.js + feed.js: build feed.xml and sitemap.xml
+                      aviso-correo.js: emails the Brevo list about a new article
 .github/workflows/    deploy.yml: publishes the site on every push, every time she publishes/
                       edits/deletes in the editor, and every day at 6:00 am (Dominican time)
+                      aviso-articulos.yml: sends the new-article email after each publish
                       studio.yml: (optional) republishes the editor when studio/ or config.js changes
 ```
 
@@ -86,6 +88,33 @@ Social links are written where they appear (`partes/pie.html`, `contacto.html`, 
 - **To make it the home page:** first rename the current `index.html` (for example to `index-completo.html`) so you keep it, then rename `loading.html` to `index.html`. To launch, do the opposite. Until then, the other pages still work if someone has the direct link.
 - **The drawing:** it's split into layers in `images/pronto/` (pot, steam, motion lines, stream, two drops, splash, cup), all the same size and stacked. The `-clara` versions are for dark mode. The animation is in `styles.css`, section "Muy pronto": one 6-second cycle where the pot tilts, the stream falls, drops fall, the cup splashes and the pot straightens. People who turn on "reduce motion" on their device see the still drawing.
 - **The sound:** `audio/cafe.ogg` and `audio/cafe.mp3` (24 seconds, loops). Browsers don't let a page play sound on its own, so it starts with the button. To use a different sound, replace those two files with the same names, or change the `src` in the `<audio>` tag (one `.mp3` is enough).
+
+## Email alerts for new articles (Brevo + GitHub Actions)
+
+When an article is published, the site emails the Brevo list once: brand-styled email with the cover, section, title, summary and a "Leer el artículo" button. It works like the "News alert email" on LPBLSA, and it is **off until you turn it on**.
+
+- **How it runs:** `.github/workflows/aviso-articulos.yml` starts right after "Publicar sitio" finishes OK (every Sanity publish, every push, and the 6 am run that releases scheduled posts). It runs `scripts/aviso-correo.js`, which waits until the article is live on the site, then creates the campaign in Brevo and sends it.
+- **No duplicates:** each article becomes a Brevo campaign named `Aviso: <article id>`; if one exists, it is skipped. Edits to an old article send nothing.
+- **Only what is new:** it only emails articles published on or after `AVISOS_DESDE`. With that variable empty, nothing is sent, so articles can be uploaded before launch without emailing anyone.
+- **Safety stop:** if more than 3 articles would go out at once, it sends nothing and the run fails. Send them one by one with "Run workflow".
+- **Scope:** articles and Sobremesa posts. Episodes are not emailed by this.
+
+**One-time setup**
+1. **Brevo API key**: *SMTP & API › API Keys › Generate a new API key*. Copy it right away (it is shown once).
+2. **List ID**: *Contacts › Lists*; the number next to your subscriber list.
+3. In the GitHub repo: **Settings › Secrets and variables › Actions**
+   - tab **Secrets** › New repository secret: `BREVO_API_KEY` = the key.
+   - tab **Variables** › New repository variable, one each:
+     `BREVO_LIST_ID` (the number), `SENDER_EMAIL` (`newsletter@cafecondos.com`), `SENDER_NAME` (`Café Con Dos`), `REPLY_TO` (`info@cafecondos.com`).
+   - Leave `AVISOS_DESDE` **out** for now.
+4. Make sure the sender is verified in Brevo (*Senders, domains, IPs*), and that the **Brevo RSS integration is not active** (both on = two emails per article).
+
+**Test it** (GitHub › Actions › *Aviso por correo* › Run workflow). `story_id` is what comes after `?id=` in the article's URL.
+- `dry-run`: no email; the run saves a preview (download the `email-preview` artifact at the bottom of the run).
+- `test`: emails only the address you type, as a Brevo test.
+- `send`: emails the whole list. Check "force" to resend one that already went out.
+
+**To turn it on at launch:** add the variable `AVISOS_DESDE` with the launch moment in UTC, for example `2026-11-01T00:00:00Z`. Articles published from then on are emailed automatically. To turn it off, delete the variable.
 
 ## Sections
 
@@ -155,7 +184,7 @@ Notes:
 - [ ] **Domain**: set `siteUrl` in `config.js`, the `og:image` URL and the JSON-LD URLs in each HTML `<head>` (search for `cafecondos.com`), and the Sitemap line in `robots.txt`. In **Settings › Pages**, set **Source** to **GitHub Actions** and enter the custom domain there.
 - [ ] **Host bio/photo**: the bio is in `nosotros.html` (the `host` block). The photo goes in `images/`; use it in that block and in `hosts[].foto` in `config.js` (the author line on each article).
 - [ ] **Newsletter (Brevo)**: create a subscription form, copy its `action="…"` URL into `boletin.action`. The form only asks for name and email. Until then, the form runs in test mode and says so.
-- [ ] **New-content emails**: point an RSS-to-email campaign at `https://YOUR-DOMAIN/feed.xml`. Articles, Sobremesa posts and episodes are all in the feed; Sobremesa posts are prefixed "Sobremesa:" and every article carries its section as a category.
+- [ ] **New-article emails**: set up "Email alerts for new articles" above (API key, list ID, variables; test with dry-run and test; add `AVISOS_DESDE` at launch). The feed (`https://YOUR-DOMAIN/feed.xml`) is still there for podcast apps and readers, but the Brevo RSS campaign is not used, so you don't get two emails.
 - [ ] **Comments (Firebase)**: in the Firebase console, create a project for Café Con Dos, add a Web app, and copy its `apiKey`, `authDomain`, `projectId` and `appId` into `comentarios.firebase` in `config.js`. Turn on Firestore and paste `firestore.rules` into Firestore › Rules. Comments go into the `ccd_comentarios` collection (all articles, not just Sobremesa); delete one from the console to remove it from the site. The section stays hidden until `projectId` is filled in.
 - [ ] **"Invítanos un café" bubble**: paste Café Con Dos' Buy Me a Coffee link into `apoyo.cafeConDos` in `config.js`. Until then the bubble only shows the developer option. `avisoSegundos` sets when the little alert pops up (once every 7 days per visitor; 0 turns it off).
 - [ ] **Contact form**: paste a Formspree (or similar) endpoint into `contacto.action`, or set `contacto.email` to fall back to a mailto link.

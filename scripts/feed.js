@@ -105,6 +105,6 @@
       "</urlset>\n";
   }
 
-  root.CCD_FEED = { buildFeed, buildSitemap };
+  root.CCD_FEED = { buildFeed, buildSitemap, cuando };
   if (typeof module !== "undefined") module.exports = root.CCD_FEED;
 })(typeof window !== "undefined" ? window : globalThis);
