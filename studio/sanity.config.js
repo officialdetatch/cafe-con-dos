@@ -10,12 +10,28 @@ import {publicarConFecha, VerEnLaPagina} from './acciones.js'
 import {Comentarios} from './herramientas/Comentarios.jsx'
 
 // Los colores de Café Con Dos en todo el editor (claro y oscuro).
-// Salen de assets/css/styles.css: --cafe, --espuma, --tinta-suave y el fondo oscuro.
-const tema = buildTheme({
-  accent: '#723F40', // café: botones, links y foco
-  text: '#6B4744', // tinta suave: textos, íconos y bordes con un gris cálido
-  background: {light: '#FBF3EC', dark: '#221415'}, // espuma / fondo oscuro del sitio
-})
+// Salen de assets/css/styles.css: --cafe, --espuma, --tinta-suave, --brand y el fondo oscuro.
+// Si una versión de @sanity/themer pide las opciones de otra forma, se prueba la
+// otra; y si ninguna sirve, el editor se queda con los colores de Sanity en vez
+// de romperse (el aviso sale en la consola del navegador).
+function construirTema() {
+  const claro = {accent: '#723F40', text: '#6B4744', background: '#FBF3EC'} // café / tinta suave / espuma
+  const oscuro = {accent: '#E9CAB0', text: '#CFB3A3', background: '#221415'} // latte / tinta clara / fondo oscuro del sitio
+  const intentos = [
+    () => buildTheme({light: claro, dark: oscuro}), // versiones nuevas: opciones por esquema
+    () => buildTheme({light: {accent: claro.accent, background: claro.background}, dark: {accent: oscuro.accent, background: oscuro.background}}),
+    () => buildTheme({accent: claro.accent, text: claro.text, background: {light: claro.background, dark: oscuro.background}}), // versiones anteriores
+  ]
+  for (const intento of intentos) {
+    try {
+      return intento()
+    } catch (e) {
+      console.warn('[Café Con Dos] tema del editor:', e && e.message)
+    }
+  }
+  return undefined
+}
+const tema = construirTema()
 
 // Ícono de globo de diálogo para la pestaña de comentarios.
 const IconoComentarios = () =>
@@ -34,7 +50,7 @@ export default defineConfig({
   icon: Taza,
   projectId: sitio.projectId,
   dataset: sitio.dataset,
-  theme: tema,
+  ...(tema ? {theme: tema} : {}),
 
   plugins: [structureTool({title: 'Artículos', structure: estructura}), esESLocale()],
 
