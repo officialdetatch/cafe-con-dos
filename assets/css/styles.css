@@ -34,6 +34,12 @@
   --footer-bg: var(--cafe);
   --tarjeta-oscura: var(--espresso);
   --peligro: #B3261E;
+  /* Textura de papel (grano fino + manchas suaves). Para más o menos textura, sube o baja
+     los dos últimos números de cada feColorMatrix, o quítala poniendo --textura-grano y
+     --textura-nube en none. */
+  --textura-grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.15  0 0 0 0 0.15  0 0 0 0.36 -0.075'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --textura-nube: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.25  0 0 0 0 0.22  0 0 0 0.26 -0.095'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --sombra-nav: 0 10px 22px -12px rgba(58, 31, 32, .45), 0 2px 4px rgba(58, 31, 32, .08);
   --ver-claro: none;   /* imágenes para fondo oscuro (logo claro, taza clara) */
   --ver-oscuro: block; /* imágenes para fondo claro */
 
@@ -68,6 +74,9 @@
     --footer-bg: #170D0E;
     --tarjeta-oscura: #4A2A2B;
     --peligro: #FF9A8F;
+    --textura-grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.8  0 0 0 0 0.68  0 0 0 0.2 -0.045'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --textura-nube: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.0  0 0 0 0 0.0  0 0 0 0 0.0  0 0 0 0.55 -0.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --sombra-nav: 0 10px 24px -10px rgba(0, 0, 0, .7), 0 2px 4px rgba(0, 0, 0, .35);
     --ver-claro: block;
     --ver-oscuro: none;
     --linea: rgba(233, 202, 176, 0.22);
@@ -91,6 +100,9 @@
   --footer-bg: #170D0E;
   --tarjeta-oscura: #4A2A2B;
   --peligro: #FF9A8F;
+  --textura-grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.8  0 0 0 0 0.68  0 0 0 0.2 -0.045'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --textura-nube: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.0  0 0 0 0 0.0  0 0 0 0 0.0  0 0 0 0.55 -0.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --sombra-nav: 0 10px 24px -10px rgba(0, 0, 0, .7), 0 2px 4px rgba(0, 0, 0, .35);
   --ver-claro: block;
   --ver-oscuro: none;
   --linea: rgba(233, 202, 176, 0.22);
@@ -99,11 +111,16 @@
 
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: 96px; background: var(--bg); }
+html {
+  -webkit-text-size-adjust: 100%; scroll-padding-top: 96px;
+  background-color: var(--bg);
+  background-image: var(--textura-grano), var(--textura-nube);
+  background-size: 220px 220px, 640px 640px;
+}
 main { display: block; min-height: 50vh; }
 body {
   margin: 0;
-  background: var(--bg);
+  background: transparent;
   color: var(--ink);
   font-family: var(--f-text);
   font-size: 1.125rem;
@@ -157,11 +174,17 @@ p { margin: 0 0 1em; text-wrap: pretty; }
 /* ---------- encabezado ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 50;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: var(--textura-grano), var(--textura-nube);
+  background-size: 220px 220px, 640px 640px;
   border-bottom: 1px solid transparent;
-  transition: border-color .2s ease;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
-.site-header.is-scrolled { border-bottom-color: var(--linea); }
+/* Al bajar, el encabezado se separa del contenido con una sombra suave. */
+.site-header.is-scrolled {
+  border-bottom-color: var(--linea);
+  box-shadow: var(--sombra-nav);
+}
 .site-header .wrap { display: flex; align-items: center; gap: 24px; min-height: 92px; }
 .logo { display: block; flex: none; }
 .logo img { height: 70px; width: auto; }
@@ -195,7 +218,7 @@ p { margin: 0 0 1em; text-wrap: pretty; }
   .header-acciones .btn { display: none; }
   .nav {
     position: fixed; inset: 72px 0 auto 0; flex-direction: column; align-items: stretch; gap: 0;
-    background: var(--bg); padding: 8px var(--gutter) 24px; border-bottom: 1px solid var(--linea);
+    background-color: var(--bg); background-image: var(--textura-grano), var(--textura-nube); background-size: 220px 220px, 640px 640px; padding: 8px var(--gutter) 24px; border-bottom: 1px solid var(--linea); box-shadow: var(--sombra-nav);
     transform: translateY(-8px); opacity: 0; visibility: hidden; transition: opacity .2s ease, transform .2s ease, visibility .2s;
   }
   .nav.is-open { transform: none; opacity: 1; visibility: visible; }
@@ -462,6 +485,9 @@ textarea { min-height: 160px; resize: vertical; }
 }
 .prosa blockquote p:last-child { margin: 0; }
 .prosa img { border-radius: 16px; margin: 1.4em 0; }
+.prosa figure.foto { margin: 1.8em 0; }
+.prosa figure.foto img { width: 100%; margin: 0; }
+.prosa figure.foto figcaption { margin-top: .6em; font-size: .92rem; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
 .prosa hr { border: 0; border-top: 1px solid var(--linea); margin: 2em 0; }
 
 /* ---------- entrada del blog ---------- */

@@ -112,13 +112,13 @@ export const articulo = defineType({
       name: 'cuerpo',
       title: 'El artículo',
       type: 'array',
-      description: 'Escribe o pega el texto. Usa "Título" y "Subtítulo" para dividirlo, y el botón de imagen para meter fotos en medio.',
+      description: 'Escribe o pega el texto. Usa "Título de sección" y "Subtítulo" para dividirlo. Para meter una foto entre párrafos, toca el + (o "Insertar") y elige "Foto"; puedes poner todas las que quieras.',
       of: [
         defineArrayMember({
           type: 'block',
           styles: [
             {title: 'Normal', value: 'normal'},
-            {title: 'Título', value: 'h2'},
+            {title: 'Título de sección', value: 'h2'},
             {title: 'Subtítulo', value: 'h3'},
             {title: 'Cita', value: 'blockquote'},
           ],
@@ -154,9 +154,16 @@ export const articulo = defineType({
           title: 'Foto',
           fields: [
             defineField({
+              name: 'caption',
+              title: 'Pie de foto (opcional)',
+              type: 'string',
+              description: 'Una línea que sale debajo de la foto. Déjalo vacío si no hace falta.',
+            }),
+            defineField({
               name: 'alt',
               title: 'Describe la foto',
               type: 'string',
+              description: 'Una frase de lo que se ve. La usan Google y las personas que leen con lector de pantalla.',
               validation: (Rule) => Rule.required().warning('Describe la foto en una frase.'),
             }),
           ],

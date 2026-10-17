@@ -127,6 +127,13 @@
       let m;
       if (!line) return flushAll();
       if (/^---+$/.test(line)) { flushAll(); html += "<hr>"; return; }
+      // Una foto sola en su línea: ![descripción](ruta "pie de foto opcional")
+      if ((m = line.match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/))) {
+        flushAll();
+        html += '<figure class="foto"><img src="' + esc(m[2]) + '" alt="' + esc(m[1]) + '" loading="lazy">' +
+          (m[3] ? "<figcaption>" + esc(m[3]) + "</figcaption>" : "") + "</figure>";
+        return;
+      }
       if ((m = line.match(/^(#{2,3})\s+(.*)$/))) { flushAll(); const h = m[1].length; html += "<h" + h + ">" + inline(m[2]) + "</h" + h + ">"; return; }
       if ((m = line.match(/^>\s?(.*)$/))) { flushP(); flushL(); quote.push(m[1]); return; }
       if ((m = line.match(/^[-*]\s+(.*)$/))) { flushP(); flushQ(); if (list !== "ul") { flushL(); html += "<ul>"; list = "ul"; } html += "<li>" + inline(m[1]) + "</li>"; return; }

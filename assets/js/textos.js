@@ -118,7 +118,7 @@ window.CCD_TEXTOS = {
   "com.ahora": "Ahora mismo",
 
   // Burbuja "Invítanos un café"
-  "art.apoyo": "Si te gustó esto, no olvides comentar y apoyarnos invitándonos un café.",
+  "art.apoyo": "Si te gusta este contenido, no olvides comentar y apoyanos con un café.",
   "art.apoyo.comentar": "Dejar un comentario",
   "art.apoyo.cafe": "Invítanos un café",
   "apoyo.titulo": "Invítanos un café",

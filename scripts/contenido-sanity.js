@@ -69,7 +69,10 @@ function textoAMarkdown(bloques) {
     if (!b) return;
     if (b._type === "image") {
       previoLista = null;
-      if (b.url) partes.push({ txt: "![" + String(b.alt || "").replace(/[\[\]]/g, "") + "](" + b.url + "?w=1400&fit=max&auto=format)" });
+      if (b.url) {
+        const pie = String(b.caption || "").replace(/\s+/g, " ").replace(/"/g, "'").trim();
+        partes.push({ txt: "![" + String(b.alt || "").replace(/[\[\]]/g, "") + "](" + b.url + "?w=1400&fit=max&auto=format" + (pie ? ' "' + pie + '"' : "") + ")" });
+      }
       return;
     }
     if (b._type !== "block") return;
@@ -125,7 +128,7 @@ const CONSULTA = `*[_type == "articulo" && !(_id in path("drafts.**"))] | order(
   resumen, temas, episodio,
   personas[]{ nombre, rol, link },
   "foto": portada{ "url": asset->url, "dim": asset->metadata.dimensions{ width, height }, alt, crop, hotspot },
-  cuerpo[]{ ..., _type == "image" => { "url": asset->url, alt } }
+  cuerpo[]{ ..., _type == "image" => { "url": asset->url, alt, caption } }
 }`;
 
 function convertir(doc, cfg) {

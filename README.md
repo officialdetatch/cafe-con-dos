@@ -166,7 +166,7 @@ A future date schedules an item (in the editor or the writers): it appears on th
 
 ## Article editor (Sanity) — one-time setup
 
-What she gets: a private page with her login, a form in Spanish with the same fields as the site (title, section, language, date, cover photo with focus point, summary, the article with headings/lists/quotes/links/photos, topics, "Destacar en la portada", people in the story, related episode), and buttons to publish, unpublish, delete and **Ver en la página**. Sections, topics and the host come from `config.js`, so there is one place to change them.
+What she gets: a private page with her login, a form in Spanish with the same fields as the site (title, section, language, date, cover photo with focus point, summary, the article with section titles/subtitles/lists/quotes/links and as many photos as she wants between paragraphs (in the body, tap + → Foto; each photo has an optional caption and a description), topics, "Destacar en la portada", people in the story, related episode), and buttons to publish, unpublish, delete and **Ver en la página**. Sections, topics and the host come from `config.js`, so there is one place to change them.
 
 How it connects: when she publishes, Sanity sends a webhook to GitHub, which runs `deploy.yml`. The Action pulls every **published** article from Sanity (`scripts/contenido-sanity.js`), adds them to the ones in `data/articulos.js`, then builds the feed and sitemap and publishes. Drafts are never read. If Sanity can't be reached, the run fails on purpose and the live site stays as it was. The daily 6:00 am run also pulls from Sanity, so even if the webhook ever fails, her posts are up by the next morning.
 
@@ -220,6 +220,8 @@ Notes:
 - [ ] Delete the sample content with the writers.
 
 ## Light and dark theme
+
+The background has a paper texture (fine grain plus soft mottling) drawn with inline SVG, so there are no image files. It is set by `--textura-grano` and `--textura-nube` at the top of `assets/css/styles.css`; set both to `none` to remove it, or lower the last two numbers of each `feColorMatrix` to soften it. The header gets a soft shadow (`--sombra-nav`) once you scroll.
 
 The site follows the visitor's system setting. The moon/sun button in the header switches it, and the choice is remembered in that browser (`localStorage` key `ccd-tema`, applied as `<html data-theme="light|dark">` before the page paints, so there's no flash). Colors are tokens at the top of `styles.css`. The writers follow the same choice.
 
