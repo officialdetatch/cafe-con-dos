@@ -146,10 +146,10 @@ window.CCD_CONFIG = {
     activo: true,
     coleccion: "ccd_comentarios",
     firebase: {
-      apiKey: "",
-      authDomain: "",
-      projectId: "",
-      appId: ""
+      apiKey: "AIzaSyDaz4skUdnzWvR96JQ5s3x4BqvOpSrhf9g",
+      authDomain: "cafe-con-dos.firebaseapp.com",
+      projectId: "cafe-con-dos",
+      appId: "1:771340079140:web:b39b0a9aa570daadcb08b1"
     }
   },
 
