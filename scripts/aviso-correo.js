@@ -73,20 +73,28 @@ function construirCorreo(a, cfg) {
     .filter(([, u]) => u && /^https?:/.test(u));
   const asunto = (a.seccion === "sobremesa" ? "Sobremesa: " : "") + a.titulo;
   const previa = a.resumen || "Nuevo en Café Con Dos.";
-  const fondo = (c) => "background:" + c + ";background-image:linear-gradient(" + c + "," + c + ");";
+  const fondo = (c) => "background:" + c + ";";
   const html =
 '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
 '<html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head>\n' +
 '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n' +
 '<meta name="viewport" content="width=device-width, initial-scale=1" />\n' +
-'<meta name="color-scheme" content="light" /><meta name="supported-color-schemes" content="light" />\n' +
+'<meta name="color-scheme" content="light dark" /><meta name="supported-color-schemes" content="light dark" />\n' +
 "<title>" + esc(asunto) + "</title>\n" +
 '<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@600;700&amp;family=Literata:wght@400;600&amp;display=swap" rel="stylesheet" type="text/css" />\n' +
 '<style type="text/css">\n' +
-"  :root { color-scheme: light only; supported-color-schemes: light only; }\n" +
+"  :root { color-scheme: light dark; supported-color-schemes: light dark; }\n" +
 "  body { margin:0; padding:0; background:#E9CAB0; } table { border-collapse:collapse; } img { border:0; display:block; } a { color:#723F40; }\n" +
-"  @media (prefers-color-scheme: dark) { body, .fondo { background:#E9CAB0 !important; } .tarjeta { background:#FBF3EC !important; } }\n" +
-"  [data-ogsc] .fondo { background-color:#E9CAB0 !important; } [data-ogsc] .tarjeta { background-color:#FBF3EC !important; }\n" +
+"  /* Modo oscuro (Apple Mail y los que lo respetan). Gmail y otros lo invierten solos. */\n" +
+"  @media (prefers-color-scheme: dark) {\n" +
+"    body, .fondo { background:#241513 !important; } .tarjeta { background:#35211F !important; }\n" +
+"    .t-marca { color:#E9CAB0 !important; } .t-etiqueta { color:#F47D50 !important; } .t-titulo { color:#FBF3EC !important; } .t-texto { color:#E3C9B6 !important; }\n" +
+"    .t-boton { background:#E9CAB0 !important; } .t-boton a { color:#3A1F20 !important; } .t-link, .t-link a { color:#F5C7AE !important; } .t-sep { color:#8A6A5C !important; }\n" +
+"    .t-lema { color:#E9CAB0 !important; } .t-pie, .t-pie a { color:#B99A8C !important; }\n" +
+"  }\n" +
+"  [data-ogsb] .fondo { background-color:#241513 !important; } [data-ogsb] .tarjeta { background-color:#35211F !important; } [data-ogsb] .t-boton { background-color:#E9CAB0 !important; }\n" +
+"  [data-ogsc] .t-marca, [data-ogsc] .t-lema { color:#E9CAB0 !important; } [data-ogsc] .t-etiqueta { color:#F47D50 !important; } [data-ogsc] .t-titulo { color:#FBF3EC !important; } [data-ogsc] .t-texto { color:#E3C9B6 !important; }\n" +
+"  [data-ogsc] .t-boton a { color:#3A1F20 !important; } [data-ogsc] .t-link a { color:#F5C7AE !important; } [data-ogsc] .t-pie, [data-ogsc] .t-pie a { color:#B99A8C !important; }\n" +
 "  @media only screen and (max-width:620px) { .contenedor { width:100% !important; } .relleno { padding-left:24px !important; padding-right:24px !important; } .titulo { font-size:30px !important; line-height:36px !important; } .foto { width:100% !important; height:auto !important; } }\n" +
 "</style></head>\n" +
 '<body style="margin:0;padding:0;background:#E9CAB0;">\n' +
@@ -94,20 +102,20 @@ function construirCorreo(a, cfg) {
 '<table role="presentation" class="fondo" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#E9CAB0" style="' + fondo("#E9CAB0") + '"><tr>' +
 '<td class="fondo" align="center" bgcolor="#E9CAB0" style="padding:32px 12px;' + fondo("#E9CAB0") + '">\n' +
 '<table role="presentation" class="contenedor" width="560" cellspacing="0" cellpadding="0" border="0" style="width:560px;max-width:560px;">\n' +
-'<tr><td align="center" style="padding:0 0 14px;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:15px;line-height:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#723F40;">Café para llevar</td></tr>\n' +
+'<tr><td class="t-marca" align="center" style="padding:0 0 14px;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:15px;line-height:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#723F40;">Café para llevar</td></tr>\n' +
 '<tr><td class="tarjeta" bgcolor="#FBF3EC" style="' + fondo("#FBF3EC") + 'border-radius:22px 22px 22px 6px;overflow:hidden;">\n' +
 '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">\n' +
 (img ? '<tr><td style="font-size:0;line-height:0;border-radius:22px 22px 0 0;overflow:hidden;"><a href="' + esc(url) + '" target="_blank"><img class="foto" src="' + esc(img) + '" width="560" alt="' + esc(a.portadaAlt || a.titulo) + '" style="width:560px;max-width:100%;height:auto;" /></a></td></tr>\n' : "") +
-(etiqueta ? '<tr><td class="relleno" align="left" style="padding:' + (img ? "28" : "36") + 'px 44px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:14px;line-height:18px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#9A3816;">' + esc(etiqueta) + "</td></tr>\n" : "") +
-'<tr><td class="relleno titulo" align="left" style="padding:' + (etiqueta ? "10" : (img ? "28" : "36")) + 'px 44px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:34px;line-height:40px;font-weight:700;color:#3A1F20;">' + esc(a.titulo) + "</td></tr>\n" +
-(a.resumen ? '<tr><td class="relleno" align="left" style="padding:16px 44px 0;font-family:\'Literata\',Georgia,\'Times New Roman\',serif;font-size:17px;line-height:28px;color:#6B4744;">' + esc(a.resumen) + "</td></tr>\n" : "") +
-'<tr><td class="relleno" align="left" style="padding:26px 44px 40px;"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td bgcolor="#723F40" style="background:#723F40;border-radius:14px 14px 14px 4px;">' +
+(etiqueta ? '<tr><td class="relleno t-etiqueta" align="left" style="padding:' + (img ? "28" : "36") + 'px 44px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:14px;line-height:18px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#9A3816;">' + esc(etiqueta) + "</td></tr>\n" : "") +
+'<tr><td class="relleno titulo t-titulo" align="left" style="padding:' + (etiqueta ? "10" : (img ? "28" : "36")) + 'px 44px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:34px;line-height:40px;font-weight:700;color:#3A1F20;">' + esc(a.titulo) + "</td></tr>\n" +
+(a.resumen ? '<tr><td class="relleno t-texto" align="left" style="padding:16px 44px 0;font-family:\'Literata\',Georgia,\'Times New Roman\',serif;font-size:17px;line-height:28px;color:#6B4744;">' + esc(a.resumen) + "</td></tr>\n" : "") +
+'<tr><td class="relleno" align="left" style="padding:26px 44px 40px;"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td class="t-boton" bgcolor="#723F40" style="background:#723F40;border-radius:14px 14px 14px 4px;">' +
 '<a href="' + esc(url) + '" target="_blank" style="display:inline-block;padding:13px 26px;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:18px;font-weight:600;letter-spacing:.3px;color:#F5E4D5;text-decoration:none;">Leer el artículo &rarr;</a></td></tr></table></td></tr>\n' +
 "</table></td></tr>\n" +
-(redes.length ? '<tr><td align="center" style="padding:26px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;">' +
-  redes.map(([n, u]) => '<a href="' + esc(u) + '" target="_blank" style="color:#723F40;text-decoration:underline;text-decoration-color:#F47D50;">' + n + "</a>").join('<span style="color:#C9A28C;">&nbsp;·&nbsp;</span>') + "</td></tr>\n" : "") +
-'<tr><td align="center" style="padding:18px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:23px;font-weight:600;color:#723F40;" lang="en">' + esc(cfg.lema || "Stories worth discovering.") + "</td></tr>\n" +
-'<tr><td align="center" style="padding:10px 20px 0;font-family:\'Literata\',Georgia,\'Times New Roman\',serif;font-size:13px;line-height:20px;color:#8A6560;">' +
+(redes.length ? '<tr><td class="t-link" align="center" style="padding:26px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;">' +
+  redes.map(([n, u]) => '<a href="' + esc(u) + '" target="_blank" style="color:#723F40;text-decoration:underline;text-decoration-color:#F47D50;">' + n + "</a>").join('<span class="t-sep" style="color:#C9A28C;">&nbsp;·&nbsp;</span>') + "</td></tr>\n" : "") +
+'<tr><td class="t-lema" align="center" style="padding:18px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:23px;font-weight:600;color:#723F40;" lang="en">' + esc(cfg.lema || "Stories worth discovering.") + "</td></tr>\n" +
+'<tr><td class="t-pie" align="center" style="padding:10px 20px 0;font-family:\'Literata\',Georgia,\'Times New Roman\',serif;font-size:13px;line-height:20px;color:#8A6560;">' +
 'Recibes este correo porque te suscribiste en cafecondos.com.<br /><a href="{{ unsubscribe }}" style="color:#8A6560;">Darme de baja</a> · <a href="{{ mirror }}" style="color:#8A6560;">Ver en el navegador</a></td></tr>\n' +
 "</table></td></tr></table></body></html>\n";
   return { asunto, previa, html, url };
