@@ -30,6 +30,10 @@ const sitio = {
   projectId: s.projectId,
   dataset: s.dataset || "production",
   studioAppId: s.studioAppId || "",
+  comentarios: {
+    coleccion: (cfg.comentarios && cfg.comentarios.coleccion) || "ccd_comentarios",
+    firebase: (cfg.comentarios && cfg.comentarios.firebase) || {}
+  },
   secciones: (cfg.secciones || []).map((x) => ({ id: x.id, nombre: x.nombre, descripcion: x.descripcion || "" })),
   temas: (cfg.temas || []).map((x) => ({ id: x.id, nombre: x.nombre || x.es || x.id })),
   hosts: (cfg.hosts || []).map((x) => ({ id: x.id, nombre: x.nombre }))

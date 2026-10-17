@@ -1,12 +1,23 @@
 rules_version = '2';
 
 // Reglas de Firestore para los comentarios de Café Con Dos.
-// Si usas el mismo proyecto de Firebase que LPBLSA, NO reemplaces sus reglas:
-// copia solo el bloque "match /ccd_comentarios/{id} { ... }" dentro del
-// "match /databases/{database}/documents { ... }" que ya existe.
+// Si usas el mismo proyecto de Firebase que otro sitio, NO reemplaces sus reglas:
+// copia solo los bloques "match /ccd_comentarios/{id}" y "match /ccd_admins/{email}"
+// dentro del "match /databases/{database}/documents { ... }" que ya existe.
+//
+// Quién puede moderar: los correos que tengan un documento en la colección
+// "ccd_admins" (el id del documento ES el correo, en minúsculas). Se agregan y
+// quitan a mano en la consola de Firebase, así los correos no quedan en GitHub.
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Lista de moderadores. Cada quien solo puede leer su propio documento
+    // (para saber si es moderador); nadie la puede listar ni cambiar desde afuera.
+    match /ccd_admins/{email} {
+      allow get: if request.auth != null && request.auth.token.email == email;
+      allow list, write: if false;
+    }
 
     match /ccd_comentarios/{id} {
       // Cualquiera puede leer los comentarios.
@@ -26,9 +37,13 @@ service cloud.firestore {
         && request.resource.data.texto.size() <= 1500
         && request.resource.data.fecha == request.time;
 
-      // Nadie puede editar ni borrar desde el sitio.
-      // Para borrar uno, hazlo desde la consola de Firebase.
-      allow update, delete: if false;
+      // Nadie puede editar un comentario.
+      allow update: if false;
+
+      // Solo los moderadores (con Google, correo verificado y en ccd_admins) pueden borrar.
+      allow delete: if request.auth != null
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/ccd_admins/$(request.auth.token.email));
     }
   }
 }
