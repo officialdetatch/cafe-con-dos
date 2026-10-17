@@ -903,6 +903,22 @@
     pintar();
   };
 
+  // Cierre de cada artículo: invita a comentar y a apoyar con un café.
+  // El link del café sale de apoyo.cafeConDos en config.js; si está vacío, no se muestra.
+  function apoyoArticulo() {
+    const A = CFG.apoyo || {};
+    if (A.mostrar === false || !A.cafeConDos) return "";
+    const C = CFG.comentarios || {};
+    const fb = C.firebase || {};
+    const hayComentarios = C.activo && fb.projectId && fb.apiKey;
+    return '<aside class="art-apoyo">' + tazaHTML("art-apoyo-taza") +
+      "<div><p>" + t("art.apoyo") + "</p>" +
+      '<div class="art-apoyo-acciones">' +
+      (hayComentarios ? '<a class="btn" href="#comentarios">' + t("art.apoyo.comentar") + "</a>" : "") +
+      '<a class="btn btn--naranja" href="' + esc(A.cafeConDos) + '" target="_blank" rel="noopener">' + t("art.apoyo.cafe") + "</a>" +
+      "</div></div></aside>";
+  }
+
   PAGES.entrada = function () {
     const root = $("#entrada");
     const p = ARTS.find((x) => x.id === params.get("id"));
@@ -943,6 +959,7 @@
       ((p.temas || []).length ? '<div class="entrada-temas">' + chipsTemas(p.temas, BASE + (esSob ? "sobremesa.html" : "explorar.html")) + "</div>" : "") +
       personas +
       (ep ? '<section class="entrada-ep"><h2>' + t("art.relacionado") + '</h2><div class="rejilla">' + epCard(ep) + "</div></section>" : "") +
+      apoyoArticulo() +
       '<section class="entrada-compartir"><h2>' + t("comp.titulo") + "</h2>" + compartirHTML(p.titulo) + "</section>" +
       '<section class="comentarios" id="comentarios" hidden></section>' +
       "</div></article>" +

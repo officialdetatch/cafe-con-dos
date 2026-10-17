@@ -48,13 +48,13 @@ window.CCD_CONFIG = {
     {
       id: "allie",
       nombre: "Allie Tolentino",
-      rol: "Editora en jefe",
+      rol: "Editorial Director",
       foto: "" // ej: "images/autores/allie.jpg"
     },
     {
       id: "sarah",
-      nombre: "Sarah", // agrégale el apellido si quieres
-      rol: "Columnista",
+      nombre: "Sarah Espaillat", // agrégale el apellido si quieres
+      rol: "Columnist",
       foto: "" // ej: "images/autores/sarah.jpg"
     }
     // , { id: "otra", nombre: "Nombre Apellido", rol: "Columnista", foto: "" }

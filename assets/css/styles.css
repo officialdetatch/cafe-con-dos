@@ -771,6 +771,11 @@ textarea { min-height: 160px; resize: vertical; }
 .entrada-temas { margin-top: 32px; }
 .art-personas, .entrada-compartir { max-width: 68ch; margin-top: 44px; }
 .art-personas h2, .entrada-compartir h2 { font-size: 1.7rem; margin-bottom: 10px; }
+.art-apoyo { max-width: 68ch; margin-top: 44px; display: flex; gap: 18px; align-items: center; padding: 20px 22px; background: var(--surface); border: 1px solid var(--linea); border-radius: var(--r-burbuja); }
+.art-apoyo .art-apoyo-taza { width: 56px; height: 56px; flex: none; object-fit: contain; }
+.art-apoyo p { margin: 0 0 12px; font-family: var(--f-display); font-size: 1.25rem; line-height: 1.35; }
+.art-apoyo-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 520px) { .art-apoyo { flex-direction: column; align-items: flex-start; } }
 .badge-ejemplo--suelto { position: static; display: inline-block; }
 .sigue { padding-top: 0; }
 .sigue .wrap > h2 { border-top: 1px solid var(--linea); padding-top: clamp(36px, 5vw, 56px); font-size: clamp(2rem, 3.6vw, 2.8rem); margin-bottom: 28px; }
