@@ -120,8 +120,8 @@ window.CCD_CONFIG = {
      Pega aquí el endpoint de Formspree (https://formspree.io).
      Si está vacío y hay email, el formulario abre el email de la persona. */
   contacto: {
-    action: "",
-    email: ""
+    action: "https://formspree.io/f/meaenyqr",
+    email: "colaboraciones@cafecondos.com"
   },
 
   /* Sección "En redes" de Inicio (feed de Instagram + perfil de TikTok)

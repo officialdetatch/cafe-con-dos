@@ -422,6 +422,31 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--e
 .form-contacto :is(input, select, textarea), .lista-controles :is(input, select) { border-color: var(--linea); background: var(--surface-2); color: var(--ink); }
 .form-contacto :is(input, select, textarea):focus, .lista-controles :is(input, select):focus { border-color: var(--brand); }
 textarea { min-height: 160px; resize: vertical; }
+
+/* Los menús desplegables (<select>) con los colores del sitio.
+   Navegadores nuevos (Chrome, Edge): la lista de opciones también se pinta con la marca.
+   Los demás (Safari, Firefox, el celular) usan su lista propia, que se ve normal. */
+select {
+  appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 40px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+  background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
+}
+select option { background: var(--surface-2); color: var(--ink); }
+@supports (appearance: base-select) {
+  select, select::picker(select) { appearance: base-select; }
+  select { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-right: 14px; background-image: none; }
+  select::picker-icon { color: var(--brand); transition: rotate .2s ease; }
+  select:open::picker-icon { rotate: 180deg; }
+  select::picker(select) {
+    background: var(--surface-2); color: var(--ink); border: 2px solid var(--linea); border-radius: 14px;
+    padding: 6px; margin-top: 6px; box-shadow: 0 16px 36px -12px rgba(58, 31, 32, .45);
+  }
+  select option { font: inherit; font-size: 1.05rem; padding: 10px 12px; border-radius: 9px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  select option:hover, select option:focus-visible { background: color-mix(in srgb, var(--naranja) 24%, transparent); outline: none; }
+  select option:checked { background: var(--brand); color: var(--brand-ink); }
+  select option::checkmark { display: none; }
+}
 .aviso { font-family: var(--f-display); font-size: 1.05rem; padding: 12px 14px; border-radius: 10px; background: var(--espuma); color: var(--espresso); margin: 0; }
 .aviso[hidden] { display: none; }
 .aviso--error { background: #FFE1D6; color: #7A1F06; }
