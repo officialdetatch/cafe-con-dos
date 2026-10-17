@@ -41,13 +41,18 @@ const IconoComentarios = () =>
     createElement('path', {d: 'M5.5 5.5h14v10h-7l-4 3.5v-3.5h-3z'}),
   )
 
-// La taza de la marca como ícono del editor.
-const Taza = () => createElement('img', {src: '/static/taza.png', alt: '', style: {width: '100%', height: '100%', objectFit: 'contain'}})
+// El logo del moderador (sobre con taza) como ícono del editor, con las esquinas redondeadas.
+const Logo = () =>
+  createElement('img', {
+    src: '/static/logo-moderador.png',
+    alt: '',
+    style: {width: '100%', height: '100%', objectFit: 'contain', borderRadius: '22%'},
+  })
 
 export default defineConfig({
   name: 'cafe-con-dos',
   title: sitio.nombre,
-  icon: Taza,
+  icon: Logo,
   projectId: sitio.projectId,
   dataset: sitio.dataset,
   ...(tema ? {theme: tema} : {}),
