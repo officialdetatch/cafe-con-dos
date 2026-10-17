@@ -189,7 +189,8 @@ async function main() {
 
   const existentes = MODE === "send" ? await campanasExistentes() : [];
   const remitente = { name: env("SENDER_NAME") || cfg.nombre || "Café Con Dos", email: env("SENDER_EMAIL") || "newsletter@example.com" };
-  const respuesta = env("REPLY_TO") ? { email: env("REPLY_TO"), name: remitente.name } : undefined;
+  // En la API de campañas de Brevo, replyTo es solo el correo (texto), no un objeto como sender.
+  const respuesta = env("REPLY_TO") || undefined;
 
   for (const a of porAvisar) {
     const correo = construirCorreo(a, cfg);
