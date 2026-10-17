@@ -46,7 +46,7 @@ firestore.rules       Security rules for the comments (paste into Firebase)
 scripts/              partes.js: copies partes/ into every page (see below)
                       contenido-sanity.js: pulls the editor's articles into the site
                       build-feed.js + feed.js: build feed.xml and sitemap.xml
-                      aviso-correo.js: emails the Brevo list about a new article
+                      aviso-correo.js: emails the Brevo list about a new article or episode
 .github/workflows/    deploy.yml: publishes the site on every push, every time she publishes/
                       edits/deletes in the editor, and every day at 6:00 am (Dominican time)
                       aviso-articulos.yml: sends the new-article email after each publish
@@ -89,15 +89,16 @@ Social links are written where they appear (`partes/pie.html`, `contacto.html`, 
 - **The drawing:** it's split into layers in `images/pronto/` (pot, steam, motion lines, stream, two drops, splash, cup), all the same size and stacked. The `-clara` versions are for dark mode. The animation is in `styles.css`, section "Muy pronto": one 6-second cycle where the pot tilts, the stream falls, drops fall, the cup splashes and the pot straightens. People who turn on "reduce motion" on their device see the still drawing.
 - **The sound:** `audio/cafe.ogg` and `audio/cafe.mp3` (24 seconds, loops). Browsers don't let a page play sound on its own, so it starts with the button. To use a different sound, replace those two files with the same names, or change the `src` in the `<audio>` tag (one `.mp3` is enough).
 
-## Email alerts for new articles (Brevo + GitHub Actions)
+## Email alerts for new articles and episodes (Brevo + GitHub Actions)
 
-When an article is published, the site emails the Brevo list once: brand-styled email with the cover, section, title, summary and a "Leer el artículo" button. It works like the "News alert email" on LPBLSA, and it is **off until you turn it on**.
+When an article or an episode is published, the site emails the Brevo list once: brand-styled email with the cover, section, title, summary and a "Leer el artículo" button. It works like the "News alert email" on LPBLSA, and it is **off until you turn it on**.
 
 - **How it runs:** `.github/workflows/aviso-articulos.yml` starts right after "Publicar sitio" finishes OK (every Sanity publish, every push, and the 6 am run that releases scheduled posts). It runs `scripts/aviso-correo.js`, which waits until the article is live on the site, then creates the campaign in Brevo and sends it.
 - **No duplicates:** each article becomes a Brevo campaign named `Aviso: <article id>`; if one exists, it is skipped. Edits to an old article send nothing.
 - **Only what is new:** it only emails articles published on or after `AVISOS_DESDE`. With that variable empty, nothing is sent, so articles can be uploaded before launch without emailing anyone.
 - **Safety stop:** if more than 3 articles would go out at once, it sends nothing and the run fails. Send them one by one with "Run workflow".
-- **Scope:** articles and Sobremesa posts. Episodes are not emailed by this.
+- **Scope:** articles, Sobremesa posts **and episodes**. Episodes come from `data/episodios.js` (added with the episode writer): when you push a new one, the site publishes and the alert goes out right after. The email says "Nuevo episodio · <series> · Ep. N", uses the YouTube thumbnail (or `portada` if the episode has one), shortens the YouTube-style title (drops the " | series | Ep. #N" tail) and has an "Escuchar el episodio" button. Episode campaigns are named `Aviso episodio: <episode id>`.
+- **Old episodes are safe:** archive episodes added with an old `fecha` (a day other than today) are never emailed, even if you upload them after launch. Only an episode whose `fecha` is today (or later, once that day arrives) goes out. To email an old one on purpose, use "Run workflow" with its id.
 
 **One-time setup**
 1. **Brevo API key**: *SMTP & API › API Keys › Generate a new API key*. Copy it right away (it is shown once).

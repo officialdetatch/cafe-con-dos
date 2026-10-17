@@ -1,11 +1,13 @@
-# Avisa por correo (Brevo) a la lista cuando se publica un artículo nuevo.
+# Avisa por correo (Brevo) a la lista cuando se publica un artículo o un episodio nuevo.
 #
 # Corre solo, justo después de que "Publicar sitio" termina bien (o sea, después
 # de cada publicación en Sanity y cada mañana a las 6:00 am para lo programado),
 # y también a mano con "Run workflow" (para probar o mandar un artículo suelto).
 #
 # Está APAGADO hasta que exista la variable AVISOS_DESDE (ver README,
-# "Avisos por correo de artículos nuevos"). Cada artículo se avisa una sola vez.
+# "Avisos por correo de artículos nuevos"). Cada artículo o episodio se avisa una sola vez.
+# Los episodios salen de data/episodios.js: al subir uno nuevo (push), el sitio se
+# publica y justo después sale el aviso.
 
 name: Aviso por correo
 run-name: ${{ github.event_name == 'workflow_dispatch' && format('Aviso ({0}){1} {2}', inputs.mode, ':', inputs.story_id) || 'Aviso automático de artículos nuevos' }}
@@ -18,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       story_id:
-        description: "Dirección del artículo (lo que sale después de ?id= en su URL)"
+        description: "Dirección del artículo o episodio (lo que sale después de ?id= en su URL)"
         required: true
       mode:
         description: "dry-run = solo una vista previa | test = lo manda solo al correo de abajo | send = lo manda a TODA la lista"

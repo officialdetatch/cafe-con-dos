@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Avisa por correo (Brevo) a los suscriptores cuando sale un artículo nuevo.
+   Avisa por correo (Brevo) a los suscriptores cuando sale un artículo o un
+   episodio nuevo (los episodios salen de data/episodios.js).
    Lo corre GitHub Actions justo DESPUÉS de publicar el sitio
    (.github/workflows/aviso-articulos.yml), con los artículos tal como quedaron
    en el sitio (los del editor Sanity + los de data/articulos.js).
@@ -13,8 +14,10 @@
      (así se pueden subir artículos antes del lanzamiento sin mandar nada).
    - "Publicado" = la misma hora que usa feed.xml (6:00 am de RD del día elegido
      en Sanity, o la hora real si se subió ese mismo día).
-   - No manda dos veces el mismo artículo: antes de enviar mira si ya existe en
-     Brevo una campaña llamada "Aviso: <id del artículo>".
+   - No manda dos veces lo mismo: antes de enviar mira si ya existe en Brevo una
+     campaña llamada "Aviso: <id del artículo>" o "Aviso episodio: <id>".
+   - Un episodio viejo que se agrega al archivo (su fecha es de otro día) NO se
+     avisa: solo cuenta lo que se publica con la fecha de hoy.
    - Si hay más de MAX_NUEVOS (3) artículos por avisar de golpe, no manda nada
      y falla a propósito: se mandan uno por uno con "Run workflow".
 
@@ -47,7 +50,8 @@ function leer() {
   const rutas = [
     [path.join(raiz, "assets/js/config.js")],
     [path.join(carpeta, "data/articulos.js"), path.join(raiz, "data/articulos.js")],
-    [path.join(carpeta, "data/sobremesa.js"), path.join(raiz, "data/sobremesa.js")]
+    [path.join(carpeta, "data/sobremesa.js"), path.join(raiz, "data/sobremesa.js")],
+    [path.join(carpeta, "data/episodios.js"), path.join(raiz, "data/episodios.js")]
   ];
   for (const opciones of rutas) {
     const r = opciones.find((f) => fs.existsSync(f));
@@ -58,20 +62,43 @@ function leer() {
   const ids = new Set();
   const articulos = (ctx.window.CCD_ARTICULOS || []).concat((ctx.window.CCD_SOBREMESA || []).map((p) => Object.assign({ seccion: "sobremesa" }, p)))
     .filter((p) => p && p.id && !ids.has(p.id) && ids.add(p.id));
-  return { cfg, articulos };
+  const idsEp = new Set();
+  const episodios = (ctx.window.CCD_EPISODIOS || []).filter((e) => e && e.id && !idsEp.has(e.id) && idsEp.add(e.id))
+    .map((e) => Object.assign({}, e, { tipo: "episodio" }));
+  return { cfg, articulos, episodios };
+}
+
+const esEp = (a) => a.tipo === "episodio";
+const nombreCampana = (a) => (esEp(a) ? "Aviso episodio: " : "Aviso: ") + a.id;
+// Los títulos de YouTube traen "| Entre Elementos by Café Con Dos | Ep. #3"; en el correo basta lo primero.
+const tituloCorto = (t) => { const p = String(t || "").split(/\s+\|\s+/)[0].trim(); return p.length >= 12 ? p : String(t || "").trim(); };
+
+// Miniatura grande de YouTube si existe (si no, la mediana, que nunca tiene franjas negras).
+async function miniaturaYoutube(id) {
+  const base = "https://i.ytimg.com/vi/" + encodeURIComponent(id) + "/";
+  try {
+    const r = await fetch(base + "maxresdefault.jpg", { method: "HEAD", signal: AbortSignal.timeout(8000) });
+    if (r.ok) return base + "maxresdefault.jpg";
+  } catch (e) { /* se usa la mediana */ }
+  return base + "mqdefault.jpg";
 }
 
 /* ---------- el correo ---------- */
 function construirCorreo(a, cfg) {
   const sitio = String(env("SITIO_URL") || cfg.siteUrl || "").replace(/\/$/, "");
-  const url = sitio + "/entrada.html?id=" + encodeURIComponent(a.id);
+  const ep = esEp(a);
+  const url = sitio + (ep ? "/episodio.html?id=" : "/entrada.html?id=") + encodeURIComponent(a.id);
   const img = a.portada ? (/^https?:/.test(a.portada) ? a.portada : sitio + "/" + String(a.portada).replace(/^\//, "")) : "";
   const sec = (cfg.secciones || []).find((s) => s.id === (a.seccion || "sobremesa"));
-  const etiqueta = sec ? (sec.corto || sec.nombre) : "";
+  const serie = ep ? (cfg.series || []).find((s) => s.id === a.serie) : null;
+  const etiqueta = ep
+    ? ["Nuevo episodio", serie && serie.nombre, a.numero ? "Ep. " + a.numero : ""].filter(Boolean).join(" · ")
+    : (sec ? (sec.corto || sec.nombre) : "");
+  const titulo = ep ? tituloCorto(a.titulo) : a.titulo;
   const r = cfg.redes || {};
   const redes = [["Instagram", r.instagram], ["YouTube", r.youtube], ["Spotify", r.spotify], ["TikTok", r.tiktok]]
     .filter(([, u]) => u && /^https?:/.test(u));
-  const asunto = (a.seccion === "sobremesa" ? "Sobremesa: " : "") + a.titulo;
+  const asunto = ep ? "Nuevo episodio: " + titulo : (a.seccion === "sobremesa" ? "Sobremesa: " : "") + a.titulo;
   const previa = a.resumen || "Nuevo en Café Con Dos.";
   const fondo = (c) => "background:" + c + ";";
   const html =
@@ -105,12 +132,12 @@ function construirCorreo(a, cfg) {
 '<tr><td class="t-marca" align="center" style="padding:0 0 14px;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:15px;line-height:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#723F40;">Café para llevar</td></tr>\n' +
 '<tr><td class="tarjeta" bgcolor="#FBF3EC" style="' + fondo("#FBF3EC") + 'border-radius:22px 22px 22px 6px;overflow:hidden;">\n' +
 '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">\n' +
-(img ? '<tr><td style="font-size:0;line-height:0;border-radius:22px 22px 0 0;overflow:hidden;"><a href="' + esc(url) + '" target="_blank"><img class="foto" src="' + esc(img) + '" width="560" alt="' + esc(a.portadaAlt || a.titulo) + '" style="width:560px;max-width:100%;height:auto;" /></a></td></tr>\n' : "") +
+(img ? '<tr><td style="font-size:0;line-height:0;border-radius:22px 22px 0 0;overflow:hidden;"><a href="' + esc(url) + '" target="_blank"><img class="foto" src="' + esc(img) + '" width="560" alt="' + esc(a.portadaAlt || titulo) + '" style="width:560px;max-width:100%;height:auto;" /></a></td></tr>\n' : "") +
 (etiqueta ? '<tr><td class="relleno t-etiqueta" align="left" style="padding:' + (img ? "28" : "36") + 'px 44px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:14px;line-height:18px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#9A3816;">' + esc(etiqueta) + "</td></tr>\n" : "") +
-'<tr><td class="relleno titulo t-titulo" align="left" style="padding:' + (etiqueta ? "10" : (img ? "28" : "36")) + 'px 44px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:34px;line-height:40px;font-weight:700;color:#3A1F20;">' + esc(a.titulo) + "</td></tr>\n" +
+'<tr><td class="relleno titulo t-titulo" align="left" style="padding:' + (etiqueta ? "10" : (img ? "28" : "36")) + 'px 44px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:34px;line-height:40px;font-weight:700;color:#3A1F20;">' + esc(titulo) + "</td></tr>\n" +
 (a.resumen ? '<tr><td class="relleno t-texto" align="left" style="padding:16px 44px 0;font-family:\'Literata\',Georgia,\'Times New Roman\',serif;font-size:17px;line-height:28px;color:#6B4744;">' + esc(a.resumen) + "</td></tr>\n" : "") +
 '<tr><td class="relleno" align="left" style="padding:26px 44px 40px;"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td class="t-boton" bgcolor="#723F40" style="background:#723F40;border-radius:14px 14px 14px 4px;">' +
-'<a href="' + esc(url) + '" target="_blank" style="display:inline-block;padding:13px 26px;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:18px;font-weight:600;letter-spacing:.3px;color:#F5E4D5;text-decoration:none;">Leer el artículo &rarr;</a></td></tr></table></td></tr>\n' +
+'<a href="' + esc(url) + '" target="_blank" style="display:inline-block;padding:13px 26px;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:18px;font-weight:600;letter-spacing:.3px;color:#F5E4D5;text-decoration:none;">' + (ep ? "Escuchar el episodio" : "Leer el artículo") + ' &rarr;</a></td></tr></table></td></tr>\n' +
 "</table></td></tr>\n" +
 (redes.length ? '<tr><td class="t-link" align="center" style="padding:26px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;">' +
   redes.map(([n, u]) => '<a href="' + esc(u) + '" target="_blank" style="color:#723F40;text-decoration:underline;text-decoration-color:#F47D50;">' + n + "</a>").join('<span class="t-sep" style="color:#C9A28C;">&nbsp;·&nbsp;</span>') + "</td></tr>\n" : "") +
@@ -145,15 +172,16 @@ async function campanasExistentes() {
 }
 
 async function esperarSitio(a, cfg) {
+  const archivo = esEp(a) ? "episodios.js" : "articulos.js";
   const sitio = String(env("SITIO_URL") || cfg.siteUrl || "").replace(/\/$/, "");
   const limite = Date.now() + (Number(env("ESPERA_MINUTOS")) || 10) * 60000;
   while (true) {
     try {
-      const r = await fetch(sitio + "/data/articulos.js?v=" + Date.now(), { headers: { "cache-control": "no-cache" } });
+      const r = await fetch(sitio + "/data/" + archivo + "?v=" + Date.now(), { headers: { "cache-control": "no-cache" } });
       if (r.ok && (await r.text()).includes(JSON.stringify(a.id))) return;
     } catch (e) { /* se reintenta */ }
-    if (Date.now() > limite) throw new Error('El artículo "' + a.id + '" todavía no aparece en ' + sitio + " después de esperar. No se mandó nada.");
-    console.log("Esperando a que el artículo esté en línea…");
+    if (Date.now() > limite) throw new Error((esEp(a) ? 'El episodio "' : 'El artículo "') + a.id + '" todavía no aparece en ' + sitio + " después de esperar. No se mandó nada.");
+    console.log("Esperando a que esté en línea…");
     await espera(Number(env("ESPERA_SEGUNDOS")) * 1000 || 15000);
   }
 }
@@ -161,15 +189,18 @@ async function esperarSitio(a, cfg) {
 /* ---------- principal ---------- */
 async function main() {
   if (!["dry-run", "test", "send"].includes(MODE)) throw new Error('MODE debe ser dry-run, test o send (llegó "' + MODE + '").');
-  const { cfg, articulos } = leer();
+  const { cfg, articulos, episodios } = leer();
+  const todo = articulos.concat(episodios);
   const ahora = Date.now();
-  const publicados = articulos.filter((a) => !a.ejemplo && a.titulo && a.fecha && cuando(a).getTime() <= ahora);
+  const publicados = todo.filter((a) => !a.ejemplo && a.titulo && a.fecha && cuando(a).getTime() <= ahora);
 
   let porAvisar;
   const manual = env("STORY_ID");
   if (manual) {
-    const a = articulos.find((x) => x.id === manual);
-    if (!a) throw new Error('No existe un artículo con la dirección "' + manual + '". Usa la de la URL: entrada.html?id=<esta>.');
+    const coinciden = todo.filter((x) => x.id === manual);
+    if (!coinciden.length) throw new Error('No existe un artículo ni un episodio con la dirección "' + manual + '". Usa la de la URL: entrada.html?id=<esta> o episodio.html?id=<esta>.');
+    if (coinciden.length > 1) throw new Error('"' + manual + '" existe como artículo y como episodio. Cambia la dirección de uno de los dos.');
+    const a = coinciden[0];
     if (!publicados.includes(a)) throw new Error('"' + manual + '" todavía no está publicado (su fecha es futura o le falta título).');
     porAvisar = [a];
   } else {
@@ -182,9 +213,9 @@ async function main() {
     porAvisar = publicados.filter((a) => cuando(a).getTime() >= desde);
   }
 
-  if (!porAvisar.length) { console.log("No hay artículos nuevos para avisar."); return; }
+  if (!porAvisar.length) { console.log("No hay artículos ni episodios nuevos para avisar."); return; }
   if (!manual && porAvisar.length > MAX_NUEVOS) {
-    throw new Error("Hay " + porAvisar.length + " artículos por avisar de golpe (" + porAvisar.map((a) => a.id).join(", ") + ").\n" +
+    throw new Error("Hay " + porAvisar.length + " artículos o episodios por avisar de golpe (" + porAvisar.map((a) => a.id).join(", ") + ").\n" +
       "Por seguridad no se manda nada. Avísalos uno por uno: Actions > 'Aviso por correo' > Run workflow.");
   }
 
@@ -201,8 +232,9 @@ async function main() {
   const respuesta = env("REPLY_TO") || undefined;
 
   for (const a of porAvisar) {
+    if (esEp(a) && !a.portada && a.youtube) a.portada = await miniaturaYoutube(a.youtube);
     const correo = construirCorreo(a, cfg);
-    const nombre = "Aviso: " + a.id;
+    const nombre = nombreCampana(a);
     console.log("\n▸ " + a.titulo + "  (" + a.id + ")");
 
     if (MODE === "dry-run") {
