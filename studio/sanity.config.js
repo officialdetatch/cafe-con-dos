@@ -6,7 +6,7 @@ import {esESLocale} from '@sanity/locale-es-es'
 import sitio from './generado/sitio.js'
 import {tiposDeEsquema} from './esquemas/index.js'
 import {estructura, estructuraBoletin, documentoBoletin} from './estructura.js'
-import {IconoBoletin} from './esquemas/boletin.js'
+import {boletin, IconoBoletin} from './esquemas/boletin.js'
 import {publicarConFecha, publicarBoletin, VerEnLaPagina} from './acciones.js'
 import {Comentarios} from './herramientas/Comentarios.jsx'
 
@@ -69,7 +69,8 @@ export default defineConfig({
   tools: [{name: 'comentarios', title: 'Comentarios', icon: IconoComentarios, component: Comentarios}],
 
   schema: {
-    types: tiposDeEsquema,
+    // El boletín se agrega aquí también, por si esquemas/index.js quedó sin actualizar.
+    types: tiposDeEsquema.some((tipo) => tipo.name === 'boletin') ? tiposDeEsquema : [...tiposDeEsquema, boletin],
   },
 
   document: {
