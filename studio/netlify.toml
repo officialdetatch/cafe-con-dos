@@ -1,0 +1,17 @@
+# Publica el editor (Sanity Studio) en Netlify, en moderador.cafecondos.com.
+# Netlify clona todo el repo (el editor lee ../assets/js/config.js) y construye
+# solo esta carpeta. El sitio principal NO pasa por aquí: sigue en GitHub Pages.
+
+[build]
+  base    = "studio"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# El editor es una app de una sola página: cualquier dirección debe abrir index.html.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
