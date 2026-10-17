@@ -935,7 +935,7 @@
       "<h1" + L + ">" + esc(p.titulo) + "</h1>" +
       (p.resumen ? '<p class="lead"' + L + ">" + esc(p.resumen) + "</p>" : "") +
       '<div class="entrada-firma">' +
-      (a ? '<div class="autor">' + (a.foto ? '<img src="' + esc(BASE + a.foto) + '" alt="">' : tazaHTML("taza-mini")) + "<div><b>" + esc(a.nombre) + "</b><span>" + esc(loc(a, "rol")) + "</span></div></div>" : "") +
+      (a ? '<div class="autor">' + (a.foto ? '<img src="' + esc(BASE + a.foto) + '" alt="">' : tazaHTML("taza-mini")) + "<div><b>" + t("sob.por") + " " + esc(a.nombre) + "</b><span>" + esc(loc(a, "rol")) + "</span></div></div>" : "") +
       artMeta(p) + (p.ejemplo ? '<span class="badge-ejemplo badge-ejemplo--suelto">' + t("ep.ejemplo") + "</span>" : "") + "</div></header>" +
       portada +
       '<div class="entrada-cuerpo' + (portada ? "" : " entrada-cuerpo--sin-foto") + '">' +

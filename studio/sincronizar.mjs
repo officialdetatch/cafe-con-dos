@@ -36,7 +36,7 @@ const sitio = {
   },
   secciones: (cfg.secciones || []).map((x) => ({ id: x.id, nombre: x.nombre, descripcion: x.descripcion || "" })),
   temas: (cfg.temas || []).map((x) => ({ id: x.id, nombre: x.nombre || x.es || x.id })),
-  hosts: (cfg.hosts || []).map((x) => ({ id: x.id, nombre: x.nombre }))
+  hosts: (cfg.hosts || []).map((x) => ({ id: x.id, nombre: x.nombre, rol: x.rol || "" }))
 };
 
 fs.mkdirSync(path.join(aqui, "generado"), { recursive: true });

@@ -34,15 +34,30 @@ window.CCD_CONFIG = {
     discord: "" // déjalo vacío para que no aparezca
   },
 
-  // La autora de los artículos (sale en cada artículo, con su foto).
+  // Quién escribe en Café Con Dos. Cada artículo se firma con una de estas personas
+  // (se elige en el editor, en "Escrito por") y sale con su foto, nombre y rol.
   // Su bio de "Nosotros" está en nosotros.html.
+  //   id:     sin tildes ni espacios. NO lo cambies después: los artículos lo guardan.
+  //   nombre: como sale firmado
+  //   rol:    lo que sale debajo del nombre
+  //   foto:   ej: "images/autores/sarah.jpg" (cuadrada se ve mejor). Vacío = la taza.
+  // Para sumar a alguien: copia un bloque { … }, ponle coma y cambia los datos.
+  // La primera persona de la lista es la que firma los artículos viejos que no
+  // tienen autora, así que déjala de primera.
   hosts: [
     {
       id: "allie",
       nombre: "Allie Tolentino",
-      rol: "Host y creadora",
-      foto: "" // ej: "images/allie.jpg" — si está vacío se usa la taza
+      rol: "Editora en jefe",
+      foto: "" // ej: "images/autores/allie.jpg"
+    },
+    {
+      id: "sarah",
+      nombre: "Sarah", // agrégale el apellido si quieres
+      rol: "Columnista",
+      foto: "" // ej: "images/autores/sarah.jpg"
     }
+    // , { id: "otra", nombre: "Nombre Apellido", rol: "Columnista", foto: "" }
   ],
 
   // Secciones de Explorar. Cada artículo va en una (se elige en el editor).

@@ -1,0 +1,3 @@
+Fotos de quienes escriben en Cafe Con Dos.
+Guarda aqui una foto por persona (cuadrada se ve mejor, menos de 200 KB), por ejemplo sarah.jpg,
+y escribe su ruta en assets/js/config.js: foto: "images/autores/sarah.jpg"

@@ -6,7 +6,7 @@ import {hoy, slugify} from '../slug.js'
 
 const secciones = sitio.secciones.map((s) => ({title: s.nombre, value: s.id}))
 const temas = sitio.temas.map((t) => ({title: t.nombre, value: t.id}))
-const hosts = sitio.hosts.map((h) => ({title: h.nombre, value: h.id}))
+const hosts = sitio.hosts.map((h) => ({title: h.nombre + (h.rol ? ' · ' + h.rol : ''), value: h.id}))
 const nombreSeccion = (id) => (sitio.secciones.find((s) => s.id === id) || {}).nombre || ''
 
 const fechaBonita = (iso) => {
@@ -60,6 +60,15 @@ export const articulo = defineType({
       },
       initialValue: 'es',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'autor',
+      title: 'Escrito por',
+      type: 'string',
+      description: 'Sale firmado en el artículo, con su foto y su rol.',
+      options: {list: hosts, layout: 'radio'},
+      hidden: hosts.length < 2,
+      validation: (Rule) => Rule.required().error('Elige quién escribió este artículo.'),
     }),
     defineField({
       name: 'fecha',
@@ -215,15 +224,6 @@ export const articulo = defineType({
         'Se crea sola con el título al publicar (no hace falta tocarla). Después de publicado ya no cambia, para que no se rompan los links compartidos ni los comentarios.',
       options: {source: 'titulo', maxLength: 80, slugify: (texto) => slugify(texto)},
       readOnly: ({document}) => Boolean(document && document.publicado),
-    }),
-    defineField({
-      name: 'autor',
-      title: 'Autora',
-      type: 'string',
-      fieldset: 'mas',
-      options: {list: hosts},
-      initialValue: hosts.length ? hosts[0].value : undefined,
-      hidden: hosts.length < 2,
     }),
     defineField({
       name: 'publicado',

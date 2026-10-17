@@ -74,6 +74,7 @@ Don't edit the header or footer inside a page: the next copy overwrites it. The 
 | Home picture when no article is featured | `index.html`, inside `<figure class="hero-figura" data-destacado>` |
 | The video in "Del archivo" | `index.html`, the `<iframe>` (comment explains how to show one fixed video) |
 | Host bio and photo | `nosotros.html`, the `<div class="host">` block |
+| Who writes (name, role, photo) | `assets/js/config.js` → `hosts` (see "Writers" below) |
 | Contact cards, form questions, reasons list | `contacto.html` |
 | Labels of filters, form messages, pop-up text | `assets/js/textos.js` |
 | Sections, topics, series | `assets/js/config.js` (then `npm run deploy` in `studio/` so the editor picks them up) |
@@ -116,6 +117,15 @@ When an article or an episode is published, the site emails the Brevo list once:
 - `send`: emails the whole list. Check "force" to resend one that already went out.
 
 **To turn it on at launch:** add the variable `AVISOS_DESDE` with the launch moment in UTC, for example `2026-11-01T00:00:00Z`. Articles published from then on are emailed automatically. To turn it off, delete the variable.
+
+## Writers (who signs each article)
+
+Several people write for the site (Allie → Editora en jefe, Sarah → Columnista, others later). They live in `assets/js/config.js` → `hosts`: `id` (no accents/spaces, never change it after articles use it), `nombre`, `rol` (shown under the name) and `foto`.
+
+- **In the Studio:** each article has **Escrito por**, a required choice (shown only when there are 2+ people). Nothing is pre-selected, so nobody gets credited by accident.
+- **On the site:** the article shows the photo, "Por <name>" and the role. Sobremesa cards show "Por <name>". Articles with no author fall back to the first person in `hosts` (keep Allie first).
+- **Photos:** put them in `images/autores/` (square, under ~200 KB) and write the path in `foto`, e.g. `"images/autores/sarah.jpg"`. Empty = the cup. (`studio/static/` is only for the Studio's own icons, not for writers.)
+- **Add a writer:** copy a `{ … }` block in `hosts`, push, and run `npm run deploy` in `studio/` (or let Netlify rebuild moderador.cafecondos.com, which happens on push). The new name then appears in "Escrito por". Their bio on "Nosotros" is a copy of the `<div class="host">` block in `nosotros.html`.
 
 ## Admin panel: moderador.cafecondos.com (Studio + comment moderation)
 
@@ -199,7 +209,7 @@ Notes:
 ## One-time setup checklist
 
 - [ ] **Domain**: set `siteUrl` in `config.js`, the `og:image` URL and the JSON-LD URLs in each HTML `<head>` (search for `cafecondos.com`), and the Sitemap line in `robots.txt`. In **Settings › Pages**, set **Source** to **GitHub Actions** and enter the custom domain there.
-- [ ] **Host bio/photo**: the bio is in `nosotros.html` (the `host` block). The photo goes in `images/`; use it in that block and in `hosts[].foto` in `config.js` (the author line on each article).
+- [ ] **Host bio/photo**: the bio is in `nosotros.html` (the `host` block). The photo goes in `images/autores/`; use it in that block and in `hosts[].foto` in `config.js` (the author line on each article).
 - [ ] **Newsletter (Brevo)**: create a subscription form, copy its `action="…"` URL into `boletin.action`. The form only asks for name and email. Until then, the form runs in test mode and says so.
 - [ ] **New-article emails**: set up "Email alerts for new articles" above (API key, list ID, variables; test with dry-run and test; add `AVISOS_DESDE` at launch). The feed (`https://YOUR-DOMAIN/feed.xml`) is still there for podcast apps and readers, but the Brevo RSS campaign is not used, so you don't get two emails.
 - [ ] **Comments (Firebase)**: the project `cafe-con-dos` exists and its keys are already in `comentarios.firebase` in `config.js`. Still to do in the Firebase console: turn on Firestore (production mode) and paste `firestore.rules` into Firestore › Rules, then post a test comment on an article and delete it. Comments go into the `ccd_comentarios` collection (all articles, not just Sobremesa); delete one from the console to remove it from the site. The section stays hidden until `projectId` is filled in.
