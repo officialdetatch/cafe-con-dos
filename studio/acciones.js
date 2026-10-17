@@ -1,7 +1,8 @@
 import {useDocumentOperation} from 'sanity'
 import {LaunchIcon} from '@sanity/icons/Launch'
 import sitio from './generado/sitio.js'
-import {slugify} from './slug.js'
+import {hoy, slugify} from './slug.js'
+import {fechaLarga} from './generado/boletin-html.js'
 
 /* El botón Publicar de siempre, con dos cosas más la primera vez:
    - crea la dirección del artículo desde el título si nadie la tocó,
@@ -47,4 +48,33 @@ export function VerEnLaPagina(props) {
       props.onComplete()
     },
   }
+}
+
+/* Publicar un boletín es lo que lo deja listo para salir a los suscriptores, así que
+   antes de publicar pregunta, diciendo cuándo sale. */
+export function publicarBoletin(publicarOriginal) {
+  function Publicar(props) {
+    const original = publicarOriginal(props)
+    if (!original) return original
+    return {
+      ...original,
+      onHandle: () => {
+        const doc = props.draft || props.published || {}
+        const dia = doc.fechaEnvio
+        const cuando = !dia
+          ? 'el día que elijas en "Enviar el"'
+          : dia <= hoy()
+            ? 'en unos minutos (la fecha de envío es hoy o ya pasó)'
+            : 'el ' + fechaLarga(dia).toLowerCase() + ' a las 6:00 am'
+        const ok = window.confirm(
+          'Al publicar, este boletín le llega por correo a todos los suscriptores ' + cuando + '.\n\n' +
+            'Una vez enviado no se puede deshacer. ¿Ya revisaste la vista previa y todo está listo?',
+        )
+        if (!ok) return props.onComplete && props.onComplete()
+        original.onHandle()
+      },
+    }
+  }
+  Publicar.action = publicarOriginal.action
+  return Publicar
 }

@@ -1,0 +1,82 @@
+# Manda por correo (Brevo) el BOLETÍN semanal que se escribe en el editor (pestaña "Boletín").
+# No sale en el sitio: solo por correo, a los suscriptores.
+#
+# Corre solo, justo después de que "Publicar sitio" termina bien (o sea, después de cada
+# cambio en Sanity y cada mañana a las 6:00 am), y manda los boletines PUBLICADOS cuya fecha
+# de "Enviar el" ya llegó. También corre a mano con "Run workflow" (para probar o reenviar).
+#
+# Los envíos automáticos están APAGADOS hasta que exista la variable AVISOS_DESDE
+# (la misma de los avisos de artículos; ver README, "Boletín semanal").
+
+name: Boletín por correo
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('Boletín ({0}){1} {2}', inputs.mode, ':', inputs.boletin) || 'Boletín automático' }}
+
+on:
+  workflow_run:
+    workflows: ["Publicar sitio"]
+    types: [completed]
+
+  workflow_dispatch:
+    inputs:
+      boletin:
+        description: "Cuál boletín: escribe 'ultimo' o su fecha de envío (AAAA-MM-DD). Debe estar PUBLICADO en el editor."
+        required: true
+        default: "ultimo"
+      mode:
+        description: "dry-run = solo una vista previa | test = lo manda solo al correo de abajo | send = lo manda a TODA la lista"
+        type: choice
+        options: [dry-run, test, send]
+        default: dry-run
+      test_email:
+        description: "Tu correo (solo para el modo test)"
+        required: false
+      force:
+        description: "Mandarlo aunque ya se haya mandado antes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: boletin-correo
+  cancel-in-progress: false
+
+jobs:
+  boletin:
+    # Solo si la publicación salió bien (o si se corrió a mano).
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: America/Santo_Domingo
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Mandar el boletín
+        run: node scripts/boletin-correo.js
+        env:
+          SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }} # opcional, solo si el dataset es privado
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ vars.BREVO_LIST_ID }}
+          SENDER_EMAIL: ${{ vars.SENDER_EMAIL }}
+          SENDER_NAME: ${{ vars.SENDER_NAME }}
+          REPLY_TO: ${{ vars.REPLY_TO }}
+          AVISOS_DESDE: ${{ vars.AVISOS_DESDE }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'send' }}
+          BOLETIN: ${{ github.event_name == 'workflow_dispatch' && inputs.boletin || '' }}
+          TEST_EMAIL: ${{ inputs.test_email }}
+          FORCE: ${{ inputs.force }}
+
+      - name: Guardar las vistas previas (dry-run)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boletin-preview
+          path: email-preview-boletin-*.html
+          if-no-files-found: ignore

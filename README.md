@@ -47,9 +47,11 @@ scripts/              partes.js: copies partes/ into every page (see below)
                       contenido-sanity.js: pulls the editor's articles into the site
                       build-feed.js + feed.js: build feed.xml and sitemap.xml
                       aviso-correo.js: emails the Brevo list about a new article or episode
+                      boletin-html.mjs + boletin-correo.js: the weekly newsletter email (template + sender)
 .github/workflows/    deploy.yml: publishes the site on every push, every time she publishes/
                       edits/deletes in the editor, and every day at 6:00 am (Dominican time)
                       aviso-articulos.yml: sends the new-article email after each publish
+                      boletin.yml: sends the weekly newsletter (Studio "Boletín" tab) when its day arrives
                       studio.yml: (optional) republishes the editor when studio/ or config.js changes
 ```
 
@@ -117,6 +119,32 @@ When an article or an episode is published, the site emails the Brevo list once:
 - `send`: emails the whole list. Check "force" to resend one that already went out.
 
 **To turn it on at launch:** add the variable `AVISOS_DESDE` with the launch moment in UTC, for example `2026-11-01T00:00:00Z`. Articles published from then on are emailed automatically. To turn it off, delete the variable.
+
+## Weekly newsletter ("Boletín"): written in the Studio, sent by email only
+
+A tab called **Boletín** in the Studio (next to Artículos and Comentarios). It never appears on the website: it only goes out by email to the Brevo list. The layout is fixed (logo, big title, the date range, a greeting, one block per entry with an optional photo, a closing, and a footer with "Síguenos en nuestras redes…" and the social links), so nobody has to design a template in Brevo.
+
+**Writing one (what she does):**
+1. Boletín tab → **Crear** (new). The title is already "Lo que viene esta semana".
+2. **Enviar el**: the day it goes out (6:00 am, RD). Required.
+3. Optional **Saludo**; then **Lo que viene**: add one entry per thing (date, optional label like "Nuevo episodio", title, a few lines of text, optional photo, optional link). Entries are sorted by date automatically.
+4. Optional **Despedida**.
+5. Check the **Vista previa del correo** tab (shows the real email, light or dark mode, updating as she types).
+6. **Publicar**. It asks for confirmation and says when it will go out. A draft never goes out; only a published boletín does.
+
+**How it goes out:** `scripts/boletin-correo.js`, run by `.github/workflows/boletin.yml` right after every "Publicar sitio" (each Sanity change and every morning at 6:00 am). It sends published boletines whose "Enviar el" day has arrived. Safety rules:
+- **Off until launch**: it uses the same `AVISOS_DESDE` repository variable as the article alerts. Empty = nothing goes out automatically. (Manual runs below always work.)
+- **Once only**: before sending it looks in Brevo for a campaign whose name ends in the boletín's id (`Boletín: … [id]`). Editing and re-publishing a boletín that already went out does **not** resend it.
+- A boletín whose date passed more than 3 days ago is not sent automatically, and if two are due at once nothing is sent (the run fails on purpose; send them one by one).
+- The email uses the same Brevo variables as the article alerts (`BREVO_API_KEY` secret; `BREVO_LIST_ID`, `SENDER_EMAIL`, `SENDER_NAME`, `REPLY_TO`).
+
+**Trying it (do this once before launch):** GitHub → Actions → **Boletín por correo** → Run workflow. Type `ultimo` (or the boletín's "Enviar el" date, `AAAA-MM-DD`), mode **test** and your own email: Brevo sends you a copy only to you. `dry-run` just saves the HTML (download it from the run's "boletin-preview" artifact); `send` mails the whole list (add `force` to resend one that already went out). The boletín must be **published** in the Studio.
+
+**One-time setup:**
+- In sanity.io/manage → your project → API → **Webhooks**: the existing webhook that triggers "Publicar sitio" must also fire for boletines. If it has a filter like `_type == "articulo"`, change it to `_type in ["articulo", "boletin"]` (an empty filter already covers everything). Without this, a boletín dated today would wait until the next morning's run.
+- Studio: Netlify redeploys moderador.cafecondos.com on push (and run `npm run deploy` in `studio/` if you also use the cafecondos.sanity.studio copy).
+- Footer wording ("Síguenos en nuestras redes…") and the layout live in `scripts/boletin-html.mjs`. The Studio's preview uses a copy of that file made by `studio/sincronizar.mjs` (`studio/generado/`), so there is only one template.
+- The Sanity dataset is public-read by default, so a published boletín's text is technically readable through the API; keep truly confidential things out of it.
 
 ## Writers (who signs each article)
 
@@ -214,7 +242,7 @@ Notes:
 - [ ] **New-article emails**: set up "Email alerts for new articles" above (API key, list ID, variables; test with dry-run and test; add `AVISOS_DESDE` at launch). The feed (`https://YOUR-DOMAIN/feed.xml`) is still there for podcast apps and readers, but the Brevo RSS campaign is not used, so you don't get two emails.
 - [ ] **Comments (Firebase)**: the project `cafe-con-dos` exists and its keys are already in `comentarios.firebase` in `config.js`. Still to do in the Firebase console: turn on Firestore (production mode) and paste `firestore.rules` into Firestore › Rules, then post a test comment on an article and delete it. Comments go into the `ccd_comentarios` collection (all articles, not just Sobremesa); delete one from the console to remove it from the site. The section stays hidden until `projectId` is filled in.
 - [ ] **"Invítanos un café" bubble**: paste Café Con Dos' Buy Me a Coffee link into `apoyo.cafeConDos` in `config.js`. The same link feeds the box at the end of every article ("Si te gustó esto, no olvides comentar y apoyarnos invitándonos un café", with a comment button when comments are on); that box stays hidden until the link is set. Until then the bubble only shows the developer option. `avisoSegundos` sets when the little alert pops up (once every 7 days per visitor; 0 turns it off).
-- [ ] **Contact form**: paste a Formspree (or similar) endpoint into `contacto.action`, or set `contacto.email` to fall back to a mailto link.
+- [ ] **Contact form**: in formspree.io create a form ("Café Con Dos – Contacto") that delivers to the inbox that should get the messages (e.g. info@cafecondos.com), confirm the verification email, copy the endpoint (`https://formspree.io/f/xxxxxxxx`) into `contacto.action` in `config.js`, push, then send a test message from /contacto.html (the first one may need a confirmation click in the email Formspree sends). The form already sends `nombre`, `email` (used as reply-to), `motivo` and `mensaje`, plus a hidden `_gotcha` anti-spam field. Without `action`, `contacto.email` falls back to opening the visitor's mail app.
 - [ ] **"En redes" (optional)**: the Instagram + TikTok section is off because it isn't in the home design. To turn it on: sign up at behold.so, connect the Instagram, create a **JSON feed**, paste its URL into `enRedes.instagramFeed` in `config.js`, and remove the word `hidden` from `<section … id="en-redes" hidden>` in `index.html`.
 - [ ] **Article editor (Sanity)**: steps 1–6 in "Article editor (Sanity) — one-time setup" above.
 - [ ] Delete the sample content with the writers.

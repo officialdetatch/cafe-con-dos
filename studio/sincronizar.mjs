@@ -30,6 +30,8 @@ const sitio = {
   projectId: s.projectId,
   dataset: s.dataset || "production",
   studioAppId: s.studioAppId || "",
+  lema: cfg.lema || "",
+  redes: cfg.redes || {},
   comentarios: {
     coleccion: (cfg.comentarios && cfg.comentarios.coleccion) || "ccd_comentarios",
     firebase: (cfg.comentarios && cfg.comentarios.firebase) || {}
@@ -45,4 +47,6 @@ fs.writeFileSync(
   "// Generado por sincronizar.mjs desde assets/js/config.js. No se edita a mano.\n" +
     "const sitio = " + JSON.stringify(sitio, null, 2) + ";\nexport default sitio;\n"
 );
+// El mismo armador del correo del boletín que usa GitHub Actions, para la vista previa.
+fs.copyFileSync(path.join(aqui, "..", "scripts", "boletin-html.mjs"), path.join(aqui, "generado", "boletin-html.js"));
 console.log("✔ Editor sincronizado con config.js (" + sitio.secciones.length + " secciones, " + sitio.temas.length + " temas).");

@@ -5,8 +5,9 @@ import {structureTool} from 'sanity/structure'
 import {esESLocale} from '@sanity/locale-es-es'
 import sitio from './generado/sitio.js'
 import {tiposDeEsquema} from './esquemas/index.js'
-import {estructura} from './estructura.js'
-import {publicarConFecha, VerEnLaPagina} from './acciones.js'
+import {estructura, estructuraBoletin, documentoBoletin} from './estructura.js'
+import {IconoBoletin} from './esquemas/boletin.js'
+import {publicarConFecha, publicarBoletin, VerEnLaPagina} from './acciones.js'
 import {Comentarios} from './herramientas/Comentarios.jsx'
 
 // Los colores de Café Con Dos en todo el editor (claro y oscuro).
@@ -57,7 +58,12 @@ export default defineConfig({
   dataset: sitio.dataset,
   ...(tema ? {theme: tema} : {}),
 
-  plugins: [structureTool({title: 'Artículos', structure: estructura}), esESLocale()],
+  plugins: [
+    structureTool({title: 'Artículos', structure: estructura}),
+    // La pestaña del boletín semanal (se manda por correo, no sale en el sitio).
+    structureTool({name: 'boletin', title: 'Boletín', icon: IconoBoletin, structure: estructuraBoletin, defaultDocumentNode: documentoBoletin}),
+    esESLocale(),
+  ],
 
   // Pestañas extra junto a "Artículos": moderar los comentarios del sitio.
   tools: [{name: 'comentarios', title: 'Comentarios', icon: IconoComentarios, component: Comentarios}],
@@ -68,6 +74,9 @@ export default defineConfig({
 
   document: {
     actions: (anteriores, contexto) => {
+      if (contexto.schemaType === 'boletin') {
+        return anteriores.map((accion) => (accion.action === 'publish' ? publicarBoletin(accion) : accion))
+      }
       if (contexto.schemaType !== 'articulo') return anteriores
       return [
         // "Duplicar" copiaría la dirección y la fecha de publicación del original.

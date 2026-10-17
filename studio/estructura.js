@@ -3,6 +3,7 @@ import {DocumentsIcon} from '@sanity/icons/Documents'
 import {FolderIcon} from '@sanity/icons/Folder'
 import sitio from './generado/sitio.js'
 import {hoy} from './slug.js'
+import {VistaPreviaCorreo} from './herramientas/VistaPreviaCorreo.jsx'
 
 const masNuevo = [{field: 'fecha', direction: 'desc'}]
 
@@ -44,3 +45,20 @@ export const estructura = (S) =>
           ),
       ),
     ])
+
+// La pestaña "Boletín": el correo semanal. No sale en el sitio, solo por correo.
+export const estructuraBoletin = (S) =>
+  S.list()
+    .title('Boletín')
+    .items([
+      S.listItem()
+        .title('Boletines')
+        .id('boletines')
+        .child(S.documentTypeList('boletin').title('Boletines').defaultOrdering([{field: 'fechaEnvio', direction: 'desc'}])),
+    ])
+
+// Al abrir un boletín: el formulario y, al lado, la vista previa del correo.
+export const documentoBoletin = (S, {schemaType}) =>
+  schemaType === 'boletin'
+    ? S.document().views([S.view.form(), S.view.component(VistaPreviaCorreo).title('Vista previa del correo')])
+    : S.document().views([S.view.form()])
