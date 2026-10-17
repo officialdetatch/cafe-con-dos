@@ -126,7 +126,6 @@ window.CCD_TEXTOS = {
   "apoyo.nos": "Apóyanos",
   "apoyo.nos.sub": "Cada café ayuda a que sigamos contando historias.",
   "apoyo.dev": "Apoya a nuestro developer",
-  "apoyo.dev.sub": "cmramirez.dev hizo este sitio.",
   "apoyo.cerrar": "Cerrar",
 
   // Compartir y otros

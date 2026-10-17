@@ -176,7 +176,7 @@ window.CCD_CONFIG = {
                  cada 7 días por visitante). 0 = sin aviso. */
   apoyo: {
     mostrar: true,
-    cafeConDos: "",
+    cafeConDos: "https://buymeacoffee.com/cafecondos",
     developer: "https://buymeacoffee.com/cmramirez.dev",
     avisoSegundos: 15
   }

@@ -1047,7 +1047,7 @@
     const A = CFG.apoyo || {};
     const opciones = [
       A.cafeConDos && { url: A.cafeConDos, titulo: t("apoyo.nos"), sub: t("apoyo.nos.sub"), icono: '<img src="' + BASE + 'images/taza.png" alt="">' },
-      A.developer && { url: A.developer, titulo: t("apoyo.dev"), sub: t("apoyo.dev.sub"), icono: '<span class="apoyo-dev" aria-hidden="true">&lt;/&gt;</span>' }
+      A.developer && { url: A.developer, titulo: t("apoyo.dev"), icono: '<span class="apoyo-dev" aria-hidden="true">&lt;/&gt;</span>' }
     ].filter(Boolean);
     if (A.mostrar === false || !opciones.length) return;
 
@@ -1058,7 +1058,7 @@
       '<p class="apoyo-titulo" id="apoyo-titulo">' + t("apoyo.titulo") + "</p>" +
       '<ul class="apoyo-opciones">' + opciones.map((o) =>
         '<li><a href="' + esc(o.url) + '" target="_blank" rel="noopener"><span class="apoyo-ico">' + o.icono + "</span>" +
-        "<span><b>" + esc(o.titulo) + "</b><small>" + esc(o.sub) + "</small></span></a></li>").join("") + "</ul></div>" +
+        "<span><b>" + esc(o.titulo) + "</b>" + (o.sub ? "<small>" + esc(o.sub) + "</small>" : "") + "</span></a></li>").join("") + "</ul></div>" +
       '<div class="apoyo-aviso" hidden><button type="button" class="apoyo-aviso-texto">' + t("apoyo.aviso") + "</button>" +
       '<button type="button" class="apoyo-aviso-cerrar" aria-label="' + t("apoyo.cerrar") + '">' +
       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>' +
