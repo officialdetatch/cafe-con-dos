@@ -13,6 +13,7 @@
   "dependencies": {
     "@sanity/icons": "^5.2.3",
     "@sanity/locale-es-es": "^1.2.39",
+    "@sanity/themer": "latest",
     "@sanity/ui": "^4.4.4",
     "react": "^19.2.2",
     "react-dom": "^19.2.2",

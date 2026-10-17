@@ -1,9 +1,107 @@
-import {useCallback, useEffect, useMemo, useState} from 'react'
-import {Badge, Box, Button, Card, Flex, Heading, Spinner, Stack, Text, TextInput} from '@sanity/ui'
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react'
 import sitio from '../generado/sitio.js'
 import {alCambiarSesion, borrar, enviarVerificacion, entrar, entrarConCorreo, escuchar, esModerador, recuperar, salir, yaVerificado} from './nube.js'
 
+// Esta pestaña NO usa los componentes de colores de Sanity: trae su propio estilo y
+// se adapta sola al modo claro u oscuro del editor (mira el color de fondo real de la
+// pantalla). Así se ve bien sin depender de la versión del editor.
+
 const POR_PAGINA = 50
+
+// ---------- modo claro / oscuro ----------
+function leerColor(texto) {
+  let m = texto.match(/rgba?\(([^)]+)\)/)
+  if (m) {
+    const p = m[1].split(/[,\s/]+/).filter(Boolean).map(parseFloat)
+    return {rgb: p.slice(0, 3), a: p.length > 3 ? p[3] : 1}
+  }
+  m = texto.match(/color\(srgb\s+([^)]+)\)/)
+  if (m) {
+    const p = m[1].split(/[\s/]+/).filter(Boolean).map(parseFloat)
+    return {rgb: p.slice(0, 3).map((v) => v * 255), a: p.length > 3 ? p[3] : 1}
+  }
+  return null
+}
+
+function fondoReal(el) {
+  for (let n = el; n; n = n.parentElement) {
+    const c = leerColor(getComputedStyle(n).backgroundColor || '')
+    if (c && c.a > 0.5) return c.rgb
+  }
+  return null
+}
+
+function esOscuro(el) {
+  const rgb = el ? fondoReal(el) : null
+  if (rgb) {
+    const [r, g, b] = rgb.map((v) => v / 255)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.5
+  }
+  return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+}
+
+function useOscuro(ref) {
+  const [oscuro, setOscuro] = useState(false)
+  useLayoutEffect(() => {
+    const medir = () => {
+      const el = ref.current
+      if (el) setOscuro(esOscuro(el.parentElement || el))
+    }
+    medir()
+    let cuadro = 0
+    const pronto = () => {
+      cancelAnimationFrame(cuadro)
+      cuadro = requestAnimationFrame(medir)
+    }
+    const mo = new MutationObserver(pronto)
+    mo.observe(document.documentElement, {attributes: true, subtree: true, attributeFilter: ['data-scheme', 'data-theme', 'class', 'style']})
+    const mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null
+    if (mq && mq.addEventListener) mq.addEventListener('change', pronto)
+    const reloj = setInterval(medir, 2000)
+    return () => {
+      mo.disconnect()
+      cancelAnimationFrame(cuadro)
+      clearInterval(reloj)
+      if (mq && mq.removeEventListener) mq.removeEventListener('change', pronto)
+    }
+  }, [ref])
+  return oscuro
+}
+
+const COLORES = {
+  claro: {fg: '#3A1F20', suave: '#6B4744', borde: 'rgba(114,63,64,.3)', tarjeta: 'rgba(114,63,64,.06)', boton: '#723F40', botonTxt: '#F5E4D5', peligro: '#B3261E', enlace: '#9A3816', critico: 'rgba(179,38,30,.1)', atencion: 'rgba(244,125,80,.16)', bien: 'rgba(70,140,90,.16)', campo: '#FFFDF9'},
+  oscuro: {fg: '#F3E2D3', suave: '#CFB3A3', borde: 'rgba(233,202,176,.3)', tarjeta: 'rgba(233,202,176,.07)', boton: '#E9CAB0', botonTxt: '#2E1C1D', peligro: '#FF9A8F', enlace: '#F7A37F', critico: 'rgba(255,154,143,.14)', atencion: 'rgba(244,125,80,.16)', bien: 'rgba(120,200,150,.16)', campo: 'rgba(233,202,176,.08)'},
+}
+
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@600;700&family=Literata:wght@400;600&display=swap');
+.ccd-com{box-sizing:border-box;height:100%;overflow:auto;color:var(--fg);font-family:'Literata',Georgia,'Times New Roman',serif;font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}
+.ccd-com *{box-sizing:border-box}
+.ccd-com .ccd-in{max-width:720px;margin:0 auto;padding:20px 16px 60px;display:flex;flex-direction:column;gap:16px}
+.ccd-com h1{margin:0;font-family:'Antonio','Arial Narrow',Arial,sans-serif;font-size:28px;line-height:1.1;font-weight:700;letter-spacing:.3px;color:var(--fg)}
+.ccd-com p{margin:0}
+.ccd-com .fila{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ccd-com .entre{justify-content:space-between}
+.ccd-com .col{display:flex;flex-direction:column;gap:12px}
+.ccd-com .suave{color:var(--suave);font-size:13px}
+.ccd-com .tarjeta{border:1px solid var(--borde);background:var(--tarjeta);border-radius:18px 18px 18px 6px;padding:16px;color:var(--fg)}
+.ccd-com .tarjeta.critico{background:var(--critico);border-color:var(--peligro)}
+.ccd-com .tarjeta.atencion{background:var(--atencion)}
+.ccd-com .tarjeta.bien{background:var(--bien)}
+.ccd-com .insignia{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--bien);color:var(--fg);border:1px solid var(--borde)}
+.ccd-com button{font-family:'Antonio','Arial Narrow',Arial,sans-serif;letter-spacing:.3px;font-size:17px;min-height:44px;padding:0 18px;border-radius:12px 12px 12px 4px;cursor:pointer;border:1px solid var(--borde);background:transparent;color:var(--fg)}
+.ccd-com button.primario{background:var(--boton);border-color:var(--boton);color:var(--botonTxt);font-weight:600}
+.ccd-com button.peligro{background:var(--peligro);border-color:var(--peligro);color:var(--botonTxt);font-weight:600}
+.ccd-com button.borrar{color:var(--peligro);border-color:var(--peligro)}
+.ccd-com button.chico{min-height:36px;font-size:15px;padding:0 14px}
+.ccd-com button:disabled{opacity:.55;cursor:default}
+.ccd-com input{font:inherit;font-size:16px;width:100%;min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--borde);background:var(--campo);color:var(--fg)}
+.ccd-com input::placeholder{color:var(--suave)}
+.ccd-com a{color:var(--enlace)}
+.ccd-com .nombre{font-weight:600}
+.ccd-com .texto{white-space:pre-wrap;overflow-wrap:anywhere}
+.ccd-com .id{overflow-wrap:anywhere;color:var(--suave);font-size:12px}
+`
 
 // Traduce los errores de Firebase a algo que se pueda resolver.
 function explicar(e) {
@@ -37,44 +135,42 @@ function fechaCorta(d) {
 function Comentario({c, confirmando, borrando, alPedir, alCancelar, alConfirmar}) {
   const enlace = (sitio.siteUrl || '') + '/entrada.html?id=' + encodeURIComponent(c.post)
   return (
-    <Card padding={3} radius={3} border tone={confirmando ? 'critical' : 'default'}>
-      <Stack space={3}>
-        <Flex justify="space-between" align="flex-start" gap={3} wrap="wrap">
-          <Stack space={2}>
-            <Text weight="semibold">{c.nombre}</Text>
-            <Text size={1} muted>
-              {fechaCorta(c.fecha)}
-            </Text>
-          </Stack>
-          <Text size={1}>
-            <a href={enlace} target="_blank" rel="noopener noreferrer">
-              Ver artículo ↗
-            </a>
-          </Text>
-        </Flex>
-        <Text size={1} muted style={{wordBreak: 'break-all'}}>
-          {c.post}
-        </Text>
-        <Text style={{whiteSpace: 'pre-wrap', overflowWrap: 'anywhere'}}>{c.texto}</Text>
-        {confirmando ? (
-          <Flex gap={2} align="center" wrap="wrap">
-            <Text size={1} weight="semibold">
-              ¿Borrar este comentario?
-            </Text>
-            <Button text="Sí, borrar" tone="critical" fontSize={1} padding={3} loading={borrando} disabled={borrando} onClick={alConfirmar} />
-            <Button text="Cancelar" mode="ghost" fontSize={1} padding={3} disabled={borrando} onClick={alCancelar} />
-          </Flex>
-        ) : (
-          <Flex>
-            <Button text="Borrar" tone="critical" mode="ghost" fontSize={1} padding={3} onClick={alPedir} />
-          </Flex>
-        )}
-      </Stack>
-    </Card>
+    <div className={'tarjeta' + (confirmando ? ' critico' : '')} style={{display: 'flex', flexDirection: 'column', gap: 10}}>
+      <div className="fila entre" style={{alignItems: 'flex-start'}}>
+        <div>
+          <div className="nombre">{c.nombre}</div>
+          <div className="suave">{fechaCorta(c.fecha)}</div>
+        </div>
+        <a href={enlace} target="_blank" rel="noopener noreferrer" className="suave" style={{color: 'var(--enlace)'}}>
+          Ver artículo ↗
+        </a>
+      </div>
+      <div className="id">{c.post}</div>
+      <div className="texto">{c.texto}</div>
+      {confirmando ? (
+        <div className="fila">
+          <b style={{fontSize: 13}}>¿Borrar este comentario?</b>
+          <button type="button" className="peligro chico" disabled={borrando} onClick={alConfirmar}>
+            {borrando ? 'Borrando…' : 'Sí, borrar'}
+          </button>
+          <button type="button" className="chico" disabled={borrando} onClick={alCancelar}>
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <div className="fila">
+          <button type="button" className="borrar chico" onClick={alPedir}>
+            Borrar
+          </button>
+        </div>
+      )}
+    </div>
   )
 }
 
 export function Comentarios() {
+  const raiz = useRef(null)
+  const oscuro = useOscuro(raiz)
   // undefined = revisando · null = sin sesión · {email, nombre} = con sesión
   const [usuario, setUsuario] = useState(undefined)
   // null = revisando · true/false
@@ -223,95 +319,90 @@ export function Comentarios() {
   }, [items, buscar])
 
   let contenido
-  if (usuario === undefined) {
-    contenido = (
-      <Flex justify="center" padding={5}>
-        <Spinner muted />
-      </Flex>
-    )
+  if (usuario === undefined || (usuario && usuario.verificado && moderador === null)) {
+    contenido = <p className="suave">Cargando…</p>
   } else if (!usuario) {
     contenido = (
-      <Card padding={4} radius={3} border>
-        <Stack space={4}>
-          <Text>Para moderar los comentarios, entra con tu cuenta. Solo pueden hacerlo los correos autorizados.</Text>
-          <Flex>
-            <Button text="Entrar con Google" tone="primary" padding={4} loading={entrando} disabled={entrando || ocupado} onClick={hacerEntrar} />
-          </Flex>
-          <Text size={1} muted>
-            ¿No usas Google? Entra con tu correo y contraseña:
-          </Text>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              hacerEntrarConCorreo()
-            }}
-          >
-            <Stack space={3}>
-              <TextInput type="email" value={correo} onChange={(e) => setCorreo(e.currentTarget.value)} placeholder="Correo" autoComplete="username" />
-              <TextInput type="password" value={clave} onChange={(e) => setClave(e.currentTarget.value)} placeholder="Contraseña" autoComplete="current-password" />
-              <Flex gap={2} wrap="wrap">
-                <Button type="submit" text="Entrar con correo" padding={3} loading={ocupado} disabled={ocupado || entrando} />
-                <Button text="Crear o cambiar mi contraseña" mode="ghost" fontSize={1} padding={3} disabled={ocupado || entrando} onClick={hacerRecuperar} />
-              </Flex>
-            </Stack>
-          </form>
-        </Stack>
-      </Card>
+      <div className="tarjeta col">
+        <p>Para moderar los comentarios, entra con tu cuenta. Solo pueden hacerlo los correos autorizados.</p>
+        <div className="fila">
+          <button type="button" className="primario" disabled={entrando || ocupado} onClick={hacerEntrar}>
+            {entrando ? 'Abriendo Google…' : 'Entrar con Google'}
+          </button>
+        </div>
+        <p className="suave">¿No usas Google? Entra con tu correo y contraseña:</p>
+        <form
+          className="col"
+          onSubmit={(e) => {
+            e.preventDefault()
+            hacerEntrarConCorreo()
+          }}
+        >
+          <input type="email" value={correo} onChange={(e) => setCorreo(e.currentTarget.value)} placeholder="Correo" autoComplete="username" />
+          <input type="password" value={clave} onChange={(e) => setClave(e.currentTarget.value)} placeholder="Contraseña" autoComplete="current-password" />
+          <div className="fila">
+            <button type="submit" className="primario" disabled={ocupado || entrando}>
+              {ocupado ? 'Entrando…' : 'Entrar con correo'}
+            </button>
+            <button type="button" disabled={ocupado || entrando} onClick={hacerRecuperar}>
+              Crear o cambiar mi contraseña
+            </button>
+          </div>
+        </form>
+      </div>
     )
   } else if (!usuario.verificado) {
     contenido = (
-      <Card padding={4} radius={3} border tone="caution">
-        <Stack space={4}>
-          <Text>
-            Falta verificar el correo <b>{usuario.email}</b>. Es un paso de seguridad: así nadie puede usar tu correo sin ser tú.
-          </Text>
-          <Flex gap={2} wrap="wrap">
-            <Button text="Enviar correo de verificación" tone="primary" padding={3} loading={ocupado} disabled={ocupado} onClick={hacerVerificar} />
-            <Button text="Ya lo verifiqué" mode="ghost" padding={3} disabled={ocupado} onClick={hacerYaVerifique} />
-            <Button text="Salir" mode="ghost" padding={3} onClick={hacerSalir} />
-          </Flex>
-        </Stack>
-      </Card>
-    )
-  } else if (moderador === null) {
-    contenido = (
-      <Flex justify="center" padding={5}>
-        <Spinner muted />
-      </Flex>
+      <div className="tarjeta atencion col">
+        <p>
+          Falta verificar el correo <b>{usuario.email}</b>. Es un paso de seguridad: así nadie puede usar tu correo sin ser tú.
+        </p>
+        <div className="fila">
+          <button type="button" className="primario" disabled={ocupado} onClick={hacerVerificar}>
+            Enviar correo de verificación
+          </button>
+          <button type="button" disabled={ocupado} onClick={hacerYaVerifique}>
+            Ya lo verifiqué
+          </button>
+          <button type="button" onClick={hacerSalir}>
+            Salir
+          </button>
+        </div>
+      </div>
     )
   } else if (!moderador) {
     contenido = (
-      <Card padding={4} radius={3} border tone="caution">
-        <Stack space={4}>
-          <Text>
-            El correo <b>{usuario.email}</b> no está en la lista de moderadores. Si debería estarlo, agrégalo en Firebase (Firestore → ccd_admins) o entra con otra cuenta.
-          </Text>
-          <Flex>
-            <Button text="Salir" mode="ghost" onClick={hacerSalir} />
-          </Flex>
-        </Stack>
-      </Card>
+      <div className="tarjeta atencion col">
+        <p>
+          El correo <b>{usuario.email}</b> no está en la lista de moderadores. Si debería estarlo, agrégalo en Firebase (Firestore → ccd_admins) o entra con otra cuenta.
+        </p>
+        <div className="fila">
+          <button type="button" onClick={hacerSalir}>
+            Salir
+          </button>
+        </div>
+      </div>
     )
   } else {
     contenido = (
-      <Stack space={4}>
-        <Flex justify="space-between" align="center" gap={3} wrap="wrap">
-          <Text size={1} muted style={{overflowWrap: 'anywhere'}}>
+      <div className="col" style={{gap: 16}}>
+        <div className="fila entre">
+          <span className="suave" style={{overflowWrap: 'anywhere'}}>
             {usuario.email}
-          </Text>
-          <Button text="Salir" mode="ghost" fontSize={1} padding={2} onClick={hacerSalir} />
-        </Flex>
-        <TextInput value={buscar} onChange={(e) => setBuscar(e.currentTarget.value)} placeholder="Buscar por nombre, texto o artículo…" />
+          </span>
+          <button type="button" className="chico" onClick={hacerSalir}>
+            Salir
+          </button>
+        </div>
+        <input type="search" value={buscar} onChange={(e) => setBuscar(e.currentTarget.value)} placeholder="Buscar por nombre, texto o artículo…" />
         {items === null ? (
-          <Flex justify="center" padding={5}>
-            <Spinner muted />
-          </Flex>
+          <p className="suave">Cargando comentarios…</p>
         ) : visibles.length === 0 ? (
-          <Card padding={4} radius={3} border>
-            <Text muted>{items.length === 0 ? 'Todavía no hay comentarios.' : 'Ningún comentario coincide con la búsqueda.'}</Text>
-          </Card>
+          <div className="tarjeta">
+            <p className="suave">{items.length === 0 ? 'Todavía no hay comentarios.' : 'Ningún comentario coincide con la búsqueda.'}</p>
+          </div>
         ) : (
-          <Stack space={3}>
+          <div className="col">
             {visibles.map((c) => (
               <Comentario
                 key={c.id}
@@ -323,44 +414,45 @@ export function Comentarios() {
                 alConfirmar={() => confirmarBorrar(c.id)}
               />
             ))}
-          </Stack>
+          </div>
         )}
         {items && items.length >= limite ? (
-          <Flex justify="center">
-            <Button text="Ver más antiguos" mode="ghost" onClick={() => setLimite(limite + POR_PAGINA)} />
-          </Flex>
+          <div className="fila" style={{justifyContent: 'center'}}>
+            <button type="button" onClick={() => setLimite(limite + POR_PAGINA)}>
+              Ver más antiguos
+            </button>
+          </div>
         ) : null}
-      </Stack>
+      </div>
     )
   }
 
+  const paleta = oscuro ? COLORES.oscuro : COLORES.claro
+  const vars = {
+    "--fg": paleta.fg, "--suave": paleta.suave, "--borde": paleta.borde, "--tarjeta": paleta.tarjeta, "--boton": paleta.boton, "--botonTxt": paleta.botonTxt,
+    "--peligro": paleta.peligro, "--enlace": paleta.enlace, "--critico": paleta.critico, "--atencion": paleta.atencion, "--bien": paleta.bien, "--campo": paleta.campo,
+  }
+
   return (
-    <Card style={{height: '100%', overflow: 'auto'}}>
-      <Box padding={[3, 4, 5]}>
-        <Stack space={4} style={{maxWidth: 720, margin: '0 auto'}}>
-          <Flex align="center" gap={3} wrap="wrap">
-            <Heading as="h1" size={2}>
-              Comentarios
-            </Heading>
-            {moderador ? (
-              <Badge tone="positive" fontSize={0}>
-                En vivo{items ? ' · ' + items.length + (items.length >= limite ? '+' : '') : ''}
-              </Badge>
-            ) : null}
-          </Flex>
-          {error ? (
-            <Card padding={3} radius={2} tone="critical" border>
-              <Text size={1}>{error}</Text>
-            </Card>
-          ) : null}
-          {aviso ? (
-            <Card padding={3} radius={2} tone="positive" border>
-              <Text size={1}>{aviso}</Text>
-            </Card>
-          ) : null}
-          {contenido}
-        </Stack>
-      </Box>
-    </Card>
+    <div className="ccd-com" ref={raiz} style={vars}>
+      <style>{CSS}</style>
+      <div className="ccd-in">
+        <div className="fila">
+          <h1>Comentarios</h1>
+          {moderador ? <span className="insignia">En vivo{items ? ' · ' + items.length + (items.length >= limite ? '+' : '') : ''}</span> : null}
+        </div>
+        {error ? (
+          <div className="tarjeta critico">
+            <p style={{fontSize: 13}}>{error}</p>
+          </div>
+        ) : null}
+        {aviso ? (
+          <div className="tarjeta bien">
+            <p style={{fontSize: 13}}>{aviso}</p>
+          </div>
+        ) : null}
+        {contenido}
+      </div>
+    </div>
   )
 }

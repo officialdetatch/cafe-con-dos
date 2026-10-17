@@ -1,5 +1,6 @@
 import {createElement} from 'react'
 import {defineConfig} from 'sanity'
+import {buildTheme} from '@sanity/themer'
 import {structureTool} from 'sanity/structure'
 import {esESLocale} from '@sanity/locale-es-es'
 import sitio from './generado/sitio.js'
@@ -7,6 +8,14 @@ import {tiposDeEsquema} from './esquemas/index.js'
 import {estructura} from './estructura.js'
 import {publicarConFecha, VerEnLaPagina} from './acciones.js'
 import {Comentarios} from './herramientas/Comentarios.jsx'
+
+// Los colores de Café Con Dos en todo el editor (claro y oscuro).
+// Salen de assets/css/styles.css: --cafe, --espuma, --tinta-suave y el fondo oscuro.
+const tema = buildTheme({
+  accent: '#723F40', // café: botones, links y foco
+  text: '#6B4744', // tinta suave: textos, íconos y bordes con un gris cálido
+  background: {light: '#FBF3EC', dark: '#221415'}, // espuma / fondo oscuro del sitio
+})
 
 // Ícono de globo de diálogo para la pestaña de comentarios.
 const IconoComentarios = () =>
@@ -25,6 +34,7 @@ export default defineConfig({
   icon: Taza,
   projectId: sitio.projectId,
   dataset: sitio.dataset,
+  theme: tema,
 
   plugins: [structureTool({title: 'Artículos', structure: estructura}), esESLocale()],
 
