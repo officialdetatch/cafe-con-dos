@@ -6,7 +6,8 @@
       <img class="logo-claro" src="images/logo-claro.png" alt="" width="334" height="258">
     </a>
     <button class="btn-menu" type="button" aria-expanded="false" aria-controls="nav-principal" aria-label="Menú" data-abrir="Menú" data-cerrar="Cerrar menú">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      <!-- Tres rayitas separadas para que se vuelvan una X al abrir (styles.css, "encabezado") -->
+      <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path class="raya-1" d="M4 7h16"/><path class="raya-2" d="M4 12h16"/><path class="raya-3" d="M4 17h10"/></svg>
     </button>
     <!-- El menú. data-nav marca el link de la página en la que estás. -->
     <nav class="nav" id="nav-principal" aria-label="Principal">

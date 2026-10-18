@@ -282,6 +282,15 @@
   }
 
   /* ---------------- encabezado y pie (el HTML está en partes/) ---------------- */
+  // Menú del celular: abrir o cerrar (lo usan el botón, Escape, tocar afuera y los links "Suscríbete").
+  function menuAbierto(abrir) {
+    const btn = $(".btn-menu"), nav = $(".nav");
+    if (!btn || !nav) return;
+    nav.classList.toggle("is-open", abrir);
+    btn.setAttribute("aria-expanded", abrir);
+    btn.setAttribute("aria-label", abrir ? btn.dataset.cerrar || "Cerrar menú" : btn.dataset.abrir || "Menú");
+  }
+
   function montarEncabezado(page) {
     const el = $("#site-header");
     if (!el) return;
@@ -293,13 +302,17 @@
     }
     $$("[data-nav]", el).forEach((a) => { if (a.dataset.nav === activo) a.setAttribute("aria-current", "page"); });
 
-    // Menú del celular
+    // Menú del celular. Escape o tocar fuera del menú también lo cierran.
     const btn = $(".btn-menu", el), nav = $(".nav", el);
-    if (btn && nav) btn.addEventListener("click", () => {
-      const open = nav.classList.toggle("is-open");
-      btn.setAttribute("aria-expanded", open);
-      btn.setAttribute("aria-label", open ? btn.dataset.cerrar || "Cerrar menú" : btn.dataset.abrir || "Menú");
-    });
+    if (btn && nav) {
+      btn.addEventListener("click", () => menuAbierto(!nav.classList.contains("is-open")));
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && nav.classList.contains("is-open")) { menuAbierto(false); btn.focus(); }
+      });
+      document.addEventListener("click", (e) => {
+        if (nav.classList.contains("is-open") && !nav.contains(e.target) && !btn.contains(e.target)) menuAbierto(false);
+      });
+    }
 
     // Tema claro / oscuro
     const btnTema = $(".btn-tema", el);
@@ -311,9 +324,22 @@
       };
       btnTema.addEventListener("click", () => {
         const nuevo = temaActual() === "dark" ? "light" : "dark";
-        raiz.dataset.theme = nuevo;
-        store("ccd-tema", nuevo);
-        etiquetarTema();
+        const aplicar = () => { raiz.dataset.theme = nuevo; store("ccd-tema", nuevo); etiquetarTema(); };
+        // La nueva paleta se abre en círculo desde el botón (styles.css, "Movimiento").
+        // Sin View Transitions o con "reducir movimiento", cambia de una vez, como antes.
+        const quieto = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!document.startViewTransition || quieto) return aplicar();
+        const r = btnTema.getBoundingClientRect();
+        const x = r.left + r.width / 2, y = r.top + r.height / 2;
+        const radio = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+        const listo = () => raiz.classList.remove("cambiando-tema");
+        raiz.classList.add("cambiando-tema");
+        const vt = document.startViewTransition(aplicar);
+        vt.ready.then(() => raiz.animate(
+          { clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + radio + "px at " + x + "px " + y + "px)"] },
+          { duration: 560, easing: "cubic-bezier(.22, 1, .36, 1)", pseudoElement: "::view-transition-new(root)" }
+        )).catch(() => {});
+        vt.finished.then(listo, listo);
       });
       if (window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", etiquetarTema);
       etiquetarTema();
@@ -380,8 +406,7 @@
     // botones "Suscríbete": baja al formulario más cercano o abre la ventanita
     $$("[data-ir-boletin]").forEach((a) => a.addEventListener("click", (e) => {
       const destino = $("[data-boletin]");
-      const nav = $(".nav.is-open");
-      if (nav) { nav.classList.remove("is-open"); $(".btn-menu").setAttribute("aria-expanded", "false"); }
+      if ($(".nav.is-open")) menuAbierto(false);
       e.preventDefault();
       if (destino) {
         destino.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });

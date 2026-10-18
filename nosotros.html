@@ -23,7 +23,7 @@
   <link rel="alternate" type="application/rss+xml" title="Café Con Dos" href="feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400..700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body data-page="nosotros">
@@ -36,7 +36,8 @@
         <img class="logo-claro" src="images/logo-claro.png" alt="" width="334" height="258">
       </a>
       <button class="btn-menu" type="button" aria-expanded="false" aria-controls="nav-principal" aria-label="Menú" data-abrir="Menú" data-cerrar="Cerrar menú">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <!-- Tres rayitas separadas para que se vuelvan una X al abrir (styles.css, "encabezado") -->
+        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path class="raya-1" d="M4 7h16"/><path class="raya-2" d="M4 12h16"/><path class="raya-3" d="M4 17h10"/></svg>
       </button>
       <!-- El menú. data-nav marca el link de la página en la que estás. -->
       <nav class="nav" id="nav-principal" aria-label="Principal">
@@ -113,27 +114,27 @@
              <img src="images/allie.jpg" alt="Allie Tolentino"> -->
         <div class="host">
           <div class="host-foto">
-            <img class="img-oscura taza-mini" src="images/taza.png" alt="">
-            <img class="img-clara taza-mini" src="images/taza-clara.png" alt="">
+            <img src="images/allie.jpeg" alt="Allie Tolentino">
           </div>
           <div>
             <h3>Allie Tolentino</h3>
             <p class="rol">Editorial Director</p>
-            <div class="prosa"><p>Escribe aquí una bio corta y en primera persona: quién eres, por qué empezaste Café Con Dos y hacia dónde va la plataforma.</p></div>
-            <p><a href="https://www.instagram.com/cafecondos" target="_blank" rel="noopener">Instagram</a></p>
+            <div class="prosa"><p>Allie Tolentino es la fundadora y directora editorial de Café con Dos. Digital marketer, músico y lectora apasionada que encuentra en las historias, la cultura y el entretenimiento una fuente constante 
+              de curiosidad e inspiración para conversar con un buen café.</p>
+            </div>
+            <p><a href="allie@cafecondos.com" target="_blank" rel="noopener">Email</a></p>
           </div>
         </div>
+
         <div class="host">
           <div class="host-foto">
-            <img class="img-oscura taza-mini" src="images/taza.png" alt="">
-            <img class="img-clara taza-mini" src="images/taza-clara.png" alt="">
+            <img src="images/sarah.jpeg" alt="Sarah Espaillat">
           </div>
-          
           <div>
             <h3>Sarah Espaillat</h3>
             <p class="rol">Columnist</p>
             <div class="prosa"><p>Escribe aquí una bio corta y en primera persona: quién eres, por qué empezaste Café Con Dos y hacia dónde va la plataforma.</p></div>
-            <p><a href="https://www.instagram.com/cafecondos" target="_blank" rel="noopener">Instagram</a></p>
+            <p><a href="sarah@cafecondos.com" target="_blank" rel="noopener">Email</a></p>
           </div>
         </div>
       </section>
@@ -182,7 +183,7 @@
   <footer class="site-footer" id="site-footer">
     <div class="wrap">
       <img class="logo-pie" src="images/logo-claro.png" alt="Café Con Dos" width="334" height="258">
-      <p class="pie-lema" lang="en">Stories worth discovering. Perspectives worth sharing.</p>
+      <p class="pie-lema" lang="en"><span>Stories worth discovering.</span> <span>Perspectives worth sharing.</span></p>
 
       <p class="pie-siguenos">Síguenos y escucha en:</p>
       <ul class="redes">

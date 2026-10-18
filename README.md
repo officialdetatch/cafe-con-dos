@@ -92,7 +92,7 @@ Social links are written where they appear (`partes/pie.html`, `contacto.html`, 
 The "muy pronto" page is **currently `index.html`** (the full home page is saved as `cafenotready.html`): the moka pot serving a cup (her drawing, animated), "Ya casi sube el café. ¿Te servimos una taza?", an email signup (the same Brevo form as the newsletter), a button to play the brewing sound, and the footer without its menu.
 
 - **To launch:** rename `index.html` (the pre-launch page) to something like `pronto.html` so you keep it, then rename `cafenotready.html` to `index.html`. Until then, the other pages still work if someone has the direct link.
-- **The sound:** the pre-launch page picks one of the tracks listed near the end of its `index.html` (`audio/whisky-on-ice.mp3`, `iced-coffee.mp3`, `Starbucks-girl.mp3`, `green-tea.mp3`).
+- **The sound:** the pre-launch page picks one of the tracks listed near the end of its `index.html` (`audio/whisky-on-ice.mp3`, `iced-coffee.mp3`, `Starbucks-girl.mp3`, `green-tea.mp3`). `music.preload = "none"` keeps the ~3 MB track from downloading until it actually starts playing (browsers only let it play after the first click), so visitors who never click don't pay for it.
 - **The drawing:** it's split into layers in `images/pronto/` (pot, steam, motion lines, stream, two drops, splash, cup), all the same size and stacked. The `-clara` versions are for dark mode. The animation is in `styles.css`, section "Muy pronto": one 6-second cycle where the pot tilts, the stream falls, drops fall, the cup splashes and the pot straightens. People who turn on "reduce motion" on their device see the still drawing.
 
 ## Email alerts for new articles and episodes (Brevo + GitHub Actions)
@@ -256,6 +256,18 @@ The background has a paper texture (fine grain plus soft mottling) drawn with in
 
 The site follows the visitor's system setting. The moon/sun button in the header switches it, and the choice is remembered in that browser (`localStorage` key `ccd-tema`, applied as `<html data-theme="light|dark">` before the page paints, so there's no flash). Colors are tokens at the top of `styles.css`. The writers follow the same choice.
 
+In dark mode the "Café para llevar" block and its pop-up become a toasted panel with an orange button instead of a full orange block (tokens `--boletin-*`), and the cup swaps to its light version.
+
+## Design system (how the site looks)
+
+The idea: *café con dos* is a conversation between two, so the design leans on two devices from the logo and nothing else.
+
+- **Two voices.** Two-sentence titles read as a reply: the second sentence sits a little further in, in the accent color (the home tagline, "Ya casi sube el café. ¿Te servimos una taza?" and the footer tagline, whose two sentences are wrapped in `<span>`s in `partes/pie.html` for that). Section and page headers do the same: headline on the left, the sentence that answers it on the right (on wide screens).
+- **The speech bubble** (the saucer in the logo) is used only where something "speaks": the featured story on the home page, the video frame, quotes inside articles, comments, the reader phrases on Nosotros, the support box, the newsletter and its pop-up. The little orange bubble before section labels is the same shape, small.
+- **Type:** Antonio for headlines, labels and buttons (labels are shown as written, not forced to uppercase); Literata for reading, with its italic only for quotes, standfirsts and captions. Articles use a centered reading column (`--medida`), photos inside the text are a bit wider than the column, and the first letter is a drop cap in browsers that support it.
+- **Motion** (end of `styles.css`, "Movimiento"): the home tagline arrives in two voices and steam rises off the featured story; the pre-launch title does the same. Everything else only answers the visitor: the menu icon turns into an X, links and filters underline, pages cross-fade when you change page, the reading bar fills as you scroll an article, and the theme switch opens the new palette in a circle from the button (`app.js`, theme button). With "reduce motion" turned on, all of it is off.
+- The menu icon in `partes/encabezado.html` is three separate lines (`raya-1`…`raya-3`) so it can turn into an X; keep them if you edit the header.
+
 ## Language
 
 Page text lives in each `.html` file and in `partes/`; the texts JavaScript needs (filters, form messages, pop-ups) are in `assets/js/textos.js`. Everything is in Spanish with the everyday Spanglish the brand uses (host, email, link, show notes, timestamps, collab…). The tagline stays in English on purpose. `lang="es"` is set on every page, the tagline and English articles carry `lang="en"`, so screen readers pronounce them correctly and Chrome/Safari offer translation sensibly. Brand names (Café Con Dos, Sobremesa, Entre Elementos) are marked `translate="no"`.
@@ -278,5 +290,5 @@ A visitor sees at most one interruption per visit: on the home page, the newslet
 - The writers stamp each new item with `publicado` (the moment it was added); the editor's **Publicar** button does the same on an article's first publish. The feed dates an item at 6:00 am Dominican time on its `fecha`, or at that `publicado` time if it was added later that same day, so an item pushed after the daily email still counts as new for the next one. Old items added later keep their original date, so they are not emailed as new.
 - Upgrading from the previous version: `data/sobremesa.js` and `writers/sobremesa-writer.html` are replaced by `data/articulos.js` and `writers/articulo-writer.html`. If an old `data/sobremesa.js` is still around, the site and the feed read its posts as Sobremesa, but it's best to delete it.
 - GitHub pauses scheduled runs in public repos after 60 days without repository activity. Pushes and the editor's webhook still publish; re-enable the schedule from the Actions tab if it stops.
-- Fonts: Antonio (display, matches the condensed logo lettering) + Literata (reading), loaded from Google Fonts.
+- Fonts: Antonio (display, matches the condensed logo lettering) + Literata (reading), loaded from Google Fonts as variable fonts (Antonio 400–700; Literata 400–700 and italic 400–600, with optical sizes).
 - Colors come straight from the logo: latte `#E9CAB0`, café `#723F40`, naranja `#F47D50`.
