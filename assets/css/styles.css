@@ -701,7 +701,7 @@ select option { background: var(--surface-2); color: var(--ink); }
 }
 
 /* ==========================================================================
-   Plataforma editorial: artículos, Explorar, portada, Nosotros, Contacto
+   Plataforma editorial: artículos, En Portada, portada, Nosotros, Contacto
    ========================================================================== */
 
 /* ---------- portadas de artículos ---------- */
@@ -789,7 +789,7 @@ select option { background: var(--surface-2); color: var(--ink); }
 .historia-cta h2 { font-size: clamp(2rem, 3.8vw, 2.9rem); margin-bottom: 10px; }
 .historia-cta p { color: var(--ink-soft); max-width: 56ch; }
 
-/* ---------- Explorar ---------- */
+/* ---------- En Portada (antes Explorar) ---------- */
 .tabs {
   display: flex; gap: 4px 6px; flex-wrap: wrap; border-bottom: 1px solid var(--linea); margin-bottom: 4px;
 }
@@ -801,7 +801,7 @@ select option { background: var(--surface-2); color: var(--ink); }
 .tab:hover { color: var(--ink); }
 .tab[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--naranja); }
 .tab-desc { color: var(--ink-soft); margin: 16px 0 0; max-width: 62ch; }
-#explorar .lista-controles { margin-top: 24px; }
+#enportada .lista-controles { margin-top: 24px; }
 @media (max-width: 700px) {
   .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
   .tabs::-webkit-scrollbar { display: none; }

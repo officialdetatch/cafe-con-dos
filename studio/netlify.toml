@@ -6,6 +6,12 @@
   base    = "studio"
   command = "npm run build"
   publish = "dist"
+  # Netlify cobra créditos por cada publicación (el plan gratis trae 300 al mes,
+  # 15 por publicación). Esto evita publicar el editor cuando el cambio es solo del sitio
+  # (páginas, estilos, artículos…): solo se construye si cambió algo de studio/, la
+  # configuración (config.js) o la plantilla del boletín que usa la vista previa.
+  # (Si el comando falla o no hay commit anterior, Netlify construye igual: es lo más seguro.)
+  ignore  = 'git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- . ../assets/js/config.js ../scripts/boletin-html.mjs'
 
 [build.environment]
   NODE_VERSION = "22"

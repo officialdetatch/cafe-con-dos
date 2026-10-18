@@ -60,13 +60,13 @@ window.CCD_CONFIG = {
     // , { id: "otra", nombre: "Nombre Apellido", rol: "Columnista", foto: "" }
   ],
 
-  // Secciones de Explorar. Cada artículo va en una (se elige en el editor).
-  //   nombre: como sale en Explorar, en el artículo y en el editor
+  // Secciones de En Portada. Cada artículo va en una (se elige en el editor).
+  //   nombre: como sale en En Portada, en el artículo y en el editor
   //   corto:  la etiqueta del bloque de color de un artículo sin foto
-  //   descripcion: sale en Explorar al elegir la sección
+  //   descripcion: sale en En Portada al elegir la sección
   // Sobremesa es una sección más, pero también tiene su propia página.
   // Si cambias un id, los artículos que ya lo usan dejan de encontrarlo.
-  // (Las tarjetas de "Empieza a explorar" de Inicio están en index.html.)
+  // (Las tarjetas de "Empieza a explorar" de Inicio están en la página de inicio.)
   secciones: [
     { id: "historias", nombre: "Historias y entrevistas", corto: "Personas",
       descripcion: "Perfiles de creadores, historias personales y conversaciones que muestran lo que pasa detrás del trabajo." },
@@ -78,7 +78,7 @@ window.CCD_CONFIG = {
       descripcion: "Las conversaciones más personales, las reflexiones y el contenido más libre." }
   ],
 
-  // Temas (los "tags"). Sirven para filtrar en Explorar, Sobremesa y Episodios.
+  // Temas (los "tags"). Sirven para filtrar en En Portada, Sobremesa y Episodios.
   // El id no lleva tildes ni espacios.
   temas: [
     { id: "arte", nombre: "Arte" },

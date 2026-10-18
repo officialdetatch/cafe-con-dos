@@ -81,7 +81,7 @@
   const salida = (fecha) => Date.parse(fecha + "T10:00:00Z");
   const publicado = (x) => document.body.classList.contains("writer") || !x.fecha || !(salida(x.fecha) > Date.now());
   const EPS = (window.CCD_EPISODIOS || []).filter(publicado).sort(porFecha);
-  // Secciones de Explorar (config.js). Sobremesa es una de ellas.
+  // Secciones de En Portada (config.js). Sobremesa es una de ellas.
   const SECCIONES = CFG.secciones || [];
   const seccionDe = (id) => SECCIONES.find((s) => s.id === id) || null;
   // Todos los artículos viven en data/articulos.js. Si queda un data/sobremesa.js
@@ -226,11 +226,11 @@
       "</article>";
   }
 
-  /* ---------------- artículos (Explorar y Sobremesa) ---------------- */
+  /* ---------------- artículos (En Portada y Sobremesa) ---------------- */
   const minutos = (a) => Math.max(1, Math.round(String(a.cuerpo || "").split(/\s+/).filter(Boolean).length / 200));
   // Los artículos en inglés llevan lang="en" (lectores de pantalla, Google y traductores).
   const langAttr = (a) => (a.idioma && a.idioma !== "es" ? ' lang="' + esc(a.idioma) + '"' : "");
-  const seccionUrl = (id) => (id === "sobremesa" ? BASE + "sobremesa.html" : BASE + "explorar.html?seccion=" + encodeURIComponent(id));
+  const seccionUrl = (id) => (id === "sobremesa" ? BASE + "sobremesa.html" : BASE + "enportada.html?seccion=" + encodeURIComponent(id));
   const badgeEjemplo = () => '<span class="badge-ejemplo">' + t("ep.ejemplo") + "</span>";
 
   // Fotos: las del repo van con ruta relativa; las del editor (Sanity) ya son URLs completas.
@@ -289,7 +289,7 @@
     let activo = { episodio: "episodios" }[page] || page;
     if (page === "entrada") {
       const a = ARTS.find((x) => x.id === params.get("id"));
-      activo = a && a.seccion === "sobremesa" ? "sobremesa" : "explorar";
+      activo = a && a.seccion === "sobremesa" ? "sobremesa" : "enportada";
     }
     $$("[data-nav]", el).forEach((a) => { if (a.dataset.nav === activo) a.setAttribute("aria-current", "page"); });
 
@@ -692,8 +692,8 @@
     programarPopup();
   };
 
-  PAGES.explorar = function () {
-    const root = $("#explorar");
+  PAGES.enportada = function () {
+    const root = $("#enportada");
     const idiomas = Array.from(new Set(ARTS.map((a) => a.idioma || "es")));
     const st = { seccion: params.get("seccion") || "", tema: params.get("tema") || "", idioma: params.get("idioma") || "", q: params.get("q") || "", orden: "desc", n: 12 };
     if (st.seccion && !seccionDe(st.seccion)) st.seccion = "";
@@ -929,7 +929,7 @@
   PAGES.entrada = function () {
     const root = $("#entrada");
     const p = ARTS.find((x) => x.id === params.get("id"));
-    if (!p) { noEncontrado(root, t("art.noencontrado"), "", "explorar.html", t("art.volver")); setMeta(t("art.noencontrado")); return; }
+    if (!p) { noEncontrado(root, t("art.noencontrado"), "", "enportada.html", t("art.volver")); setMeta(t("art.noencontrado")); return; }
     setMeta(p.titulo, p.resumen);
     const s = seccionDe(p.seccion);
     const esSob = p.seccion === "sobremesa";
@@ -952,7 +952,7 @@
     root.innerHTML = '<article class="wrap">' +
       '<nav class="migas" aria-label="Migas">' +
       (esSob ? '<a href="sobremesa.html" translate="no">' + t("sob.titulo") + "</a>"
-        : '<a href="explorar.html">' + t("nav.explorar") + "</a>" + (s ? '<span aria-hidden="true">/</span><a href="' + seccionUrl(s.id) + '">' + esc(s.nombre) + "</a>" : "")) +
+        : '<a href="enportada.html">' + t("nav.enportada") + "</a>" + (s ? '<span aria-hidden="true">/</span><a href="' + seccionUrl(s.id) + '">' + esc(s.nombre) + "</a>" : "")) +
       "</nav>" +
       '<header class="entrada-cabeza">' + artKicker(p) +
       "<h1" + L + ">" + esc(p.titulo) + "</h1>" +
@@ -963,7 +963,7 @@
       portada +
       '<div class="entrada-cuerpo' + (portada ? "" : " entrada-cuerpo--sin-foto") + '">' +
       '<div class="prosa"' + L + ">" + md(p.cuerpo) + "</div>" +
-      ((p.temas || []).length ? '<div class="entrada-temas">' + chipsTemas(p.temas, BASE + (esSob ? "sobremesa.html" : "explorar.html")) + "</div>" : "") +
+      ((p.temas || []).length ? '<div class="entrada-temas">' + chipsTemas(p.temas, BASE + (esSob ? "sobremesa.html" : "enportada.html")) + "</div>" : "") +
       personas +
       (ep ? '<section class="entrada-ep"><h2>' + t("art.relacionado") + '</h2><div class="rejilla">' + epCard(ep) + "</div></section>" : "") +
       apoyoArticulo() +

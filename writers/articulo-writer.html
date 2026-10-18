@@ -32,7 +32,7 @@
       <ol>
         <li>Abre este archivo desde la carpeta del sitio (doble clic, o desde tu servidor local). Lo que ya está publicado aparece en la lista de la izquierda.</li>
         <li>Toca <b>Nuevo artículo</b> o elige uno de la lista para editarlo. La vista previa de la derecha muestra cómo se va a ver.</li>
-        <li>Elige la <b>sección</b>: Historias y entrevistas, Cultura y descubrimientos, Opiniones y perspectivas, o Sobremesa. Todo sale en Explorar; lo de Sobremesa sale además en su propia página.</li>
+        <li>Elige la <b>sección</b>: Historias y entrevistas, Cultura y descubrimientos, Opiniones y perspectivas, o Sobremesa. Todo sale en En Portada; lo de Sobremesa sale además en su propia página.</li>
         <li>Si lo escribiste en inglés, elige <b>English</b> en Idioma: sale con la etiqueta EN y se puede filtrar.</li>
         <li>Cuando termines, toca <b>Agregar a la lista</b> (o <b>Guardar cambios</b>). Puedes hacer varios seguidos.</li>
         <li>Toca <b>Descargar articulos.js</b> en la barra de abajo y reemplaza <code>data/articulos.js</code> en la carpeta del sitio. Si el artículo tiene foto, copia la foto a <code>images/articulos/</code>.</li>
@@ -57,7 +57,7 @@
         tipo: "articulos",
         variable: "CCD_ARTICULOS",
         archivo: "articulos.js",
-        cabecera: "/* Café Con Dos — artículos (Explorar y Sobremesa)\n   Generado con writers/articulo-writer.html. Puedes editarlo a mano,\n   pero es más fácil (y seguro) usar el writer. */\n",
+        cabecera: "/* Café Con Dos — artículos (En Portada y Sobremesa)\n   Generado con writers/articulo-writer.html. Puedes editarlo a mano,\n   pero es más fácil (y seguro) usar el writer. */\n",
         textos: { nuevo: "Nuevo artículo" },
         extraLista: function (d) {
           var s = (CFG.secciones || []).find(function (x) { return x.id === d.seccion; });
@@ -79,7 +79,7 @@
           { key: "resumen", type: "corto", label: "Resumen", required: true, max: 200, hint: "Una o dos frases. Sale en las tarjetas, en Google, en el email a los suscriptores y cuando se comparte el link." },
           { key: "portada", type: "imagen", label: "Foto de portada (recomendada)", placeholder: "images/articulos/mi-foto.jpg", hint: "Copia la foto a la carpeta <code>images/articulos/</code> y escribe aquí su ruta. Mejor horizontal y de menos de 400 KB. Sin foto, se usa un bloque con los colores de la sección." },
           { key: "portadaAlt", type: "text", label: "Descripción de la foto", max: 160, placeholder: "Ej: La artista pintando un mural en la Zona Colonial", hint: "Para personas que usan lectores de pantalla y para Google Imágenes. Describe lo que se ve." },
-          { key: "temas", type: "temas", label: "Temas", hint: "Sirven para los filtros de Explorar y Sobremesa." },
+          { key: "temas", type: "temas", label: "Temas", hint: "Sirven para los filtros de En Portada y Sobremesa." },
           { key: "personas", type: "lineas", label: "Personas en esta historia (opcional)", rows: 2, placeholder: "Nombre | A qué se dedica | link a su Instagram o web",
             hint: "Para entrevistas y perfiles. Una por línea, separando con | (la rayita vertical).",
             parse: function (l) { var p = l.split("|").map(function (x) { return x.trim(); }); return p[0] ? { nombre: p[0], rol: p[1] || "", link: p[2] || "" } : null; },

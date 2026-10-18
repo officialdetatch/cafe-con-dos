@@ -10,7 +10,7 @@
 
 window.CCD_TEXTOS = {
   // Migas (el camino de links arriba de un artículo o episodio)
-  "nav.explorar": "Explorar",
+  "nav.enportada": "En Portada",
   "nav.episodios": "Episodios",
 
   // Inicio: la etiqueta del artículo destacado
@@ -24,8 +24,8 @@ window.CCD_TEXTOS = {
   "redes.video": "Video",
   "redes.carrusel": "Varias fotos",
 
-  // Explorar
-  "exp.titulo": "Explorar",
+  // En Portada (antes "Explorar")
+  "exp.titulo": "En Portada",
   "exp.todo": "Todo",
   "exp.secciones": "Secciones",
   "exp.buscar": "Buscar por título, persona o tema",
@@ -78,7 +78,7 @@ window.CCD_TEXTOS = {
   "art.relacionado": "Escucha el episodio",
   "art.sigue": "Sigue leyendo",
   "art.noencontrado": "No encontramos ese post.",
-  "art.volver": "Volver a Explorar",
+  "art.volver": "Volver a En Portada",
 
   // Contacto: mensajes del formulario
   "con.faltaNombre": "Escribe tu nombre.",
@@ -118,7 +118,7 @@ window.CCD_TEXTOS = {
   "com.ahora": "Ahora mismo",
 
   // Burbuja "Invítanos un café"
-  "art.apoyo": "Si te gusta este contenido, no olvides comentar y apoyanos con un café.",
+  "art.apoyo": "Si te gusta este contenido, no olvides comentar y apóyanos con un café.",
   "art.apoyo.comentar": "Dejar un comentario",
   "art.apoyo.cafe": "Invítanos un café",
   "apoyo.titulo": "Invítanos un café",
