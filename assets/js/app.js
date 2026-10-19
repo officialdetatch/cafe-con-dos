@@ -852,6 +852,64 @@
     pintar();
   };
 
+  /* ---------------- tienda (Fourthwall) ----------------
+     Los productos se piden en vivo a la tienda de Fourthwall cada vez que alguien
+     abre tienda.html, así que lo nuevo (o agotado, o con otro precio) sale solo.
+     Cada tarjeta lleva a su página en Fourthwall, donde están el carrito y el pago. */
+  function precioTexto(valor, moneda) {
+    try { return new Intl.NumberFormat("en-US", { style: "currency", currency: moneda || "USD" }).format(valor); }
+    catch (e) { return "$" + Number(valor).toFixed(2); }
+  }
+  function productoCard(p, tiendaUrl) {
+    const vars = p.variants || [];
+    const precios = vars.map((v) => v.unitPrice && v.unitPrice.value).filter((v) => typeof v === "number");
+    const precio = p.price || (vars[0] && vars[0].unitPrice) || null; // los "bundles" traen su propio precio
+    const min = p.price ? p.price.value : (precios.length ? Math.min.apply(null, precios) : null);
+    const moneda = (precio && precio.currency) || (CFG.tienda && CFG.tienda.moneda) || "USD";
+    const varios = !p.price && new Set(precios).size > 1;
+    const antes = p.compareAtPrice || (vars.find((v) => v.compareAtPrice && v.unitPrice && v.compareAtPrice.value > v.unitPrice.value) || {}).compareAtPrice;
+    const agotado = p.state && p.state.type && p.state.type !== "AVAILABLE";
+    const fotos = (p.images || []).filter((i) => i && i.url);
+    const url = tiendaUrl + "/products/" + encodeURIComponent(p.slug || "");
+    return '<article class="prod-card' + (agotado ? " prod-card--agotado" : "") + '">' +
+      '<a class="prod-img" href="' + esc(url) + '" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">' +
+      (fotos[0] ? '<img src="' + esc(fotos[0].url) + '" alt="" loading="lazy" width="' + (fotos[0].width || 600) + '" height="' + (fotos[0].height || 800) + '">' : tazaHTML("prod-taza")) +
+      (fotos[1] ? '<img class="prod-img-2" src="' + esc(fotos[1].url) + '" alt="" loading="lazy">' : "") +
+      (agotado ? '<span class="prod-badge">' + t("tienda.agotado") + "</span>" : antes ? '<span class="prod-badge prod-badge--oferta">' + t("tienda.oferta") + "</span>" : "") +
+      "</a>" +
+      '<h3><a class="prod-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(p.name) + "</a></h3>" +
+      (min != null ? '<p class="prod-precio">' + (varios ? t("tienda.desde") + " " : "") + esc(precioTexto(min, moneda)) +
+        (antes ? ' <s>' + esc(precioTexto(antes.value, antes.currency || moneda)) + "</s>" : "") + "</p>" : "") +
+      "</article>";
+  }
+
+  PAGES.tienda = function () {
+    const root = $("#tienda");
+    if (!root) return;
+    const T = CFG.tienda || {};
+    const tiendaUrl = String(T.url || "").replace(/\/$/, "");
+    const irTienda = tiendaUrl ? '<a class="btn btn--hueco" href="' + esc(tiendaUrl) + '" target="_blank" rel="noopener">' + t("tienda.ir") + "</a>" : "";
+    root.innerHTML = '<div class="wrap"><div class="prod-rejilla" aria-live="polite" aria-busy="true"><p class="vacio">' + t("tienda.cargando") + "</p></div>" +
+      (irTienda ? '<p class="tienda-ir">' + irTienda + "</p>" : "") + "</div>";
+    const grid = $(".prod-rejilla", root);
+    const fin = (html) => { grid.innerHTML = html; grid.setAttribute("aria-busy", "false"); };
+    if (!T.token || !tiendaUrl) return fin('<p class="vacio">' + t("tienda.vacio") + "</p>");
+    const api = "https://storefront-api.fourthwall.com/v1/collections/" + encodeURIComponent(T.coleccion || "all") +
+      "/products?storefront_token=" + encodeURIComponent(T.token) + "&size=50&currency=" + encodeURIComponent(T.moneda || "USD");
+    fetch(api, { headers: { Accept: "application/json" } })
+      .then((r) => { if (!r.ok) throw new Error("Fourthwall " + r.status); return r.json(); })
+      .then((j) => {
+        const productos = (j.results || []).filter((p) => p && p.slug && !(p.access && p.access.type && p.access.type !== "PUBLIC"));
+        // Lo disponible primero; lo agotado al final.
+        productos.sort((a, b) => ((a.state && a.state.type !== "AVAILABLE") ? 1 : 0) - ((b.state && b.state.type !== "AVAILABLE") ? 1 : 0));
+        fin(productos.length ? productos.map((p) => productoCard(p, tiendaUrl)).join("") : '<p class="vacio">' + t("tienda.vacio") + "</p>");
+      })
+      .catch((e) => {
+        console.warn("[Café Con Dos] tienda:", e);
+        fin('<p class="vacio">' + t("tienda.error") + "</p>");
+      });
+  };
+
   function noEncontrado(root, titulo, sub, href, cta) {
     root.innerHTML = '<div class="wrap error-404">' + tazaHTML() + "<h1>" + titulo + '</h1><p class="lead">' + sub + '</p><p><a class="btn" href="' + href + '">' + cta + "</a></p></div>";
   }

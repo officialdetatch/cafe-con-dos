@@ -168,6 +168,21 @@ window.CCD_CONFIG = {
     }
   },
 
+  /* Tienda (Fourthwall). La página tienda.html lee los productos EN VIVO de la
+     tienda cada vez que alguien la abre: un producto nuevo, agotado o con otro
+     precio sale solo, sin publicar nada. La compra se hace en Fourthwall.
+       url:       la dirección de la tienda (sin "/" al final)
+       token:     Fourthwall > Settings > For developers > Storefront API.
+                  Es un token público (solo lee productos; no ve pedidos ni dinero).
+       coleccion: "all" = todos los productos; o el "slug" de una colección.
+       moneda:    USD, EUR, … */
+  tienda: {
+    url: "https://cafe-con-dos-shop.fourthwall.com",
+    token: "ptkn_7cfcebcf-c297-4238-a60f-192c8b0a2ca4",
+    coleccion: "all",
+    moneda: "USD"
+  },
+
   /* Burbuja flotante "Invítanos un café" (abajo a la derecha, en todas las páginas)
      cafeConDos: el link de Buy Me a Coffee de Café Con Dos. Mientras esté
                  vacío, esa opción no aparece.

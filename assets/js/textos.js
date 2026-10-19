@@ -73,6 +73,16 @@ window.CCD_TEXTOS = {
   "sob.por": "Por",
   "sob.vacio": "Todavía no hay posts con ese tema.",
 
+  // Tienda (los productos salen de Fourthwall)
+  "tienda.cargando": "Sirviendo la tienda…",
+  "tienda.vacio": "Todavía no hay productos. Muy pronto.",
+  "tienda.error": "No pudimos cargar los productos ahora mismo.",
+  "tienda.ir": "Ver la tienda completa",
+  "tienda.desde": "Desde",
+  "tienda.agotado": "Agotado",
+  "tienda.oferta": "Oferta",
+  "tienda.ver": "Ver producto",
+
   // Artículo (entrada.html)
   "art.personas": "En esta historia",
   "art.relacionado": "Escucha el episodio",

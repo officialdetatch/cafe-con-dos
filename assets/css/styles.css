@@ -336,6 +336,7 @@ a.logo:hover img { transform: rotate(-4deg); }
   .nav.is-open a:nth-child(5) { transition-delay: .12s; }
   .nav.is-open a:nth-child(6) { transition-delay: .15s; }
   .nav.is-open a:nth-child(7) { transition-delay: .18s; }
+  .nav.is-open a:nth-child(8) { transition-delay: .21s; }
   /* el resto de la página se oscurece detrás del menú (tocarlo lo cierra) */
   body::after {
     content: ""; position: fixed; inset: 0; z-index: 45; background: rgba(34, 20, 21, .42);
@@ -344,6 +345,15 @@ a.logo:hover img { transform: rotate(-4deg); }
   body:has(.nav.is-open)::after { opacity: 1; visibility: visible; }
 }
 @media (min-width: 961px) { .nav .solo-movil { display: none; } }
+/* Con 7 secciones en el menú, en pantallas medianas se aprieta un poco para que quepa en una línea. */
+.nav a { white-space: nowrap; }
+@media (min-width: 961px) and (max-width: 1140px) {
+  .site-header .wrap { gap: 14px; }
+  .nav a { font-size: 1.05rem; padding: 10px 7px; }
+  .nav a::after { left: 7px; right: 7px; }
+  .header-acciones { gap: 8px; }
+  .header-acciones .btn { padding: 8px 14px; }
+}
 
 /* ---------- etiquetas pequeñas (kickers) ----------
    En minúsculas, como están escritas. Las de los títulos de sección y de página
@@ -1029,6 +1039,34 @@ select option { background: var(--surface-2); color: var(--ink); }
 .art-img:hover .art-portada > img { transform: scale(1.04); }
 
 /* ---------- tarjetas de artículo ---------- */
+/* ---------- Tienda (productos de Fourthwall) ---------- */
+.prod-rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 44px 28px; }
+.prod-rejilla > .vacio { grid-column: 1 / -1; }
+.prod-card { position: relative; display: flex; flex-direction: column; gap: 10px; }
+.prod-img { position: relative; display: block; aspect-ratio: 3 / 4; border-radius: var(--r-burbuja); overflow: hidden; background: var(--surface); }
+.prod-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .35s ease, transform .35s ease; }
+.prod-img .prod-taza { inset: 22%; width: 56%; height: auto; object-fit: contain; }
+.prod-img .prod-img-2 { opacity: 0; }
+.prod-card:hover .prod-img .prod-img-2 { opacity: 1; }
+.prod-card:hover .prod-img img:first-child { transform: scale(1.03); }
+.prod-badge { position: absolute; top: 12px; left: 12px; z-index: 1; font-family: var(--f-display); font-size: .95rem; padding: 3px 12px; border-radius: 999px; background: var(--espresso); color: var(--crema); }
+.prod-badge--oferta { background: var(--naranja); color: var(--espresso); }
+.prod-card--agotado .prod-img img { filter: grayscale(.6); opacity: .75; }
+.prod-card h3 { margin: 4px 0 0; font-size: clamp(1.35rem, 1.7vw, 1.55rem); line-height: 1.12; }
+.prod-card .prod-link { color: inherit; text-decoration: none; }
+.prod-card .prod-link::after { content: ""; position: absolute; inset: 0; z-index: 2; }
+.prod-card .prod-link:hover { text-decoration: underline; text-decoration-color: var(--naranja); }
+.prod-precio { margin: 0; font-family: var(--f-display); font-size: 1.15rem; color: var(--accent-text); }
+.prod-precio s { color: var(--ink-soft); font-size: .95rem; margin-left: 6px; }
+.tienda-ir { margin: 48px 0 0; text-align: center; }
+@media (max-width: 600px) {
+  .prod-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 14px; }
+  .prod-card h3 { font-size: 1.2rem; }
+  .prod-precio { font-size: 1.05rem; }
+  .prod-badge { top: 8px; left: 8px; font-size: .85rem; padding: 2px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .prod-img img { transition: none; } }
+
 .art-rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 52px 28px; }
 .art-card { position: relative; display: flex; flex-direction: column; gap: 16px; }
 .art-card .kicker { margin: 0 0 6px; font-size: .98rem; }

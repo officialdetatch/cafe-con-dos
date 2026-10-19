@@ -17,6 +17,7 @@ explorar.html         Only a redirect to enportada.html (keeps ?seccion=, ?tema=
 entrada.html?id=…     One article (any section): author, reading time, people in the story,
                       related episode, share, comments (Firebase), "Sigue leyendo", BlogPosting data
 sobremesa.html        Sobremesa, its own section page, with topic chips
+tienda.html           The shop: products read LIVE from Fourthwall (see "Shop (Fourthwall)")
 episodios.html        The podcast archive: search, topic chips, series filter, sort
 episodio.html?id=…    One episode: YouTube video (or Spotify player), buttons, show notes, timestamps
 nosotros.html         Story, what the name evokes, purpose and promise, formats, who's behind it
@@ -122,6 +123,16 @@ When an article or an episode is published, the site emails the Brevo list once:
 - `send`: emails the whole list. Check "force" to resend one that already went out.
 
 **To turn it on at launch:** add the variable `AVISOS_DESDE` with the launch moment in UTC, for example `2026-11-01T00:00:00Z`. Articles published from then on are emailed automatically. To turn it off, delete the variable.
+
+## Shop (Fourthwall)
+
+The store itself lives on Fourthwall: **https://cafe-con-dos-shop.fourthwall.com** (products, cart, payments, shipping, all managed there). `tienda.html` on cafecondos.com shows the products **live**: every time someone opens the page, it asks Fourthwall's Storefront API for the current list. A new product, a price change, a sale price or a sold-out item shows up by itself, with no push and no rebuild.
+
+- **Settings:** `tienda` in `assets/js/config.js`: `url` (the shop address), `token` (Fourthwall → Settings → For developers → Storefront API; it's a public, read-only token: it can list products but can't see orders, money or customers), `coleccion` (`all`, or a collection's slug to show only that collection), `moneda`.
+- **What each card shows:** the first photo (the second one appears on hover), the name, the price ("Desde $X" when variants cost different amounts), the crossed-out old price and an "Oferta" tag when there's a compare-at price, and "Agotado" (moved to the end) when sold out. Hidden or members-only products are skipped. Each card opens the product on Fourthwall in a new tab, where people add it to the cart and pay.
+- **Texts** ("Sirviendo la tienda…", "Agotado", etc.) are the `tienda.*` keys in `assets/js/textos.js`; the page title and intro are in `tienda.html`.
+- **If Fourthwall is down** the page says "No pudimos cargar los productos ahora mismo" and keeps the "Ver la tienda completa" button.
+- **Shop look:** `fourthwall-estilo-cafecondos.html` (kept outside the site files) is the block of code that dresses the Fourthwall shop in the same colors, fonts (Antonio + Literata), rounded "bubble" corners and paper texture as the site, with dark mode following the visitor's device. It goes in Fourthwall → Site design → Style → Edit HTML code → Header code. The logo, the hero text ("Bold new looks") and the menu links are set in Fourthwall's own editor (Site design), not in code.
 
 ## Weekly newsletter ("Boletín"): written in the Studio, sent by email only
 
