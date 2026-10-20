@@ -68,13 +68,29 @@
     <div class="page-head"><div class="wrap">
       <p class="kicker">Hecho con cariño</p>
       <h1>Tienda</h1>
-      <p class="lead">Merch con el sabor de la casa. Cada compra nos ayuda a seguir contando historias y sirviendo conversaciones.</p>
+      <p class="lead">Tazas, ropa y más con el sabor de la casa. Cada compra nos ayuda a seguir contando historias y sirviendo conversaciones.</p>
     </div></div>
 
     <!-- Los productos salen EN VIVO de la tienda de Fourthwall (config.js → tienda).
          Para agregar, cambiar o quitar productos se usa Fourthwall: esta página se
          actualiza sola. Los textos de la lista están en assets/js/textos.js. -->
     <section id="tienda" class="seccion-lista"></section>
+
+    <!-- Aviso de compra. Resume las políticas de la tienda de Fourthwall
+         (https://cafe-con-dos-shop.fourthwall.com/pages/returns-faq). Si Fourthwall
+         cambia sus políticas, actualiza este texto. -->
+    <section class="tienda-aviso" aria-labelledby="aviso-titulo"><div class="wrap">
+      <div class="tienda-aviso-caja">
+        <h2 id="aviso-titulo">Antes de comprar</h2>
+        <ul>
+          <li><b>Todas las ventas son finales.</b> Cada producto se hace por encargo, solo para ti, así que no aceptamos devoluciones, cambios ni reembolsos, tampoco por talla. La única excepción: si tu pedido llega con un error de impresión o un defecto visible, se reemplaza o se reembolsa. Escribe dentro de los 30 días después de recibirlo, con fotos claras del problema y tu número de orden.</li>
+          <li><b>Cancelar o cambiar un pedido</b> solo se puede antes de que entre a producción, con el link de tu email de confirmación.</li>
+          <li><b>La producción, el envío, los pagos y la atención de los pedidos los maneja Fourthwall</b>, nuestro socio y vendedor oficial (<i lang="en">merchant of record</i>). Los tiempos de entrega son estimados, y Café Con Dos no se hace responsable por demoras, pérdidas o problemas del envío o de la paquetería.</li>
+          <li><b>Pedidos internacionales:</b> pueden tener impuestos, aranceles o cargos de aduana, que paga quien recibe el pedido.</li>
+        </ul>
+        <p>Al comprar aceptas las políticas de la tienda: <a href="https://cafe-con-dos-shop.fourthwall.com/pages/returns-faq" target="_blank" rel="noopener">Devoluciones y preguntas frecuentes</a> · <a href="https://cafe-con-dos-shop.fourthwall.com/pages/terms-of-service" target="_blank" rel="noopener">Términos de servicio</a> · <a href="https://cafe-con-dos-shop.fourthwall.com/contact" target="_blank" rel="noopener">Ayuda con un pedido</a></p>
+      </div>
+    </div></section>
 
     <!-- parte: boletin (se edita en partes/boletin.html) -->
     <section class="seccion seccion--boletin" id="suscribete" data-boletin>
