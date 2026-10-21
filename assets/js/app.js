@@ -773,12 +773,16 @@
 
   PAGES.enportada = function () {
     const root = $("#enportada");
-    const idiomas = Array.from(new Set(ARTS.map((a) => a.idioma || "es")));
+    // Lo de Sobremesa vive solo en su página: aquí no sale (ni en "Todo", ni en la búsqueda).
+    if (params.get("seccion") === "sobremesa") { location.replace(BASE + "sobremesa.html" + (params.get("tema") ? "?tema=" + encodeURIComponent(params.get("tema")) : "")); return; }
+    const LISTA = ARTS.filter((a) => a.seccion !== "sobremesa");
+    const SECC = SECCIONES.filter((s) => s.id !== "sobremesa");
+    const idiomas = Array.from(new Set(LISTA.map((a) => a.idioma || "es")));
     const st = { seccion: params.get("seccion") || "", tema: params.get("tema") || "", idioma: params.get("idioma") || "", q: params.get("q") || "", orden: "desc", n: 12 };
     if (st.seccion && !seccionDe(st.seccion)) st.seccion = "";
     root.innerHTML = '<div class="wrap">' +
       '<div class="tabs" role="group" aria-label="' + t("exp.secciones") + '">' +
-      [["", t("exp.todo")]].concat(SECCIONES.map((s) => [s.id, s.nombre])).map(([id, n]) =>
+      [["", t("exp.todo")]].concat(SECC.map((s) => [s.id, s.nombre])).map(([id, n]) =>
         '<button type="button" class="tab" data-seccion="' + esc(id) + '" aria-pressed="' + (st.seccion === id) + '"' + (id === "sobremesa" ? ' translate="no"' : "") + ">" + esc(n) + "</button>").join("") +
       "</div>" +
       '<p class="tab-desc" hidden></p>' +
@@ -788,7 +792,7 @@
         ["es", "en"].filter((i) => idiomas.includes(i)).map((i) => '<option value="' + i + '"' + (i === "en" ? ' lang="en"' : "") + ">" + t("exp.idioma." + i) + "</option>").join("") + "</select></div>" : "") +
       '<div class="campo"><label for="f-orden">' + t("lista.orden") + '</label><select id="f-orden"><option value="desc">' + t("lista.orden.nuevos") + '</option><option value="asc">' + t("lista.orden.viejos") + "</option></select></div>" +
       "</div>" +
-      filtroHTML(temasUsados(ARTS), st.tema) +
+      filtroHTML(temasUsados(LISTA), st.tema) +
       '<p class="lista-contador" aria-live="polite"></p><div class="art-rejilla"></div>' +
       '<p class="ver-mas" hidden><button class="btn btn--hueco" type="button">' + t("exp.vermas") + "</button></p></div>";
 
@@ -799,7 +803,7 @@
 
     function filtrados() {
       const q = norm(st.q);
-      const l = ARTS.filter((a) => {
+      const l = LISTA.filter((a) => {
         if (st.seccion && a.seccion !== st.seccion) return false;
         if (st.tema && !(a.temas || []).includes(st.tema)) return false;
         if (st.idioma && (a.idioma || "es") !== st.idioma) return false;
@@ -1059,7 +1063,8 @@
     const L = langAttr(p);
     // Relacionados: primero lo de la misma sección y con más temas en común; si faltan, lo más nuevo.
     const comun = (x) => (x.temas || []).filter((tm) => (p.temas || []).includes(tm)).length;
-    const otros = ARTS.filter((x) => x !== p && !x.ejemplo);
+    // Sobremesa recomienda Sobremesa; los demás artículos, los demás (como en En Portada).
+    const otros = ARTS.filter((x) => x !== p && !x.ejemplo && (x.seccion === "sobremesa") === esSob);
     const relacionados = otros
       .map((x) => ({ x, puntos: (x.seccion === p.seccion ? 2 : 0) + comun(x) }))
       .filter((o) => o.puntos > 0).sort((m, n) => n.puntos - m.puntos).map((o) => o.x);
