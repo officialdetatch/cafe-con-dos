@@ -652,7 +652,8 @@
      Se guardan en la colección de Firestore indicada en config.js.
      Las reglas de seguridad están en firestore.rules (en la raíz del repo). */
   const FB_VER = "10.12.2";
-  function montarComentarios(el, postId) {
+  function montarComentarios(el, postId, extra) {
+    extra = extra || {};
     const C = CFG.comentarios || {};
     const fbc = C.firebase || {};
     if (!el || !C.activo || !fbc.projectId || !fbc.apiKey) return;
@@ -677,6 +678,7 @@
     const cuando = (d) => d ? d.toLocaleDateString(t("fecha.locale"), { day: "numeric", month: "long", year: "numeric" }) : t("com.ahora");
     function pintar() {
       cuenta.textContent = items.length ? "(" + items.length + ")" : "";
+      if (extra.alContar) extra.alContar(items.length);
       lista.innerHTML = items.length ? items.map((c) =>
         '<li class="com-item"><div class="com-cabeza"><b>' + esc(c.nombre) + '</b><time>' + esc(cuando(c.fecha)) + "</time></div>" +
         '<p>' + esc(c.texto).replace(/\n/g, "<br>") + "</p></li>").join("")
@@ -694,7 +696,7 @@
     }
     const col = () => fs.collection(db, C.coleccion || "ccd_comentarios");
 
-    cuandoSeVea(el, async () => {
+    cuandoSeVea(extra.observar || el, async () => {
       try {
         await conectar();
         const snap = await fs.getDocs(fs.query(col(), fs.where("post", "==", postId)));
@@ -1082,7 +1084,8 @@
       '<p class="etiqueta">' + t("art.conversemos") + "</p>" +
       "<h2>" + t("art.piensas") + "</h2>" +
       "<p>" + t("art.opinion") + "</p>" +
-      (hayComentarios ? '<p><a class="conversemos-comentar" href="#comentarios">' + t("art.apoyo.comentar") + "</a></p>" : "") +
+      (hayComentarios ? '<p class="conversemos-acciones"><button class="conversemos-comentar" type="button" aria-expanded="false" aria-controls="comentarios">' + t("art.apoyo.comentar") + '</button><span class="conversemos-cuenta"></span></p>' +
+        '<section class="comentarios" id="comentarios" hidden></section>' : "") +
       '<a class="conversemos-fila" href="' + (siguiente ? postUrl(siguiente) : BASE + "enportada.html") + '">' + tazaLinea +
       "<span><b>" + t("art.otro") + "</b><small>" + (siguiente ? esc(siguiente.titulo) : t("art.otro.sub")) + "</small></span>" + flecha + "</a>" +
       (A.mostrar !== false && A.cafeConDos ? '<a class="conversemos-fila" href="' + esc(A.cafeConDos) + '" target="_blank" rel="noopener">' + tazaHTML("conversemos-taza") +
@@ -1132,12 +1135,33 @@
       personas +
       (ep ? '<section class="entrada-ep"><h2>' + t("art.relacionado") + '</h2><div class="rejilla">' + epCard(ep) + "</div></section>" : "") +
       conversemos +
-      '<section class="comentarios" id="comentarios" hidden></section>' +
       "</div></div>" + lateral + "</div></article>";
-    montarComentarios($("#comentarios", root), p.id);
+
+    // Comentarios: escondidos hasta que tocan "Dejar un comentario"; ahí se abren con el formulario.
+    const panel = $("#comentarios", root), abrir = $(".conversemos-comentar", root), cuentaCom = $(".conversemos-cuenta", root);
+    if (panel && abrir) {
+      montarComentarios(panel, p.id, {
+        observar: $(".conversemos", root),
+        alContar: (n) => { cuentaCom.textContent = n ? (n === 1 ? t("com.uno") : n + " " + t("com.varios")) : ""; }
+      });
+      panel.hidden = true; // montarComentarios lo muestra; aquí empieza cerrado
+      const abrirPanel = (abierto, enfocar) => {
+        panel.hidden = !abierto;
+        abrir.setAttribute("aria-expanded", abierto);
+        abrir.textContent = abierto ? t("com.cerrar") : t("art.apoyo.comentar");
+        if (abierto && enfocar) {
+          const campo = panel.querySelector(store("ccd-com-nombre") ? "#com-texto" : "#com-nombre");
+          panel.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+          if (campo) setTimeout(() => campo.focus({ preventScroll: true }), 350);
+        }
+      };
+      abrir.addEventListener("click", () => abrirPanel(panel.hidden, true));
+      cuentaCom.addEventListener("click", () => abrirPanel(true, false));
+      if (location.hash === "#comentarios") abrirPanel(true, false);
+    }
     // "Compartir…" del teléfono (solo donde existe; ahí sale Instagram, WhatsApp, etc.)
     const nativo = $(".comp-nativo", root);
-    if (nativo && navigator.share) {
+    if (nativo && navigator.share && matchMedia("(pointer: coarse)").matches) {
       nativo.hidden = false;
       nativo.addEventListener("click", () => navigator.share({ title: p.titulo, text: p.resumen || "", url: location.href.split("#")[0] }).catch(() => {}));
     }

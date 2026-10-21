@@ -1179,7 +1179,7 @@ select option { background: var(--surface-2); color: var(--ink); }
 .entrada-main { min-width: 0; max-width: 780px; }
 @media (min-width: 1080px) {
   .entrada-grid { grid-template-columns: minmax(0, 1fr) 300px; gap: 0 clamp(40px, 4.5vw, 64px); align-items: start; }
-  .entrada-lateral { position: sticky; top: calc(var(--alto-header) + 20px); border-left: 1px solid var(--linea); padding-left: clamp(28px, 3vw, 40px); }
+  .entrada-lateral { border-left: 1px solid var(--linea); padding-left: clamp(28px, 3vw, 40px); }
 }
 .entrada-portada { margin: 0 0 30px; border-radius: var(--r-burbuja); overflow: hidden; aspect-ratio: 16 / 9; background: var(--surface); }
 .entrada-portada img { width: 100%; height: 100%; object-fit: cover; }
@@ -1235,7 +1235,22 @@ select option { background: var(--surface-2); color: var(--ink); }
 .conversemos .etiqueta { margin: 0; font-family: var(--f-display); font-size: .86rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
 .conversemos h2 { font-family: var(--f-text); font-weight: 500; font-size: clamp(1.45rem, 2.4vw, 1.75rem); margin: 6px 0 6px; }
 .conversemos > p { margin: 0; color: var(--ink-soft); }
-.conversemos-comentar { display: inline-block; margin-top: 10px; font-family: var(--f-display); font-size: 1.05rem; }
+.conversemos-acciones { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 12px 0 0; }
+.conversemos-comentar {
+  background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--f-display); font-size: 1.05rem; color: var(--link);
+  text-decoration: underline; text-decoration-color: var(--naranja); text-decoration-thickness: 2px; text-underline-offset: 3px;
+}
+.conversemos-comentar:hover { text-decoration-thickness: 3px; }
+.conversemos-cuenta { font-size: .92rem; color: var(--ink-soft); cursor: pointer; }
+/* El panel de comentarios se abre dentro de la caja */
+.conversemos .comentarios { max-width: none; margin: 18px 0 0; padding: 20px 0 4px; border-top: 1px solid var(--linea); scroll-margin-top: calc(var(--alto-header) + 16px); }
+.conversemos .comentarios h2 { font-family: var(--f-text); font-weight: 500; font-size: 1.3rem; margin: 0 0 14px; }
+.conversemos .com-lista { margin-bottom: 26px; gap: 22px; }
+.conversemos .com-item { background: var(--bg); }
+@media (prefers-reduced-motion: no-preference) {
+  .conversemos .comentarios:not([hidden]) { animation: abrir-comentarios .35s var(--ease); }
+  @keyframes abrir-comentarios { from { opacity: 0; transform: translateY(-6px); } }
+}
 .conversemos-fila { display: flex; align-items: center; gap: 18px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--linea); color: inherit; text-decoration: none; }
 .conversemos-fila + .conversemos-fila { margin-top: 14px; }
 .conversemos-fila > span { flex: 1; display: grid; gap: 2px; min-width: 0; }
@@ -1274,8 +1289,8 @@ select option { background: var(--surface-2); color: var(--ink); }
 .form-boletin--linea:focus-within { border-bottom-color: var(--brand); }
 .lat-enviar { background: none; border: 0; padding: 8px 4px; cursor: pointer; color: var(--brand); display: grid; place-items: center; }
 .form-boletin--linea .aviso { grid-column: 1 / -1; margin: 10px 0 0; font-size: .9rem; }
-.comp-iconos { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.comp-ico { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--linea); background: transparent; color: var(--ink); cursor: pointer; padding: 0; transition: border-color .2s ease, color .2s ease, transform .3s var(--ease); }
+.comp-iconos { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.comp-ico { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--linea); background: transparent; color: var(--ink); cursor: pointer; padding: 0; transition: border-color .2s ease, color .2s ease, transform .3s var(--ease); }
 .comp-ico:hover { border-color: var(--brand); color: var(--brand); transform: translateY(-2px); }
 .comp-ico svg { width: 20px; height: 20px; }
 .comp-ico[hidden] { display: none; }

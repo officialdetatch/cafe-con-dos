@@ -90,7 +90,12 @@ window.CCD_CONFIG = {
     { id: "emprender", nombre: "Emprender" },
     { id: "bienestar", nombre: "Bienestar" },
     { id: "relaciones", nombre: "Relaciones" },
-    { id: "vida", nombre: "La vida misma" }
+    { id: "vida", nombre: "La vida misma" },
+    { id: "reviews", nombre: "Reviews" },
+    { id: "reflexiones", nombre: "Reflexiones" },
+    { id: "moda", nombre: "Moda" },
+    { id: "marcas", nombre: "Marcas" },
+    { id: "lecturas", nombre: "Lecturas" }
   ],
 
   // Series. Un episodio puede ser parte de una serie (se elige en el writer).

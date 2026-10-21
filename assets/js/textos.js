@@ -141,6 +141,9 @@ window.CCD_TEXTOS = {
   "com.faltan": "Escribe tu nombre y un comentario.",
   "com.espera": "Espera unos segundos antes de publicar otro comentario.",
   "com.ahora": "Ahora mismo",
+  "com.cerrar": "Cerrar comentarios",
+  "com.uno": "1 comentario",
+  "com.varios": "comentarios",
 
   // Burbuja "Invítanos un café"
   "art.apoyo": "Si te gusta este contenido, no olvides comentar y apóyanos con un café.",
