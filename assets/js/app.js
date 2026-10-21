@@ -737,6 +737,7 @@
   /* ================= PÁGINAS ================= */
 
   const PAGES = {};
+  let PREVIA_ACTIVA = false; // true dentro de la vista previa del editor
 
   PAGES.inicio = function () {
     // La foto de la derecha: el artículo más nuevo marcado "Destacar en la portada"
@@ -1145,7 +1146,7 @@
     // Comentarios: escondidos hasta que tocan "Dejar un comentario"; ahí se abren con el formulario.
     const panel = $("#comentarios", root), abrir = $(".conversemos-comentar", root), cuentaCom = $(".conversemos-cuenta", root);
     if (panel && abrir) {
-      montarComentarios(panel, p.id, {
+      if (!PREVIA_ACTIVA) montarComentarios(panel, p.id, {
         observar: $(".conversemos", root),
         alContar: (n) => { cuentaCom.textContent = n ? (n === 1 ? t("com.uno") : n + " " + t("com.varios")) : ""; }
       });
@@ -1171,7 +1172,8 @@
       nativo.addEventListener("click", () => navigator.share({ title: p.titulo, text: p.resumen || "", url: location.href.split("#")[0] }).catch(() => {}));
     }
 
-    // Datos estructurados para Google (BlogPosting).
+    // Datos estructurados para Google (BlogPosting). (No en la vista previa del editor.)
+    if (PREVIA_ACTIVA) return;
     const site = String(CFG.siteUrl || "").replace(/\/$/, "");
     jsonLD({
       "@context": "https://schema.org", "@type": "BlogPosting",
@@ -1306,11 +1308,32 @@
   window.CCD = { md, esc, epCard, sobItem, artCard, portadaHTML, temaNombre, seccionDe, fecha, loc, t, EPS, ARTS, POSTS, CFG };
 
   const page = document.body && document.body.dataset.page;
+  /* Vista previa del editor: entrada.html?previa=1 dentro de la pestaña "Vista previa" de
+     Sanity. El editor le manda el borrador (todavía sin publicar) y se dibuja aquí con el
+     diseño real. Solo se aceptan mensajes del editor; nada se guarda ni se publica. */
+  const EDITORES = ["https://moderador.cafecondos.com", "https://cafecondos.sanity.studio", "http://localhost:3333"];
+  const PREVIA = page === "entrada" && params.get("previa") === "1" && window.parent !== window;
+  if (PREVIA) {
+    PREVIA_ACTIVA = true;
+    const m = document.createElement("meta"); m.name = "robots"; m.content = "noindex"; document.head.appendChild(m);
+    const root = $("#entrada");
+    if (root) root.innerHTML = '<div class="wrap"><p class="vacio">' + t("art.previa.esperando") + "</p></div>";
+    window.addEventListener("message", (e) => {
+      if (!EDITORES.includes(e.origin) || !e.data || e.data.tipo !== "ccd-previa" || !e.data.articulo) return;
+      const a = Object.assign({}, e.data.articulo, { id: params.get("id") || "__previa" });
+      const i = ARTS.findIndex((x) => x.id === a.id);
+      if (i >= 0) ARTS[i] = a; else ARTS.unshift(a);
+      const y = window.scrollY;
+      PAGES.entrada();
+      window.scrollTo(0, y);
+    });
+    window.parent.postMessage({ tipo: "ccd-previa-lista" }, "*");
+  }
   if (page) {
     montarEncabezado(page);
     montarPie();
-    if (PAGES[page]) PAGES[page]();
+    if (PAGES[page] && !PREVIA) PAGES[page]();
     montarBoletines();
-    renderApoyo();
+    if (!PREVIA) renderApoyo();
   }
 })();

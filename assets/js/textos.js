@@ -103,6 +103,7 @@ window.CCD_TEXTOS = {
   "art.cafe": "¿Te gustó? Invítanos un café.",
   "art.cafe.sub": "Cada café nos ayuda a seguir contando historias.",
   "art.noencontrado": "No encontramos ese post.",
+  "art.previa.esperando": "Preparando la vista previa…",
   "art.volver": "Volver a En Portada",
 
   // Contacto: mensajes del formulario

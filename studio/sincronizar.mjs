@@ -49,4 +49,14 @@ fs.writeFileSync(
 );
 // El mismo armador del correo del boletín que usa GitHub Actions, para la vista previa.
 fs.copyFileSync(path.join(aqui, "..", "scripts", "boletin-html.mjs"), path.join(aqui, "generado", "boletin-html.js"));
+// La misma conversión de texto que usa el sitio al publicar (scripts/contenido-sanity.js),
+// para que la "Vista previa" de los artículos sea idéntica a lo publicado.
+{
+  const fuente = fs.readFileSync(path.join(aqui, "..", "scripts", "contenido-sanity.js"), "utf8");
+  const ini = fuente.indexOf("function marcar("), fin = fuente.indexOf("/* ---------------- fotos");
+  if (ini < 0 || fin < ini) falta("No encontré textoAMarkdown en scripts/contenido-sanity.js.");
+  fs.writeFileSync(path.join(aqui, "generado", "texto-sanity.js"),
+    "// Copiado por sincronizar.mjs desde scripts/contenido-sanity.js. No se edita a mano.\n" +
+      fuente.slice(ini, fin) + "\nexport { textoAMarkdown };\n");
+}
 console.log("✔ Editor sincronizado con config.js (" + sitio.secciones.length + " secciones, " + sitio.temas.length + " temas).");

@@ -5,7 +5,7 @@ import {structureTool} from 'sanity/structure'
 import {esESLocale} from '@sanity/locale-es-es'
 import sitio from './generado/sitio.js'
 import {tiposDeEsquema} from './esquemas/index.js'
-import {estructura, estructuraBoletin, documentoBoletin} from './estructura.js'
+import {estructura, estructuraBoletin, documentoBoletin, documentoArticulo} from './estructura.js'
 import {boletin, IconoBoletin} from './esquemas/boletin.js'
 import {publicarConFecha, publicarBoletin, VerEnLaPagina} from './acciones.js'
 import {Comentarios} from './herramientas/Comentarios.jsx'
@@ -59,7 +59,7 @@ export default defineConfig({
   ...(tema ? {theme: tema} : {}),
 
   plugins: [
-    structureTool({title: 'Artículos', structure: estructura}),
+    structureTool({title: 'Artículos', structure: estructura, defaultDocumentNode: documentoArticulo}),
     // La pestaña del boletín semanal (se manda por correo, no sale en el sitio).
     structureTool({name: 'boletin', title: 'Boletín', icon: IconoBoletin, structure: estructuraBoletin, defaultDocumentNode: documentoBoletin}),
     esESLocale(),

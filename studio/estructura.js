@@ -4,6 +4,7 @@ import {FolderIcon} from '@sanity/icons/Folder'
 import sitio from './generado/sitio.js'
 import {hoy} from './slug.js'
 import {VistaPreviaCorreo} from './herramientas/VistaPreviaCorreo.jsx'
+import {VistaPreviaArticulo} from './herramientas/VistaPreviaArticulo.jsx'
 
 const masNuevo = [{field: 'fecha', direction: 'desc'}]
 
@@ -61,4 +62,9 @@ export const estructuraBoletin = (S) =>
 export const documentoBoletin = (S, {schemaType}) =>
   schemaType === 'boletin'
     ? S.document().views([S.view.form(), S.view.component(VistaPreviaCorreo).title('Vista previa del correo')])
+    : S.document().views([S.view.form()])
+// Al abrir un artículo: el formulario y, al lado, la vista previa en la página real.
+export const documentoArticulo = (S, {schemaType}) =>
+  schemaType === 'articulo'
+    ? S.document().views([S.view.form().title('Escribir'), S.view.component(VistaPreviaArticulo).title('Vista previa')])
     : S.document().views([S.view.form()])
