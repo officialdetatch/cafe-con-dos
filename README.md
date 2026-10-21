@@ -14,8 +14,11 @@ enportada.html        "En Portada" (was "Explorar"): all editorial content: sect
                       chips, language, search, sort, newest piece shown large, "Ver más" every 12
 explorar.html         Only a redirect to enportada.html (keeps ?seccion=, ?tema=, ?q=), so old
                       shared links and Google results don't break. Don't delete it.
-entrada.html?id=…     One article (any section): author, reading time, people in the story,
-                      related episode, share, comments (Firebase), "Sigue leyendo", BlogPosting data
+entrada.html?id=…     One article (any section), editorial layout: cover on top, serif title +
+                      subtitle, author photo/name/role, date and reading time; the text; people in
+                      the story, related episode, "Sigamos conversando" box, comments. On wide
+                      screens a column at the side (related articles, newsletter, share icons,
+                      photo credits); on phones it comes after the article. BlogPosting data
 sobremesa.html        Sobremesa, its own section page, with topic chips
 tienda.html           The shop: products read LIVE from Fourthwall (see "Shop (Fourthwall)")
 episodios.html        The podcast archive: search, topic chips, series filter, sort
@@ -209,7 +212,7 @@ A future date schedules an item (in the editor or the writers): it appears on th
 
 ## Article editor (Sanity) — one-time setup
 
-What she gets: a private page with her login, a form in Spanish with the same fields as the site (title, section, language, date, cover photo with focus point, summary, the article with section titles/subtitles/lists/quotes/links and as many photos as she wants between paragraphs (in the body, tap + → Foto; each photo has an optional caption and a description), topics, "Destacar en la portada", people in the story, related episode), and buttons to publish, unpublish, delete and **Ver en la página**. Sections, topics and the host come from `config.js`, so there is one place to change them.
+What she gets: a private page with her login, a form in Spanish with the same fields as the site (title, section, language, date, cover photo with focus point, summary, the article with section titles/subtitles/lists/quotes/links and, from the + (Insertar) menu, as many **Foto**, **Foto con texto al lado** (photo on one side, small title + short text on the other; stacks on phones) and **Cita destacada** (a big pull quote with who said it) blocks as she wants; **Shift + Enter** breaks a line without the paragraph gap (signatures, addresses), and the **Firma** style is for the sign-off; "Escrito por" is right under the title; "Créditos de fotografía" (in Más opciones) shows in the article's side column, topics, "Destacar en la portada", people in the story, related episode), and buttons to publish, unpublish, delete and **Ver en la página**. Sections, topics and the host come from `config.js`, so there is one place to change them.
 
 How it connects: when she publishes, Sanity sends a webhook to GitHub, which runs `deploy.yml`. The Action pulls every **published** article from Sanity (`scripts/contenido-sanity.js`), adds them to the ones in `data/articulos.js`, then builds the feed and sitemap and publishes. Drafts are never read. If Sanity can't be reached, the run fails on purpose and the live site stays as it was. The daily 6:00 am run also pulls from Sanity, so even if the webhook ever fails, her posts are up by the next morning.
 

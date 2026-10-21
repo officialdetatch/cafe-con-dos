@@ -113,7 +113,26 @@
         return '<a href="' + href + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">" + txt + "</a>";
       })
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-      .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+      .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
+      .replace(/\u2028/g, "<br>"); // Shift + Enter en el editor: bajar de línea sin dejar espacio
+  }
+  // Bloques especiales del editor, en una línea "!!tipo {json}".
+  function bloqueEspecial(tipo, dato) {
+    if (tipo === "firma") return '<p class="firma">' + inline(dato) + "</p>";
+    let d;
+    try { d = JSON.parse(dato); } catch (e) { return ""; }
+    const parrafos = (txt) => String(txt || "").split(/\n{2,}/).map((x) => x.trim()).filter(Boolean)
+      .map((x) => "<p>" + esc(x).replace(/\n/g, "<br>") + "</p>").join("");
+    if (tipo === "cita") {
+      return '<figure class="cita-destacada"><blockquote><p>' + esc(d.texto).replace(/\n/g, "<br>") + "</p></blockquote>" +
+        (d.autor ? "<figcaption>" + esc(d.autor) + "</figcaption>" : "") + "</figure>";
+    }
+    if (tipo === "fototexto") {
+      return '<div class="foto-texto' + (d.lado === "derecha" ? " foto-texto--derecha" : "") + '">' +
+        '<figure><img src="' + esc(d.src) + '" alt="' + esc(d.alt || "") + '" loading="lazy"></figure>' +
+        '<div class="foto-texto-txt">' + (d.titulo ? '<p class="foto-texto-titulo">' + esc(d.titulo) + "</p>" : "") + parrafos(d.texto) + "</div></div>";
+    }
+    return "";
   }
   function md(src) {
     const lines = String(src || "").replace(/\r/g, "").split("\n");
@@ -127,6 +146,7 @@
       let m;
       if (!line) return flushAll();
       if (/^---+$/.test(line)) { flushAll(); html += "<hr>"; return; }
+      if ((m = line.match(/^!!(firma|cita|fototexto)\s+(.*)$/))) { flushAll(); html += bloqueEspecial(m[1], m[2]); return; }
       // Una foto sola en su línea: ![descripción](ruta "pie de foto opcional")
       if ((m = line.match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/))) {
         flushAll();
@@ -478,10 +498,42 @@
       '<a class="chip chip--sm" target="_blank" rel="noopener" href="https://x.com/intent/post?text=' + tt + "&url=" + u + '">X</a>' +
       '<button class="chip chip--sm" type="button" data-copiar="' + esc(url) + '">' + t("comp.copiar") + "</button></div>";
   }
+  // Compartir con íconos (la columna del artículo).
+  const ICO = {
+    link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L11.6 6M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4L12.4 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    whatsapp: '<path d="M4.5 19.5l1.1-3.9A8.2 8.2 0 1 1 8.6 18.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.3 8.6c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.6 1.5c.1.2 0 .4-.1.6l-.5.6c.6 1.1 1.4 1.9 2.5 2.5l.6-.5c.2-.2.4-.2.6-.1l1.5.7c.2.1.3.3.3.5v.5c0 .4-.2.7-.6.9-.9.4-2.3.2-4-1.2-1.8-1.5-2.7-3.4-2.7-4.2 0-.6.1-1 .4-1.2z" fill="currentColor"/>',
+    x: '<path d="M5 4.5h3.6l10.4 15h-3.6zM18.6 4.5 5.4 19.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+    facebook: '<path d="M14.5 21v-7.5h2.6l.4-3h-3V8.8c0-.9.3-1.5 1.6-1.5h1.6V4.6c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.1H9v3h2.6V21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+    pinterest: '<circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M11.4 9.2c-.6 2.4-1.5 6.3-2 8.8M10.6 12.4c.4 1.4 4.6 1.3 4.9-1.9.2-2.4-2-3.6-4-3.1-1.6.4-2.6 1.8-2.3 3.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    compartir: '<path d="M12 15V4M8 8l4-4 4 4M5 12v7h14v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+  };
+  const svgIco = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICO[k] + "</svg>";
+  function compartirIconos(p) {
+    const url = location.href.split("#")[0];
+    const u = encodeURIComponent(url), tt = encodeURIComponent(p.titulo + " · Café Con Dos");
+    const site = String(CFG.siteUrl || "").replace(/\/$/, "");
+    const img = p.portada ? (/^https?:/.test(p.portada) ? p.portada : site + "/" + p.portada) : site + "/images/og-cafe-con-dos.jpg";
+    const a = (red, href, nombre) => '<a class="comp-ico" href="' + href + '" target="_blank" rel="noopener" aria-label="' + nombre + '" title="' + nombre + '">' + svgIco(red) + "</a>";
+    return '<div class="comp-iconos">' +
+      '<button class="comp-ico" type="button" data-copiar="' + esc(url) + '" data-copiar-ico aria-label="' + t("comp.copiar") + '" title="' + t("comp.copiar") + '">' + svgIco("link") + "</button>" +
+      a("whatsapp", "https://wa.me/?text=" + tt + "%20" + u, "WhatsApp") +
+      a("x", "https://x.com/intent/post?text=" + tt + "&url=" + u, "X") +
+      a("facebook", "https://www.facebook.com/sharer/sharer.php?u=" + u, "Facebook") +
+      a("pinterest", "https://www.pinterest.com/pin/create/button/?url=" + u + "&media=" + encodeURIComponent(img) + "&description=" + tt, "Pinterest") +
+      '<button class="comp-ico comp-nativo" type="button" hidden aria-label="' + t("comp.mas") + '" title="' + t("comp.mas") + '">' + svgIco("compartir") + "</button>" +
+      '<span class="comp-aviso" role="status"></span></div>';
+  }
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-copiar]");
     if (!b) return;
-    const ok = () => { b.textContent = t("comp.copiado"); setTimeout(() => (b.textContent = t("comp.copiar")), 1800); };
+    const ok = () => {
+      if (b.hasAttribute("data-copiar-ico")) {
+        const av = b.parentElement.querySelector(".comp-aviso");
+        if (av) { av.textContent = t("comp.copiado"); setTimeout(() => (av.textContent = ""), 1800); }
+        return;
+      }
+      b.textContent = t("comp.copiado"); setTimeout(() => (b.textContent = t("comp.copiar")), 1800);
+    };
     if (navigator.clipboard) navigator.clipboard.writeText(b.dataset.copiar).then(ok, () => prompt(t("comp.copiar"), b.dataset.copiar));
     else prompt(t("comp.copiar"), b.dataset.copiar);
   });
@@ -993,22 +1045,6 @@
     pintar();
   };
 
-  // Cierre de cada artículo: invita a comentar y a apoyar con un café.
-  // El link del café sale de apoyo.cafeConDos en config.js; si está vacío, no se muestra.
-  function apoyoArticulo() {
-    const A = CFG.apoyo || {};
-    if (A.mostrar === false || !A.cafeConDos) return "";
-    const C = CFG.comentarios || {};
-    const fb = C.firebase || {};
-    const hayComentarios = C.activo && fb.projectId && fb.apiKey;
-    return '<aside class="art-apoyo">' + tazaHTML("art-apoyo-taza") +
-      "<div><p>" + t("art.apoyo") + "</p>" +
-      '<div class="art-apoyo-acciones">' +
-      (hayComentarios ? '<a class="btn" href="#comentarios">' + t("art.apoyo.comentar") + "</a>" : "") +
-      '<a class="btn btn--naranja" href="' + esc(A.cafeConDos) + '" target="_blank" rel="noopener">' + t("art.apoyo.cafe") + "</a>" +
-      "</div></div></aside>";
-  }
-
   PAGES.entrada = function () {
     const root = $("#entrada");
     const p = ARTS.find((x) => x.id === params.get("id"));
@@ -1019,42 +1055,92 @@
     const a = autorDe(p.autor);
     const ep = p.episodio && EPS.find((e) => e.id === p.episodio);
     const L = langAttr(p);
-    // Sigue leyendo: primero lo de la misma sección y con más temas en común.
+    // Relacionados: primero lo de la misma sección y con más temas en común; si faltan, lo más nuevo.
     const comun = (x) => (x.temas || []).filter((tm) => (p.temas || []).includes(tm)).length;
-    const relacionados = ARTS.filter((x) => x !== p)
+    const otros = ARTS.filter((x) => x !== p && !x.ejemplo);
+    const relacionados = otros
       .map((x) => ({ x, puntos: (x.seccion === p.seccion ? 2 : 0) + comun(x) }))
-      .filter((o) => o.puntos > 0).sort((m, n) => n.puntos - m.puntos).slice(0, 3).map((o) => o.x);
+      .filter((o) => o.puntos > 0).sort((m, n) => n.puntos - m.puntos).map((o) => o.x);
+    otros.forEach((x) => { if (relacionados.length < 3 && !relacionados.includes(x)) relacionados.push(x); });
+    relacionados.length = Math.min(relacionados.length, 3);
+    const siguiente = relacionados[0];
     const personas = (p.personas || []).length
       ? '<section class="art-personas"><h2>' + t("art.personas") + "</h2>" + p.personas.map((i) => '<div class="invitado"><b>' +
         (i.link ? '<a href="' + esc(i.link) + '" target="_blank" rel="noopener">' + esc(i.nombre) + "</a>" : esc(i.nombre)) + "</b>" + (i.rol ? "<span>" + esc(i.rol) + "</span>" : "") + "</div>").join("") + "</section>"
       : "";
     const portada = p.portada
-      ? '<figure class="entrada-portada"><img src="' + esc(imgSrc(p.portada)) + '" alt="' + esc(p.portadaAlt || "") + '" width="1200" height="800"' + imgPos(p) + "></figure>"
+      ? '<figure class="entrada-portada"><img src="' + esc(imgSrc(p.portada)) + '" alt="' + esc(p.portadaAlt || "") + '" width="1200" height="760" fetchpriority="high"' + imgPos(p) + "></figure>"
       : "";
+    const C = CFG.comentarios || {}, fbc = C.firebase || {};
+    const hayComentarios = C.activo && fbc.projectId && fbc.apiKey;
+    const A = CFG.apoyo || {};
+    const flecha = '<svg class="flecha-larga" viewBox="0 0 28 14" aria-hidden="true"><path d="M1 7h25M20 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const tazaLinea = '<svg class="conversemos-ico" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 14h21v9a9 9 0 0 1-9 9h-3a9 9 0 0 1-9-9z M28 17h2.5a4 4 0 0 1 0 8H28 M5 35h26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-    root.innerHTML = '<article class="wrap">' +
+    // Lo que va al cierre: invitar a comentar, otra lectura y el café.
+    const conversemos = '<section class="conversemos">' +
+      '<p class="etiqueta">' + t("art.conversemos") + "</p>" +
+      "<h2>" + t("art.piensas") + "</h2>" +
+      "<p>" + t("art.opinion") + "</p>" +
+      (hayComentarios ? '<p><a class="conversemos-comentar" href="#comentarios">' + t("art.apoyo.comentar") + "</a></p>" : "") +
+      '<a class="conversemos-fila" href="' + (siguiente ? postUrl(siguiente) : BASE + "enportada.html") + '">' + tazaLinea +
+      "<span><b>" + t("art.otro") + "</b><small>" + (siguiente ? esc(siguiente.titulo) : t("art.otro.sub")) + "</small></span>" + flecha + "</a>" +
+      (A.mostrar !== false && A.cafeConDos ? '<a class="conversemos-fila" href="' + esc(A.cafeConDos) + '" target="_blank" rel="noopener">' + tazaHTML("conversemos-taza") +
+        "<span><b>" + t("art.cafe") + "</b><small>" + t("art.cafe.sub") + "</small></span>" + flecha + "</a>" : "") +
+      "</section>";
+
+    // Columna de al lado (en el celular va debajo del artículo).
+    const lateral = '<aside class="entrada-lateral" aria-label="' + t("art.mas") + '">' +
+      (relacionados.length ? '<section class="lat-bloque"><h2 class="lat-titulo">' + t("art.relacionados") + '</h2><ul class="lat-relacionados">' +
+        relacionados.map((x) => {
+          const sx = seccionDe(x.seccion) || {};
+          return '<li><a href="' + postUrl(x) + '">' +
+            '<span class="lat-img">' + (x.portada ? '<img src="' + esc(imgSrc(x.portada)) + '" alt="" loading="lazy" width="96" height="96"' + imgPos(x) + ">" : '<span class="lat-img-vacia" data-seccion="' + esc(x.seccion || "") + '">' + tazaHTML() + "</span>") + "</span>" +
+            '<span class="lat-txt"><small' + (x.seccion === "sobremesa" ? ' translate="no"' : "") + ">" + esc(sx.corto || sx.nombre || "") + "</small><b" + langAttr(x) + ">" + esc(x.titulo) + "</b><em>" + minutos(x) + " " + t("exp.lectura") + "</em></span></a></li>";
+        }).join("") + "</ul></section>" : "") +
+      '<section class="lat-bloque lat-boletin" data-boletin>' +
+      '<svg class="lat-sobre" viewBox="0 0 32 24" aria-hidden="true"><path d="M2 3h28v18H2z M2 4l14 10L30 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>' +
+      '<h2 class="lat-titulo">' + t("art.bol.titulo") + "</h2><p>" + t("art.bol.sub") + "</p>" +
+      '<form class="form-boletin form-boletin--linea" novalidate>' +
+      '<label class="sr-only" for="lat-email">' + t("bol.email") + "</label>" +
+      '<input type="email" id="lat-email" name="email" autocomplete="email" required placeholder="' + t("art.bol.email") + '">' +
+      '<input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">' +
+      '<button class="lat-enviar" type="submit" aria-label="' + t("bol.enviar") + '">' + flecha + "</button>" +
+      '<p class="aviso" role="status" hidden></p></form></section>' +
+      '<section class="lat-bloque"><h2 class="lat-titulo">' + t("art.comparte") + "</h2>" + compartirIconos(p) + "</section>" +
+      (p.creditos ? '<section class="lat-bloque lat-creditos"><h2 class="lat-titulo">' + t("art.fotografia") + "</h2><p>" + inline(p.creditos).replace(/\n/g, "<br>") + "</p></section>" : "") +
+      "</aside>";
+
+    root.innerHTML = '<article class="wrap entrada">' +
       '<nav class="migas" aria-label="Migas">' +
       (esSob ? '<a href="sobremesa.html" translate="no">' + t("sob.titulo") + "</a>"
         : '<a href="enportada.html">' + t("nav.enportada") + "</a>" + (s ? '<span aria-hidden="true">/</span><a href="' + seccionUrl(s.id) + '">' + esc(s.nombre) + "</a>" : "")) +
       "</nav>" +
+      '<div class="entrada-grid"><div class="entrada-main">' +
+      portada +
       '<header class="entrada-cabeza">' + artKicker(p) +
       "<h1" + L + ">" + esc(p.titulo) + "</h1>" +
       (p.resumen ? '<p class="lead"' + L + ">" + esc(p.resumen) + "</p>" : "") +
       '<div class="entrada-firma">' +
-      (a ? '<div class="autor">' + (a.foto ? '<img src="' + esc(BASE + a.foto) + '" alt="">' : tazaHTML("taza-mini")) + "<div><b>" + t("sob.por") + " " + esc(a.nombre) + "</b><span>" + esc(loc(a, "rol")) + "</span></div></div>" : "") +
-      artMeta(p) + (p.ejemplo ? '<span class="badge-ejemplo badge-ejemplo--suelto">' + t("ep.ejemplo") + "</span>" : "") + "</div></header>" +
-      portada +
-      '<div class="entrada-cuerpo' + (portada ? "" : " entrada-cuerpo--sin-foto") + '">' +
+      (a ? (a.foto ? '<img class="autor-foto" src="' + esc(BASE + a.foto) + '" alt="">' : '<span class="autor-foto autor-foto--taza">' + tazaHTML() + "</span>") : "") +
+      '<div class="autor-datos">' + (a ? '<p class="autor-nombre">' + t("sob.por") + " " + esc(a.nombre) + (loc(a, "rol") ? ' <span class="autor-rol">· ' + esc(loc(a, "rol")) + "</span>" : "") + "</p>" : "") +
+      artMeta(p) + "</div>" +
+      (p.ejemplo ? '<span class="badge-ejemplo badge-ejemplo--suelto">' + t("ep.ejemplo") + "</span>" : "") + "</div></header>" +
+      '<div class="entrada-cuerpo">' +
       '<div class="prosa"' + L + ">" + md(p.cuerpo) + "</div>" +
       ((p.temas || []).length ? '<div class="entrada-temas">' + chipsTemas(p.temas, BASE + (esSob ? "sobremesa.html" : "enportada.html")) + "</div>" : "") +
       personas +
       (ep ? '<section class="entrada-ep"><h2>' + t("art.relacionado") + '</h2><div class="rejilla">' + epCard(ep) + "</div></section>" : "") +
-      apoyoArticulo() +
-      '<section class="entrada-compartir"><h2>' + t("comp.titulo") + "</h2>" + compartirHTML(p.titulo) + "</section>" +
+      conversemos +
       '<section class="comentarios" id="comentarios" hidden></section>' +
-      "</div></article>" +
-      (relacionados.length ? '<section class="seccion sigue"><div class="wrap"><h2>' + t("art.sigue") + '</h2><div class="art-rejilla">' + relacionados.map((x) => artCard(x)).join("") + "</div></div></section>" : "");
+      "</div></div>" + lateral + "</div></article>";
     montarComentarios($("#comentarios", root), p.id);
+    // "Compartir…" del teléfono (solo donde existe; ahí sale Instagram, WhatsApp, etc.)
+    const nativo = $(".comp-nativo", root);
+    if (nativo && navigator.share) {
+      nativo.hidden = false;
+      nativo.addEventListener("click", () => navigator.share({ title: p.titulo, text: p.resumen || "", url: location.href.split("#")[0] }).catch(() => {}));
+    }
 
     // Datos estructurados para Google (BlogPosting).
     const site = String(CFG.siteUrl || "").replace(/\/$/, "");

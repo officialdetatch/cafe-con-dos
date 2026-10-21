@@ -87,6 +87,21 @@ window.CCD_TEXTOS = {
   "art.personas": "En esta historia",
   "art.relacionado": "Escucha el episodio",
   "art.sigue": "Sigue leyendo",
+  // Artículo: la columna de al lado y el cierre
+  "art.mas": "Más de Café Con Dos",
+  "art.relacionados": "Artículos relacionados",
+  "art.bol.titulo": "Suscríbete a nuestro newsletter",
+  "art.bol.sub": "Historias, entrevistas y recomendaciones, directo a tu bandeja de entrada.",
+  "art.bol.email": "Tu correo electrónico",
+  "art.comparte": "Comparte este artículo",
+  "art.fotografia": "Fotografía",
+  "art.conversemos": "Sigamos conversando",
+  "art.piensas": "¿Y tú qué piensas?",
+  "art.opinion": "Nos encantaría leer tu opinión. Cuéntanos en los comentarios.",
+  "art.otro": "Un café lleva a otro.",
+  "art.otro.sub": "Descubre otra lectura de Café Con Dos.",
+  "art.cafe": "¿Te gustó? Invítanos un café.",
+  "art.cafe.sub": "Cada café nos ayuda a seguir contando historias.",
   "art.noencontrado": "No encontramos ese post.",
   "art.volver": "Volver a En Portada",
 
@@ -142,5 +157,6 @@ window.CCD_TEXTOS = {
   "comp.titulo": "Compartir",
   "comp.copiar": "Copiar link",
   "comp.copiado": "Link copiado",
+  "comp.mas": "Más opciones para compartir",
   "fecha.locale": "es-DO"
 };

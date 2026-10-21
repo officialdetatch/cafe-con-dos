@@ -39,6 +39,15 @@ export const articulo = defineType({
       ],
     }),
     defineField({
+      name: 'autor',
+      title: 'Escrito por',
+      type: 'string',
+      description: 'Sale firmado en el artículo, con su foto y su rol.',
+      options: {list: hosts, layout: 'radio'},
+      hidden: hosts.length < 2,
+      validation: (Rule) => Rule.required().error('Elige quién escribió este artículo.'),
+    }),
+    defineField({
       name: 'seccion',
       title: 'Sección',
       type: 'string',
@@ -60,15 +69,6 @@ export const articulo = defineType({
       },
       initialValue: 'es',
       validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'autor',
-      title: 'Escrito por',
-      type: 'string',
-      description: 'Sale firmado en el artículo, con su foto y su rol.',
-      options: {list: hosts, layout: 'radio'},
-      hidden: hosts.length < 2,
-      validation: (Rule) => Rule.required().error('Elige quién escribió este artículo.'),
     }),
     defineField({
       name: 'fecha',
@@ -112,7 +112,8 @@ export const articulo = defineType({
       name: 'cuerpo',
       title: 'El artículo',
       type: 'array',
-      description: 'Escribe o pega el texto. Usa "Título de sección" y "Subtítulo" para dividirlo. Para meter una foto entre párrafos, toca el + (o "Insertar") y elige "Foto"; puedes poner todas las que quieras.',
+      description:
+        'Escribe o pega el texto. Usa "Título de sección" y "Subtítulo" para dividirlo. Para bajar de línea SIN dejar espacio (una firma, una dirección), usa Shift + Enter. Con el + (o "Insertar") puedes meter una Foto, una Foto con texto al lado o una Cita destacada, todas las que quieras.',
       of: [
         defineArrayMember({
           type: 'block',
@@ -121,6 +122,7 @@ export const articulo = defineType({
             {title: 'Título de sección', value: 'h2'},
             {title: 'Subtítulo', value: 'h3'},
             {title: 'Cita', value: 'blockquote'},
+            {title: 'Firma', value: 'firma'},
           ],
           lists: [
             {title: 'Viñetas', value: 'bullet'},
@@ -167,6 +169,79 @@ export const articulo = defineType({
               validation: (Rule) => Rule.required().warning('Describe la foto en una frase.'),
             }),
           ],
+        }),
+        // Una frase que se destaca en grande, con su autora o autor debajo.
+        defineArrayMember({
+          type: 'object',
+          name: 'cita',
+          title: 'Cita destacada',
+          fields: [
+            defineField({
+              name: 'texto',
+              title: 'La frase',
+              type: 'text',
+              rows: 3,
+              description: 'Sin comillas: se ponen solas.',
+              validation: (Rule) => Rule.required().error('Escribe la frase.'),
+            }),
+            defineField({
+              name: 'autor',
+              title: 'Quién lo dijo (opcional)',
+              type: 'string',
+              description: 'Ej.: Frase de la entrevistada, o su nombre.',
+            }),
+          ],
+          preview: {
+            select: {title: 'texto', subtitle: 'autor'},
+            prepare: ({title, subtitle}) => ({title: '“' + (title || '') + '”', subtitle: subtitle ? '— ' + subtitle : 'Cita destacada'}),
+          },
+        }),
+        // Foto a un lado y un texto corto al otro (en el celular, uno debajo del otro).
+        defineArrayMember({
+          type: 'object',
+          name: 'fotoTexto',
+          title: 'Foto con texto al lado',
+          fields: [
+            defineField({
+              name: 'foto',
+              title: 'Foto',
+              type: 'image',
+              options: {hotspot: true},
+              fields: [
+                defineField({
+                  name: 'alt',
+                  title: 'Describe la foto',
+                  type: 'string',
+                  validation: (Rule) => Rule.required().warning('Describe la foto en una frase.'),
+                }),
+              ],
+              validation: (Rule) => Rule.required().error('Sube la foto.'),
+            }),
+            defineField({
+              name: 'titulo',
+              title: 'Título pequeño (opcional)',
+              type: 'string',
+              description: 'Sale en mayúsculas pequeñas arriba del texto. Ej.: Crear sin premura',
+            }),
+            defineField({
+              name: 'texto',
+              title: 'Texto',
+              type: 'text',
+              rows: 5,
+              description: 'Un párrafo corto. Una línea en blanco separa los párrafos.',
+            }),
+            defineField({
+              name: 'lado',
+              title: 'La foto va a la',
+              type: 'string',
+              options: {list: [{title: 'Izquierda', value: 'izquierda'}, {title: 'Derecha', value: 'derecha'}], layout: 'radio', direction: 'horizontal'},
+              initialValue: 'izquierda',
+            }),
+          ],
+          preview: {
+            select: {title: 'titulo', subtitle: 'texto', media: 'foto'},
+            prepare: ({title, subtitle, media}) => ({title: title || 'Foto con texto al lado', subtitle, media}),
+          },
         }),
       ],
       validation: (Rule) => Rule.required().error('El artículo está vacío.'),
@@ -221,6 +296,14 @@ export const articulo = defineType({
       fieldset: 'mas',
       description: 'Opcional. Al final del artículo sale la tarjeta de ese episodio.',
       components: {input: EpisodioInput},
+    }),
+    defineField({
+      name: 'creditos',
+      title: 'Créditos de fotografía (opcional)',
+      type: 'text',
+      rows: 2,
+      fieldset: 'mas',
+      description: 'Sale al lado del artículo, en "Fotografía". Ej.: Fotos de @nombre. Todas las imágenes son de autoría propia o con fines ilustrativos.',
     }),
     defineField({
       name: 'slug',

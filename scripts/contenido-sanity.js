@@ -43,7 +43,9 @@ function leerDatos() {
    El sitio ya sabe mostrar: ## y ### títulos, > citas, - y 1. listas, **negrita**,
    *cursiva*, [links](url) e ![imágenes](url). Aquí se traduce a eso. */
 function marcar(texto, marcas, defs) {
-  let t = String(texto || "").replace(/\s*\n\s*/g, " ");
+  // Shift + Enter en el editor = bajar de línea sin dejar espacio. Se guarda como
+  // U+2028 (un salto que no corta el párrafo) y el sitio lo muestra como <br>.
+  let t = String(texto || "").replace(/[ \t]*\n[ \t]*/g, "\u2028");
   if (!t.trim() || !marcas || !marcas.length) return t;
   // Los espacios de las orillas se quedan afuera de ** * y [ ].
   const ini = t.match(/^\s*/)[0], fin = t.match(/\s*$/)[0];
@@ -75,6 +77,21 @@ function textoAMarkdown(bloques) {
       }
       return;
     }
+    // Bloques especiales: van en una sola línea "!!tipo {json}" que el sitio sabe mostrar.
+    if (b._type === "cita") {
+      previoLista = null;
+      const texto = String(b.texto || "").trim();
+      if (texto) partes.push({ txt: "!!cita " + JSON.stringify({ texto, autor: String(b.autor || "").trim() }) });
+      return;
+    }
+    if (b._type === "fotoTexto") {
+      previoLista = null;
+      if (b.url) partes.push({ txt: "!!fototexto " + JSON.stringify({
+        src: b.url + "?w=1200&fit=max&auto=format", alt: String(b.alt || ""), titulo: String(b.titulo || "").trim(),
+        texto: String(b.texto || "").trim(), lado: b.lado === "derecha" ? "derecha" : "izquierda"
+      }) });
+      return;
+    }
     if (b._type !== "block") return;
     const txt = bloqueTexto(b);
     if (!txt) { previoLista = null; return; }
@@ -91,6 +108,7 @@ function textoAMarkdown(bloques) {
     if (estilo === "h1" || estilo === "h2") partes.push({ txt: "## " + txt });
     else if (/^h[3-6]$/.test(estilo)) partes.push({ txt: "### " + txt });
     else if (estilo === "blockquote") partes.push({ txt: "> " + txt });
+    else if (estilo === "firma") partes.push({ txt: "!!firma " + txt });
     else partes.push({ txt });
   });
   return partes.map((p) => p.txt).join("\n\n");
@@ -128,7 +146,9 @@ const CONSULTA = `*[_type == "articulo" && !(_id in path("drafts.**"))] | order(
   resumen, temas, episodio,
   personas[]{ nombre, rol, link },
   "foto": portada{ "url": asset->url, "dim": asset->metadata.dimensions{ width, height }, alt, crop, hotspot },
-  cuerpo[]{ ..., _type == "image" => { "url": asset->url, alt, caption } }
+  creditos,
+  cuerpo[]{ ..., _type == "image" => { "url": asset->url, alt, caption },
+    _type == "fotoTexto" => { "url": foto.asset->url, "alt": foto.alt, titulo, texto, lado } }
 }`;
 
 function convertir(doc, cfg) {
@@ -150,6 +170,8 @@ function convertir(doc, cfg) {
     cuerpo: textoAMarkdown(doc.cuerpo),
     destacado: !!doc.destacado
   };
+  const creditos = String(doc.creditos || "").trim();
+  if (creditos) a.creditos = creditos;
   if (foto.portadaPos) a.portadaPos = foto.portadaPos;
   if (doc.publicado) a.publicado = doc.publicado;
   return a;
