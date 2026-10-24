@@ -20,7 +20,7 @@ window.CCD_CONFIG = {
 
   // Lema y descripción del feed (lo que leen Brevo y las apps de RSS).
   // En las páginas están escritos en cada .html.
-  lema: "Stories worth discovering. Perspectives worth sharing.",
+  lema: "Stories worth sharing.",
   descripcion: "Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.",
 
   // Redes: las usan los botones de cada episodio y la sección "En redes".

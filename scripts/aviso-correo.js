@@ -141,7 +141,7 @@ function construirCorreo(a, cfg) {
 "</table></td></tr>\n" +
 (redes.length ? '<tr><td class="t-link" align="center" style="padding:26px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:24px;font-weight:600;">' +
   redes.map(([n, u]) => '<a href="' + esc(u) + '" target="_blank" style="color:#723F40;text-decoration:underline;text-decoration-color:#F47D50;">' + n + "</a>").join('<span class="t-sep" style="color:#C9A28C;">&nbsp;·&nbsp;</span>') + "</td></tr>\n" : "") +
-'<tr><td class="t-lema" align="center" style="padding:18px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:23px;font-weight:600;color:#723F40;" lang="en">' + esc(cfg.lema || "Stories worth discovering.") + "</td></tr>\n" +
+'<tr><td class="t-lema" align="center" style="padding:18px 20px 0;font-family:\'Antonio\',\'Arial Narrow\',Arial,sans-serif;font-size:16px;line-height:23px;font-weight:600;color:#723F40;" lang="en">' + esc(cfg.lema || "Stories worth sharing.") + "</td></tr>\n" +
 '<tr><td class="t-pie" align="center" style="padding:10px 20px 0;font-family:\'Literata\',Georgia,\'Times New Roman\',serif;font-size:13px;line-height:20px;color:#8A6560;">' +
 'Recibes este correo porque te suscribiste en cafecondos.com.<br /><a href="{{ unsubscribe }}" style="color:#8A6560;">Darme de baja</a> · <a href="{{ mirror }}" style="color:#8A6560;">Ver en el navegador</a></td></tr>\n' +
 "</table></td></tr></table></body></html>\n";

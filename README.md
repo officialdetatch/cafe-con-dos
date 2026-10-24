@@ -26,8 +26,10 @@ episodio.html?id=…    One episode: YouTube video (or Spotify player), buttons,
 nosotros.html         Story, what the name evokes, purpose and promise, formats, who's behind it
 contacto.html         Three entry points (creators, editorial proposals, brands) + form + socials
 404.html              Not-found page (absolute paths: assumes the site is at the domain root)
-index.html (now)      While the site isn't launched, index.html IS the pre-launch page and the
-                      full home page waits in cafenotready.html (see "Pre-launch page")
+index.html            The home page (Inicio). Until launch day the deploy shows pronto.html at
+                      cafecondos.com/ instead, and this page at cafenotready.html (see "Pre-launch page")
+pronto.html           The waiting page: "Tenemos fecha" + countdown before launch, "Volvemos enseguida" in maintenance mode
+cafenotready.html     Only a redirect to the home page (the deploy fills it in while the home is hidden)
 
 partes/               The pieces shared by every page: encabezado.html (header + menu),
                       pie.html (footer), boletin.html (the "Café para llevar" newsletter block)
@@ -91,12 +93,35 @@ Don't edit the header or footer inside a page: the next copy overwrites it. The 
 
 Social links are written where they appear (`partes/pie.html`, `contacto.html`, the buttons in `index.html`) and also in `redes` in `config.js`, which the episode pages use. If one changes, search the repo for the old link and replace it everywhere.
 
-## Pre-launch page
+## Link preview (WhatsApp, iMessage, social)
 
-The "muy pronto" page is **currently `index.html`** (the full home page is saved as `cafenotready.html`): the moka pot serving a cup (her drawing, animated), "Ya casi sube el café. ¿Te servimos una taza?", an email signup (the same Brevo form as the newsletter), a button to play the brewing sound, and the footer without its menu.
+The picture is `images/og-cafe-con-dos.jpg` (1200×630): the logo, "Stories worth sharing." and "PLATAFORMA EDITORIAL INDEPENDIENTE". Every page points to it as `og-cafe-con-dos.jpg?v=2`; if the picture changes again, replace the file and bump the number (`?v=3`) in every page (search the repo for `og-cafe-con-dos.jpg`), or apps keep showing the old one. The home page preview reads "Café Con Dos | Plataforma Editorial Independiente" / "Café Con Dos: un espacio para la cultura, la creatividad, las personas y las ideas. Descubre lo que te mueve." (in the `<head>` of `index.html`). Apps like WhatsApp also remember a link's preview for a while, so a chat where the link was already shared may keep the old one; new shares get the new one.
 
-- **To launch:** rename `index.html` (the pre-launch page) to something like `pronto.html` so you keep it, then rename `cafenotready.html` to `index.html`. Until then, the other pages still work if someone has the direct link.
-- **The sound:** the pre-launch page picks one of the tracks listed near the end of its `index.html` (`audio/whisky-on-ice.mp3`, `iced-coffee.mp3`, `Starbucks-girl.mp3`, `green-tea.mp3`). `music.preload = "none"` keeps the ~3 MB track from downloading until it actually starts playing (browsers only let it play after the first click), so visitors who never click don't pay for it.
+The slogan is **"Stories worth sharing."**: `lema` in `config.js` (emails), the home page title (`index.html`, in two voices: "Stories worth" / "sharing.") and the footer (`partes/pie.html`).
+
+## Pre-launch page and maintenance mode
+
+The waiting page is **`pronto.html`**: the moka pot serving a cup (her drawing, animated), an email signup (the same Brevo form as the newsletter), and the footer. It has two texts, and the deploy picks one:
+
+- **"Tenemos fecha"** — "El café casi está listo. ¡Prepara tu taza y bocadillos!" with a **countdown** to the launch (days, hours, min, sec) (before launch; footer menu hidden). Link preview: "Café Con Dos | ¡Tenemos fecha!".
+- **"Volvemos enseguida"** — "Estamos colando otro café. ¿Nos esperas un ratito?" (maintenance mode; footer menu shown, because the rest of the site stays open).
+
+Nobody renames files anymore. `scripts/portada.js` runs in every deploy ("Elegir la portada" step in `deploy.yml`) and decides what goes at cafecondos.com/:
+
+| When | cafecondos.com/ shows | cafenotready.html |
+|---|---|---|
+| Before `LANZAMIENTO` (Dominican time) | pronto.html, "Tenemos fecha" + countdown | the real home page (hidden from Google), to preview it |
+| From `LANZAMIENTO` on | the real home page (`index.html`) | redirects to the home page |
+| `MANTENIMIENTO` = `si` (after launch) | pronto.html, "Volvemos enseguida" | the real home page (hidden from Google) |
+
+- **Launch:** `LANZAMIENTO` is **Sunday Nov 1, 2026, 6:00 am Dominican time** (5:00 am in Miami: the US clocks go back that same night). That's exactly when the daily 6:00 am publish runs, so that run puts the home page up; `deploy.yml` also has a backup run that day at 6:15 am in case GitHub starts late or skips it. No commit needed.
+- **The countdown opens the site by itself:** when it hits zero, the page sends the visitor to `cafenotready.html?servido=1`. Before the 6:00 am publish finishes, that page still IS the home page; after it, it redirects to cafecondos.com/. So nobody gets stuck on the countdown, even if GitHub is a few minutes late. (`?servido=1` keeps a browser with an old copy from going in circles; the home page removes it from the address.) The countdown reads its moment from `data-lanzamiento`, which `portada.js` fills in from `LANZAMIENTO`, so both always match.
+- **To move the launch:** add a repository variable `LANZAMIENTO` (GitHub > Settings > Secrets and variables > Actions > Variables) with the new moment in Dominican time, e.g. `2026-11-15T06:00`, and run "Publicar sitio". For a time other than 6:00 am, also add a matching schedule line in `deploy.yml` (UTC = Dominican time + 4 h).
+- **Maintenance mode on:** add a repository variable `MANTENIMIENTO` = `si`, then Actions > "Publicar sitio" > **Run workflow**. Only the home page changes: articles, episodes and the other pages keep working, so shared links don't break.
+- **Maintenance mode off:** delete the variable (or set it to `no`) and run "Publicar sitio" again.
+- No Netlify credits are used by any of this (it's all the GitHub site, not the Studio).
+- **Edit the texts:** the visible words are in `pronto.html` (the `solo-lanzamiento` and `solo-mantenimiento` lines). The link-preview title/description for "Tenemos fecha" are in the `<head>` of `pronto.html`; the maintenance ones are at the top of `scripts/portada.js`. To see the maintenance version on your computer, change `data-pronto="lanzamiento"` to `"mantenimiento"` in the `<body>` of `pronto.html` (the deploy sets it anyway).
+- **The sound:** the waiting page picks one of the tracks listed near the end of `pronto.html` (`audio/whisky-on-ice.mp3`, `iced-coffee.mp3`, `Starbucks-girl.mp3`, `green-tea.mp3`). `music.preload = "none"` keeps the ~3 MB track from downloading until it actually starts playing (browsers only let it play after the first click), so visitors who never click don't pay for it.
 - **The drawing:** it's split into layers in `images/pronto/` (pot, steam, motion lines, stream, two drops, splash, cup), all the same size and stacked. The `-clara` versions are for dark mode. The animation is in `styles.css`, section "Muy pronto": one 6-second cycle where the pot tilts, the stream falls, drops fall, the cup splashes and the pot straightens. People who turn on "reduce motion" on their device see the still drawing.
 
 ## Email alerts for new articles and episodes (Brevo + GitHub Actions)
@@ -125,7 +150,7 @@ When an article or an episode is published, the site emails the Brevo list once:
 - `test`: emails only the address you type, as a Brevo test.
 - `send`: emails the whole list. Check "force" to resend one that already went out.
 
-**To turn it on at launch:** add the variable `AVISOS_DESDE` with the launch moment in UTC, for example `2026-11-01T00:00:00Z`. Articles published from then on are emailed automatically. To turn it off, delete the variable.
+**To turn it on at launch:** add the variable `AVISOS_DESDE` with the launch moment in UTC, for example `2026-11-01T10:00:00Z` (6:00 am Nov 1 in the DR, when the home page goes up). Articles published from then on are emailed automatically. To turn it off, delete the variable.
 
 ## Shop (Fourthwall)
 
@@ -191,7 +216,7 @@ A private copy of the editor, hosted on Netlify at `https://moderador.cafecondos
 
 ## Sections
 
-En Portada (enportada.html, formerly Explorar) has four sections, set in `secciones` in `config.js`: **Historias y entrevistas**, **Cultura y descubrimientos**, **Opiniones y perspectivas** and **Sobremesa**. Each has a name, a short label (used on the color block of an article without a photo) and a description (shown in En Portada when the section is picked). Sobremesa also has its own page. The cards in "Empieza a explorar" on Inicio are written in the home page (`cafenotready.html` until launch, then `index.html`); each one shows the photo of the newest article in its section, and the fourth one, "Conversaciones", the newest episode.
+En Portada (enportada.html, formerly Explorar) has four sections, set in `secciones` in `config.js`: **Historias y entrevistas**, **Cultura y descubrimientos**, **Opiniones y perspectivas** and **Sobremesa**. Each has a name, a short label (used on the color block of an article without a photo) and a description (shown in En Portada when the section is picked). Sobremesa also has its own page. The cards in "Empieza a explorar" on Inicio are written in the home page (`index.html`); each one shows the photo of the newest article in its section, and the fourth one, "Conversaciones", the newest episode.
 
 Every article has one section, a language (`es` or `en`), topics, and optionally a cover photo with its description, people featured, a related episode and the "Destacar en la portada" checkbox. The newest highlighted article is the big one at the top of Inicio; with none highlighted, the newest article is used. Articles without a photo get a block in the section's colors.
 

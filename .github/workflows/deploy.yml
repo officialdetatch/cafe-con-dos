@@ -6,6 +6,10 @@
 #     (el webhook de Sanity manda el aviso "sanity"),
 #   - cada mañana a las 6:00 am (hora de RD), para que lo programado con fecha
 #     futura entre al feed (y al correo) ese día sin subir nada,
+#     (la de las 6:00 am del 1 de noviembre de 2026 es la del LANZAMIENTO: la portada
+#     de verdad reemplaza a la cuenta regresiva; ver scripts/portada.js),
+#   - y otra vez ese 1 de noviembre a las 6:15 am, de respaldo, por si GitHub se
+#     retrasa o se salta la de las 6:00,
 #   - y a mano con el botón "Run workflow".
 # Requisito: Settings > Pages > Source = "GitHub Actions".
 
@@ -20,6 +24,7 @@ on:
     types: [sanity]
   schedule:
     - cron: "0 10 * * *" # 10:00 UTC = 6:00 am en República Dominicana
+    - cron: "15 10 1 11 *" # 1 de noviembre, 10:15 UTC = 6:15 am en RD: respaldo del lanzamiento
   workflow_dispatch: # botón "Run workflow" para correrlo a mano
 
 permissions:
@@ -59,6 +64,16 @@ jobs:
       # por si se editaron sin correr "node scripts/partes.js" antes del push.
       - name: Copiar el encabezado, el pie y el newsletter en cada página
         run: node scripts/partes.js _site
+
+      # ¿Qué sale en cafecondos.com/? Antes del lanzamiento, la cuenta regresiva
+      # ("Tenemos fecha"); después, la portada. Con la variable MANTENIMIENTO = si (Settings > Secrets and variables >
+      # Actions > Variables), vuelve la página de espera con "Volvemos enseguida".
+      # LANZAMIENTO también se puede cambiar ahí, sin tocar este archivo.
+      - name: Elegir la portada (lanzamiento / mantenimiento)
+        run: node scripts/portada.js _site
+        env:
+          LANZAMIENTO: ${{ vars.LANZAMIENTO || '2026-11-01T06:00' }} # hora de RD
+          MANTENIMIENTO: ${{ vars.MANTENIMIENTO }}
 
       # Si Sanity no responde, este paso falla y no se publica nada:
       # el sitio que ya está en línea se queda igual.

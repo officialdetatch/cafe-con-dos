@@ -88,7 +88,7 @@
       "    <description>" + x((lema + " " + desc).trim()) + "</description>\n" +
       "    <language>es</language>\n" +
       "    <lastBuildDate>" + rfc822(hoy()) + "</lastBuildDate>\n" +
-      "    <image><url>" + x(site + "/images/og-cafe-con-dos.jpg") + "</url><title>" + x(cfg.nombre || "Café Con Dos") + "</title><link>" + x(site + "/") + "</link></image>\n" +
+      "    <image><url>" + x(site + "/images/og-cafe-con-dos.jpg?v=2") + "</url><title>" + x(cfg.nombre || "Café Con Dos") + "</title><link>" + x(site + "/") + "</link></image>\n" +
       items.map((i) => i.xml).join("") +
       "  </channel>\n</rss>\n";
   }

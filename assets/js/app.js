@@ -512,7 +512,7 @@
     const url = location.href.split("#")[0];
     const u = encodeURIComponent(url), tt = encodeURIComponent(p.titulo + " · Café Con Dos");
     const site = String(CFG.siteUrl || "").replace(/\/$/, "");
-    const img = p.portada ? (/^https?:/.test(p.portada) ? p.portada : site + "/" + p.portada) : site + "/images/og-cafe-con-dos.jpg";
+    const img = p.portada ? (/^https?:/.test(p.portada) ? p.portada : site + "/" + p.portada) : site + "/images/og-cafe-con-dos.jpg?v=2";
     const a = (red, href, nombre) => '<a class="comp-ico" href="' + href + '" target="_blank" rel="noopener" aria-label="' + nombre + '" title="' + nombre + '">' + svgIco(red) + "</a>";
     return '<div class="comp-iconos">' +
       '<button class="comp-ico" type="button" data-copiar="' + esc(url) + '" data-copiar-ico aria-label="' + t("comp.copiar") + '" title="' + t("comp.copiar") + '">' + svgIco("link") + "</button>" +
@@ -1179,7 +1179,7 @@
       "@context": "https://schema.org", "@type": "BlogPosting",
       headline: p.titulo, description: p.resumen || "", datePublished: p.fecha, inLanguage: p.idioma || "es",
       articleSection: s ? s.nombre : "", keywords: (p.temas || []).map(temaNombre).join(", "),
-      image: p.portada ? (/^https?:/.test(p.portada) ? p.portada : site + "/" + p.portada) : site + "/images/og-cafe-con-dos.jpg",
+      image: p.portada ? (/^https?:/.test(p.portada) ? p.portada : site + "/" + p.portada) : site + "/images/og-cafe-con-dos.jpg?v=2",
       author: a ? { "@type": "Person", name: a.nombre } : { "@type": "Organization", name: "Café Con Dos" },
       publisher: { "@type": "Organization", name: "Café Con Dos", logo: { "@type": "ImageObject", url: site + "/images/logo.png" } },
       mainEntityOfPage: site + "/entrada.html?id=" + encodeURIComponent(p.id)
@@ -1234,6 +1234,7 @@
      Los navegadores no dejan que una página suene sola al abrirla: el sonido
      arranca cuando la persona toca el botón. */
   PAGES.pronto = function () {
+    cuentaRegresiva();
     const btn = $("[data-sonido]"), audio = $("#sonido-cafe");
     if (!btn || !audio) return;
     const etiqueta = $("span", btn);
@@ -1248,6 +1249,44 @@
     });
     audio.addEventListener("pause", () => pintar(false));
   };
+
+  /* La cuenta regresiva hasta el lanzamiento (pronto.html). Cuando llega a cero, la
+     página se va sola a la portada de verdad: cafenotready.html, que antes de que corra
+     la publicación de las 6:00 am todavía ES la portada, y después manda a index.html.
+     El "?servido=1" evita que se quede dando vueltas si algo viejo quedó guardado. */
+  function cuentaRegresiva() {
+    const caja = $("[data-cuenta]");
+    if (!caja || document.body.dataset.pronto === "mantenimiento") return;
+    const meta = Date.parse(caja.dataset.lanzamiento || "");
+    if (isNaN(meta)) return;
+    const yaVino = params.has("servido");
+    const dos = (n) => String(n).padStart(2, "0");
+    const poner = (sel, v) => { const el = $(sel, caja); if (el) el.textContent = v; };
+    // La fecha bonita, en hora de RD: "Domingo 1 de noviembre · 6:00 am".
+    try {
+      const zona = { timeZone: "America/Santo_Domingo" };
+      const dia = new Intl.DateTimeFormat("es-DO", Object.assign({ weekday: "long", day: "numeric", month: "long" }, zona)).format(meta);
+      const hora = new Intl.DateTimeFormat("en-US", Object.assign({ hour: "numeric", minute: "2-digit" }, zona)).format(meta).replace(" AM", " am").replace(" PM", " pm");
+      poner("[data-cuenta-fecha]", dia.charAt(0).toUpperCase() + dia.slice(1).replace(",", "") + " · " + hora);
+    } catch (e) { /* se queda el texto que trae la página */ }
+    let reloj = 0;
+    const pintar = () => {
+      const falta = Math.max(0, meta - Date.now());
+      const seg = Math.floor(falta / 1000);
+      poner("[data-cuenta-dias]", dos(Math.floor(seg / 86400)));
+      poner("[data-cuenta-horas]", dos(Math.floor(seg / 3600) % 24));
+      poner("[data-cuenta-min]", dos(Math.floor(seg / 60) % 60));
+      poner("[data-cuenta-seg]", dos(seg % 60));
+      if (falta > 0) return;
+      clearInterval(reloj);
+      caja.classList.add("cuenta--lista");
+      if (!yaVino) { location.replace("cafenotready.html?servido=1"); return; }
+      // Si ya veníamos de allá, no dar vueltas: un botón para entrar.
+      if (!$(".cuenta-entrar", caja)) caja.insertAdjacentHTML("beforeend", '<p class="cuenta-entrar"><a class="btn" href="cafenotready.html">' + t("pronto.entrar") + ' <span aria-hidden="true">→</span></a></p>');
+    };
+    pintar();
+    reloj = setInterval(pintar, 1000);
+  }
 
   /* ---------------- Burbuja "Invítanos un café" ---------------- */
   function renderApoyo() {
@@ -1328,6 +1367,10 @@
       window.scrollTo(0, y);
     });
     window.parent.postMessage({ tipo: "ccd-previa-lista" }, "*");
+  }
+  // Al llegar desde la cuenta regresiva (?servido=1), se limpia la dirección.
+  if (page && page !== "pronto" && params.has("servido")) {
+    try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) { /* nada */ }
   }
   if (page) {
     montarEncabezado(page);

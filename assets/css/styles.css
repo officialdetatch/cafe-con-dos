@@ -1392,12 +1392,18 @@ body[data-page="entrada"] .seccion--boletin { display: none; }
 .nos-intro .manifiesto { font-size: clamp(1.55rem, 3.2vw, 2.45rem); line-height: 1.18; max-width: 30ch; }
 .contacto aside h2 { font-size: clamp(1.9rem, 3vw, 2.4rem); margin-bottom: 16px; }
 
-/* ---------- Muy pronto (index.html mientras no se lanza) ----------
+/* ---------- Muy pronto / Volvemos enseguida (pronto.html) ----------
+   Hace de portada antes del lanzamiento y con el modo mantenimiento (scripts/portada.js).
    La página antes del lanzamiento: la moka sirviendo café. El dibujo está
    partido en capas (images/pronto/) del mismo tamaño, una encima de la otra.
    Un ciclo dura 6 s: la moka se inclina, cae el chorro, caen gotas,
    salpica la taza y la moka vuelve a enderezarse. */
-.pagina-pronto .site-footer nav { display: none; } /* sin el menú del pie mientras el sitio no está abierto */
+/* Cada texto sale solo en su momento: "Muy pronto" o "Volvemos enseguida". */
+.pagina-pronto[data-pronto="mantenimiento"] .solo-lanzamiento,
+.pagina-pronto:not([data-pronto="mantenimiento"]) .solo-mantenimiento { display: none; }
+/* Sin el menú del pie antes del lanzamiento. En mantenimiento sí sale, porque el
+   resto del sitio sigue abierto. */
+.pagina-pronto:not([data-pronto="mantenimiento"]) .site-footer nav { display: none; }
 .pagina-pronto .header-acciones { margin-left: auto; }
 .pronto { padding: clamp(16px, 4vw, 48px) 0 clamp(64px, 8vw, 112px); }
 .pronto .wrap { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(28px, 6vw, 96px); align-items: center; }
@@ -1414,6 +1420,15 @@ body[data-page="entrada"] .seccion--boletin { display: none; }
 /* dos voces: la pregunta responde un poco más adentro */
 .pronto-titulo-2 { color: var(--accent-text); padding-left: 1em; margin-top: .12em; }
 .pronto .lead { max-width: 40ch; margin-bottom: 28px; }
+/* La cuenta regresiva hasta el lanzamiento (la mueve app.js, "Muy pronto") */
+.cuenta { margin: 0 0 26px; }
+.cuenta-fecha { font-family: var(--f-display); font-weight: 600; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-text); margin: 0 0 12px; }
+.cuenta-numeros { list-style: none; margin: 0; padding: 0; display: flex; gap: clamp(8px, 1.4vw, 14px); }
+.cuenta-numeros li { flex: 0 1 5.2rem; min-width: 0; padding: 12px 6px 10px; text-align: center; border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--brand) 7%, transparent); }
+.cuenta-numeros span { display: block; font-family: var(--f-display); font-weight: 700; font-size: clamp(2.1rem, 4vw, 2.9rem); line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cuenta-numeros small { display: block; margin-top: 6px; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; opacity: .72; }
+.cuenta--lista .cuenta-numeros span { color: var(--accent-text); }
+.cuenta-entrar { margin: 18px 0 0; }
 .pronto-boletin { max-width: 520px; }
 .pronto-boletin .form-boletin { align-self: start; }
 .pronto-boletin .form-boletin .btn { --btn-bg: var(--brand); --btn-borde: var(--brand); --btn-ink: var(--brand-ink); min-width: 150px; }
@@ -1438,6 +1453,7 @@ body[data-page="entrada"] .seccion--boletin { display: none; }
   .pronto-texto > .kicker { justify-content: center; }
   .pronto-titulo-2 { padding-left: 0; }
   .pronto .lead { margin-left: auto; margin-right: auto; }
+  .cuenta-numeros { justify-content: center; }
   .pronto-boletin { margin: 0 auto; text-align: left; }
   .pronto-boletin .campos { grid-template-columns: 1fr; }
   .pronto-boletin .form-boletin .btn { justify-self: stretch; }
@@ -1553,6 +1569,7 @@ body[data-page="entrada"] .seccion--boletin { display: none; }
   .pronto-texto > .kicker { animation-delay: .05s; }
   .pronto-titulo > span:first-child { animation-delay: .15s; }
   .pronto-titulo > .pronto-titulo-2 { animation-delay: .55s; }
+  .pronto-texto > .cuenta { animation-delay: .7s; }
   .pronto-texto > .lead { animation-delay: .8s; }
   .pronto-texto > .pronto-boletin { animation-delay: .9s; }
 
