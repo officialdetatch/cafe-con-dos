@@ -116,12 +116,12 @@ window.CCD_TEXTOS = {
   "con.sinform": "El formulario todavía no está conectado. Mientras tanto, escríbenos por Instagram.",
 
   // Newsletter: la ventanita de Inicio y los mensajes del formulario
-  "bol.sub": "Te llega un email cuando publicamos algo nuevo: historias, opiniones, Sobremesa o un episodio. Cero spam.",
+  "bol.sub": "Te llega un email cuando publicamos algo nuevo: historias, opiniones, Sobremesa o un episodio.",
   "bol.nombre": "Nombre",
   "bol.email": "Email",
   "bol.enviar": "Suscribirme",
   "bol.enviando": "Suscribiendo…",
-  "bol.ok": "¡Listo, ya estás en la lista! Te escribimos cuando haya algo nuevo.",
+  "bol.ok": "¡Listo, ya estás en la lista! Te escribimos cuando haya algo nuevo. Recuerda revisar la carpeta de spam!",
   "bol.error": "No se pudo completar la suscripción. Revisa el email e inténtalo otra vez.",
   "bol.invalido": "Escribe un email válido, por ejemplo nombre@gmail.com.",
   "bol.prueba": "Modo prueba: el formulario aún no está conectado a Brevo, así que no se guardó el email.",
@@ -155,7 +155,7 @@ window.CCD_TEXTOS = {
   "apoyo.aviso": "¿Te gusta Café Con Dos? Invítanos un café.",
   "apoyo.nos": "Apóyanos",
   "apoyo.nos.sub": "Cada café ayuda a que sigamos contando historias.",
-  "apoyo.dev": "Apoya a nuestro developer",
+  "apoyo.dev": "Si te gusta como se ve la pagina, apoya a nuestro developer",
   "apoyo.cerrar": "Cerrar",
 
   // Compartir y otros
