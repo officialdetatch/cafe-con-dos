@@ -93,6 +93,15 @@ Don't edit the header or footer inside a page: the next copy overwrites it. The 
 
 Social links are written where they appear (`partes/pie.html`, `contacto.html`, the buttons in `index.html`) and also in `redes` in `config.js`, which the episode pages use. If one changes, search the repo for the old link and replace it everywhere.
 
+## Addresses without ".html"
+
+On the live site the addresses look like `cafecondos.com/enportada`, `cafecondos.com/entrada?id=…` (no `.html`). GitHub Pages already opens `enportada.html` when someone asks for `/enportada`, so only the links change:
+
+- **In the files you edit, nothing changes:** links keep their `.html`, so pages still open on your computer by double-click. The deploy step "Direcciones sin .html" (`scripts/urls-limpias.js`) removes `.html` from the links in the copy that gets published (pages, `assets/js`, `data`), and `index.html` becomes `./`.
+- **Old links still work:** `cafecondos.com/enportada.html` (shared before, or in Google) still opens, and `app.js` quietly changes the address bar to `/enportada` (only on the live site, not on your computer).
+- The sitemap, the RSS feed and the new-article emails use the clean addresses.
+- The Studio's preview still opens `entrada.html?previa=1` (both work).
+
 ## Link preview (WhatsApp, iMessage, social)
 
 The picture is `images/og-cafe-con-dos.jpg` (1200×630): the logo, "Stories worth sharing." and "PLATAFORMA EDITORIAL INDEPENDIENTE". Every page points to it as `og-cafe-con-dos.jpg?v=2`; if the picture changes again, replace the file and bump the number (`?v=3`) in every page (search the repo for `og-cafe-con-dos.jpg`), or apps keep showing the old one. The home page preview reads "Café Con Dos | Plataforma Editorial Independiente" / "Café Con Dos: un espacio para la cultura, la creatividad, las personas y las ideas. Descubre lo que te mueve." (in the `<head>` of `index.html`). Apps like WhatsApp also remember a link's preview for a while, so a chat where the link was already shared may keep the old one; new shares get the new one.

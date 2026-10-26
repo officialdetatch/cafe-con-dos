@@ -47,7 +47,7 @@
         xml:
           "    <item>\n" +
           "      <title>" + x(e.titulo) + "</title>\n" +
-          "      <link>" + x(site + "/episodio.html?id=" + encodeURIComponent(e.id)) + "</link>\n" +
+          "      <link>" + x(site + "/episodio?id=" + encodeURIComponent(e.id)) + "</link>\n" +
           '      <guid isPermaLink="false">ccd-episodio-' + x(e.id) + "</guid>\n" +
           "      <pubDate>" + rfc822(cuando(e)) + "</pubDate>\n" +
           "      <description>" + x(e.resumen || "") + "</description>\n" +
@@ -65,7 +65,7 @@
         xml:
           "    <item>\n" +
           "      <title>" + x((sob ? "Sobremesa: " : "") + p.titulo) + "</title>\n" +
-          "      <link>" + x(site + "/entrada.html?id=" + encodeURIComponent(p.id)) + "</link>\n" +
+          "      <link>" + x(site + "/entrada?id=" + encodeURIComponent(p.id)) + "</link>\n" +
           '      <guid isPermaLink="false">ccd-' + (sob ? "sobremesa" : "articulo") + "-" + x(p.id) + "</guid>\n" +
           "      <pubDate>" + rfc822(cuando(p)) + "</pubDate>\n" +
           "      <description>" + x(p.resumen || "") + "</description>\n" +
@@ -96,10 +96,10 @@
   function buildSitemap(cfg, episodios, entradas) {
     const site = String(cfg.siteUrl || "").replace(/\/$/, "");
     const urls = [
-      ["/", hoy()], ["/enportada.html", hoy()], ["/episodios.html", hoy()], ["/sobremesa.html", hoy()], ["/tienda.html", hoy()], ["/nosotros.html"], ["/contacto.html"]
+      ["/", hoy()], ["/enportada", hoy()], ["/episodios", hoy()], ["/sobremesa", hoy()], ["/tienda", hoy()], ["/nosotros"], ["/contacto"]
     ];
-    publicables(episodios).forEach((e) => urls.push(["/episodio.html?id=" + encodeURIComponent(e.id), e.fecha]));
-    publicables(entradas).forEach((p) => urls.push(["/entrada.html?id=" + encodeURIComponent(p.id), p.fecha]));
+    publicables(episodios).forEach((e) => urls.push(["/episodio?id=" + encodeURIComponent(e.id), e.fecha]));
+    publicables(entradas).forEach((p) => urls.push(["/entrada?id=" + encodeURIComponent(p.id), p.fecha]));
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
       urls.map(([u, d]) => "  <url><loc>" + x(site + u) + "</loc>" + (d ? "<lastmod>" + d + "</lastmod>" : "") + "</url>\n").join("") +
       "</urlset>\n";

@@ -87,7 +87,7 @@ async function miniaturaYoutube(id) {
 function construirCorreo(a, cfg) {
   const sitio = String(env("SITIO_URL") || cfg.siteUrl || "").replace(/\/$/, "");
   const ep = esEp(a);
-  const url = sitio + (ep ? "/episodio.html?id=" : "/entrada.html?id=") + encodeURIComponent(a.id);
+  const url = sitio + (ep ? "/episodio?id=" : "/entrada?id=") + encodeURIComponent(a.id);
   const img = a.portada ? (/^https?:/.test(a.portada) ? a.portada : sitio + "/" + String(a.portada).replace(/^\//, "")) : "";
   const sec = (cfg.secciones || []).find((s) => s.id === (a.seccion || "sobremesa"));
   const serie = ep ? (cfg.series || []).find((s) => s.id === a.serie) : null;

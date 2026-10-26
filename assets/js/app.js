@@ -1368,10 +1368,20 @@
     });
     window.parent.postMessage({ tipo: "ccd-previa-lista" }, "*");
   }
-  // Al llegar desde la cuenta regresiva (?servido=1), se limpia la dirección.
-  if (page && page !== "pronto" && params.has("servido")) {
-    try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) { /* nada */ }
-  }
+  // La dirección se ve limpia: sin ".html" (cafecondos.com/enportada) y sin el
+  // "?servido=1" de la cuenta regresiva. Solo en el sitio publicado: en la computadora
+  // (archivo o localhost) se deja como está. No recarga la página.
+  (function direccionLimpia() {
+    if (!/^https?:$/.test(location.protocol) || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return;
+    let ruta = location.pathname.replace(/\/index\.html$/, "/").replace(/\.html$/, "");
+    const p = new URLSearchParams(location.search);
+    if (page && page !== "pronto") p.delete("servido");
+    const busca = p.toString() ? "?" + p.toString() : "";
+    const nueva = ruta + busca + location.hash;
+    if (nueva !== location.pathname + location.search + location.hash) {
+      try { history.replaceState(history.state, "", nueva); } catch (e) { /* nada */ }
+    }
+  })();
   if (page) {
     montarEncabezado(page);
     montarPie();

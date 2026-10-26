@@ -82,6 +82,11 @@ jobs:
         env:
           SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }} # opcional, solo si el dataset es privado
 
+      # Links sin ".html" (cafecondos.com/enportada). Solo en lo que se publica:
+      # tus archivos siguen con .html. Ver scripts/urls-limpias.js.
+      - name: Direcciones sin .html
+        run: node scripts/urls-limpias.js _site
+
       - name: Generar feed.xml y sitemap.xml
         run: node scripts/build-feed.js _site
 
