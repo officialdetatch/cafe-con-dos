@@ -82,6 +82,16 @@ jobs:
         env:
           SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }} # opcional, solo si el dataset es privado
 
+      # La Fonoteca: las canciones de la playlist (Spotify) y la pestaña "Fonoteca"
+      # del editor → data/fonoteca.js. Si Spotify falla, NO frena la publicación.
+      - name: La Fonoteca (playlist de Spotify)
+        run: node scripts/fonoteca.js _site
+        env:
+          SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
+          SPOTIFY_CLIENT_ID: ${{ vars.SPOTIFY_CLIENT_ID || '35589065ae264f04a52b83fb60ea77b1' }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+
       # Links sin ".html" (cafecondos.com/enportada). Solo en lo que se publica:
       # tus archivos siguen con .html. Ver scripts/urls-limpias.js.
       - name: Direcciones sin .html

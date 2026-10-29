@@ -1230,6 +1230,283 @@
     });
   };
 
+  /* ---------------- La Fonoteca (fonoteca.html) ----------------
+     Todo sale de window.CCD_FONOTECA (data/fonoteca.js, lo arma scripts/fonoteca.js
+     al publicar): la playlist de Spotify, la canción de la semana, los "¿Sabías que…?"
+     y las preguntas propias de la pestaña "Fonoteca" del editor.
+     - El reproductor es el de Spotify (su "iFrame API"), dentro del equipo retro.
+     - La trivia se arma aquí, en cada ronda, con las canciones de la playlist. */
+  PAGES.fonoteca = function () {
+    const F = window.CCD_FONOTECA || {};
+    const listaId = (F.playlist && F.playlist.id) || "";
+    const azar = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const mezclar = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const llenar = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : m));
+    const unaDe = (k, v) => llenar(azar(t(k).split("|")), v);
+    const dos = (n) => String(n).padStart(2, "0");
+    const mmss = (ms) => { const s = Math.max(0, Math.floor((ms || 0) / 1000)); return dos(Math.floor(s / 60)) + ":" + dos(s % 60); };
+    const quieto = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // "Dreams - 2004 Remaster" → "Dreams"; "Rumours (Super Deluxe)" → "Rumours".
+    const limpio = (s) => String(s || "")
+      .replace(/\s+-\s+.*\b(remaster(ed)?|live|en vivo|version|versión|mono|stereo|edit|mix)\b.*$/i, "")
+      .replace(/\s*[([][^)\]]*\b(remaster(ed)?|deluxe|edition|edición|version|versión|live|en vivo|mono|stereo|feat\.?|ft\.|with|con)\b[^)\]]*[)\]]/gi, "")
+      .trim() || String(s || "");
+    const norm = (s) => limpio(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+    const canciones = (F.canciones || [])
+      .filter((c) => c && c.n && (c.a || []).length)
+      .map((c) => Object.assign({}, c, { n: limpio(c.n), al: limpio(c.al), crudo: c.n + " · " + c.al }));
+    const artistas = (c) => (c.a || []).join(", ");
+    const linkSpotify = (tipo, id) => "https://open.spotify.com/" + tipo + "/" + id;
+    const tapa = (c, clase) => (c && (c.mini || c.img)
+      ? '<img class="' + clase + '" src="' + esc(clase === "fono-tapa-mini" ? (c.mini || c.img) : (c.img || c.mini)) + '" alt="" loading="lazy">'
+      : '<span class="' + clase + ' fono-vinilo" aria-hidden="true"></span>');
+
+    /* ----- el reproductor ----- */
+    const deck = $("[data-deck]"), pantalla = $("#fono-spotify");
+    const lcdTiempo = $("[data-deck-tiempo]"), lcdTitulo = $("[data-deck-titulo]");
+    const volver = $("[data-deck-volver]"), abrir = $("[data-deck-abrir]");
+    const uriLista = listaId ? "spotify:playlist:" + listaId : "";
+    let control = null, modo = "";
+    const rotulo = (txt) => {
+      if (!lcdTitulo) return;
+      lcdTitulo.textContent = txt;
+      lcdTitulo.parentNode.classList.toggle("deck-titulo--corre", txt.length > 24 && !quieto);
+    };
+    const rotuloLista = () => rotulo(t("fono.deck.playlist") + (F.playlist && F.playlist.nombre ? " · " + F.playlist.nombre : ""));
+    const abrirEn = (href) => { if (abrir) abrir.href = href; };
+    rotuloLista();
+    abrirEn(listaId ? linkSpotify("playlist", listaId) : "https://open.spotify.com/");
+    const iframeSimple = () => {
+      modo = "simple";
+      pantalla.innerHTML = '<iframe title="' + esc(t("fono.deck.playlist")) + '" src="https://open.spotify.com/embed/playlist/' + esc(listaId) +
+        '?utm_source=generator" width="100%" height="380" frameborder="0" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>';
+    };
+    if (listaId && pantalla) {
+      // Si la API de Spotify no llega en 8 segundos, se pone el reproductor normal.
+      const respaldo = setTimeout(() => { if (!modo) iframeSimple(); }, 8000);
+      window.onSpotifyIframeApiReady = (API) => {
+        if (modo) return;
+        modo = "api";
+        const el = document.createElement("div");
+        pantalla.innerHTML = "";
+        pantalla.appendChild(el);
+        API.createController(el, { uri: uriLista, width: "100%", height: 380 }, (c) => {
+          clearTimeout(respaldo);
+          control = c;
+          c.addListener("playback_update", (e) => {
+            const d = (e && e.data) || {};
+            deck.classList.toggle("deck--sonando", !d.isPaused && !d.isBuffering);
+            if (lcdTiempo) lcdTiempo.textContent = mmss(d.position);
+          });
+        });
+      };
+      const sc = document.createElement("script");
+      sc.src = "https://open.spotify.com/embed/iframe-api/v1";
+      sc.async = true;
+      sc.onerror = () => { clearTimeout(respaldo); if (!modo) iframeSimple(); };
+      document.head.appendChild(sc);
+    } else if (pantalla) {
+      pantalla.innerHTML = '<p class="deck-cargando">' + esc(t("fono.afinando")) + "</p>";
+    }
+
+    // Pone una canción en el reproductor (si no se puede, la abre en Spotify).
+    function tocar(c, sinMover) {
+      if (!c) return;
+      const abrirFuera = (url) => window.open(url, "_blank", "noopener");
+      if (!c.id) return abrirFuera("https://open.spotify.com/search/" + encodeURIComponent(c.n + " " + artistas(c)));
+      if (!control) return abrirFuera(linkSpotify("track", c.id));
+      control.loadUri("spotify:track:" + c.id);
+      control.play();
+      volver.hidden = false;
+      abrirEn(linkSpotify("track", c.id));
+      rotulo(llenar(t("fono.deck.sonando"), { cancion: c.n, artista: artistas(c) }));
+      if (!sinMover) deck.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "center" });
+    }
+    if (volver) volver.addEventListener("click", () => {
+      if (control && uriLista) control.loadUri(uriLista);
+      volver.hidden = true;
+      abrirEn(linkSpotify("playlist", listaId));
+      rotuloLista();
+    });
+
+    /* ----- la canción de la semana ----- */
+    const S = F.semana;
+    const cajaSemana = $("[data-semana]");
+    if (S && (S.id || S.n) && cajaSemana) {
+      const s = Object.assign({}, S, { n: limpio(S.n), al: limpio(S.al) });
+      const parrafos = String(s.texto || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
+        .map((p) => "<p>" + esc(p).replace(/\n/g, "<br>") + "</p>").join("");
+      const cabeza = s.n
+        ? '<div class="semana-top"><figure class="polaroid">' + tapa(s, "fono-tapa") + "</figure>" +
+          '<div class="semana-info"><h3>' + esc(s.n) + "</h3><p>" + esc(artistas(s)) + (s.y ? " <span>(" + s.y + ")</span>" : "") + "</p>" +
+          '<p class="semana-botones">' +
+          (s.id ? '<button class="fono-play" type="button" data-semana-tocar aria-label="' + esc(t("fono.semana.escuchar") + ": " + s.n) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button>' +
+            '<a class="fono-spotify" href="' + esc(linkSpotify("track", s.id)) + '" target="_blank" rel="noopener" aria-label="' + esc(t("fono.semana.spotify")) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7 9.6c3.4-1 7.3-.7 10.2.9M7.6 12.6c2.8-.8 5.9-.5 8.3.8M8.2 15.4c2.2-.6 4.5-.4 6.4.6" fill="none" stroke="var(--fono-tarjeta)" stroke-width="1.6" stroke-linecap="round"/></svg></a>' : "") +
+          "</p></div></div>"
+        : '<iframe class="semana-embed" title="' + esc(t("fono.semana.escuchar")) + '" src="https://open.spotify.com/embed/track/' + esc(s.id) + '?utm_source=generator" width="100%" height="152" frameborder="0" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>';
+      cajaSemana.innerHTML = cabeza + '<div class="semana-texto">' + parrafos + "</div>" +
+        (s.nota ? '<p class="fono-mano semana-nota">' + esc(s.nota) + " <span>♡</span></p>" : "");
+      $("#fono-semana").hidden = false;
+      const b = $("[data-semana-tocar]", cajaSemana);
+      if (b) b.addEventListener("click", () => tocar(s));
+    } else {
+      const grid = $(".fono-grid");
+      if (grid) grid.classList.add("fono-grid--dos");
+    }
+
+    /* ----- ¿Sabías que…? ----- */
+    const datos = (F.sabiasQue || []).filter(Boolean);
+    if (datos.length && $("[data-sabias]")) {
+      $("[data-sabias-texto]").textContent = azar(datos);
+      $("[data-sabias]").hidden = false;
+    }
+
+    /* ----- Explora por década ----- */
+    const conAno = canciones.filter((c) => c.y >= 1900);
+    const decadas = Array.from(new Set(conAno.map((c) => Math.floor(c.y / 10) * 10))).sort((a, b) => a - b);
+    const chips = $("[data-decadas]"), listaDec = $("[data-decada-lista]");
+    if (decadas.length && chips && listaDec) {
+      const nombreDec = (d) => (d >= 2000 ? String(d) : String(d).slice(2)) + "s";
+      chips.innerHTML = decadas.map((d) => '<button class="fono-decada" type="button" aria-pressed="false" data-dec="' + d + '">' + nombreDec(d) + "</button>").join("");
+      listaDec.innerHTML = '<p class="fono-decada-vacia">' + esc(t("fono.decadas.elige")) + "</p>";
+      let enLista = [];
+      chips.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-dec]");
+        if (!b) return;
+        const d = Number(b.dataset.dec);
+        $$("[data-dec]", chips).forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        enLista = conAno.filter((c) => Math.floor(c.y / 10) * 10 === d).sort((a, z) => a.y - z.y);
+        listaDec.innerHTML = '<ul class="fono-temas">' + enLista.map((c, i) =>
+          '<li><button class="fono-tema" type="button" data-tema="' + i + '">' + tapa(c, "fono-tapa-mini") +
+          '<span class="fono-tema-texto"><span class="fono-tema-n">' + esc(c.n) + '</span><span class="fono-tema-a">' + esc(artistas(c)) + " · " + c.y + "</span></span>" +
+          '<span class="fono-tema-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg> ' + esc(t("fono.decadas.tocar")) + "</span></button></li>").join("") + "</ul>";
+      });
+      listaDec.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-tema]");
+        if (b) tocar(enLista[Number(b.dataset.tema)]);
+      });
+      $("#fono-decadas").hidden = false;
+    }
+
+    /* ----- la trivia ----- */
+    const caja = $("[data-trivia]");
+    if (!caja) return;
+    const RONDA = 5;
+    const propias = (F.preguntas || []).filter((p) => p && p.q && p.ok && (p.no || []).length >= 3);
+    // Años en duda: los de remasterizaciones y recopilaciones (Spotify da el año de ESE disco).
+    const anoDudoso = (c) => !c.y || /compilation/i.test(c.alTipo || "") ||
+      /(remaster|greatest|hits|best of|lo mejor|grandes [eé]xitos|collection|colecci[oó]n|anniversary|aniversario|deluxe|edition|edici[oó]n)/i.test(c.crudo || "");
+    function armarRonda() {
+      const primerArtista = Array.from(new Set(canciones.map((c) => c.a[0])));
+      const albumes = Array.from(new Set(canciones.map((c) => c.al).filter(Boolean)));
+      const anos = Array.from(new Set(canciones.filter((c) => !anoDudoso(c)).map((c) => c.y)));
+      const otros = (lista, fuera, n) => mezclar(lista.filter((x) => !fuera.some((f) => norm(f) === norm(x)))).slice(0, n);
+      const tipos = {
+        artista: (c) => { const no = otros(primerArtista, c.a, 3); return no.length < 3 ? null : { q: llenar(t("fono.q.artista"), { cancion: c.n }), ok: c.a[0], no, c }; },
+        cancion: (c) => {
+          const no = mezclar(canciones.filter((x) => !x.a.some((a) => c.a.includes(a)) && norm(x.n) !== norm(c.n))).map((x) => x.n)
+            .filter((n, i, arr) => arr.findIndex((m) => norm(m) === norm(n)) === i).slice(0, 3);
+          return no.length < 3 ? null : { q: llenar(t("fono.q.cancion"), { artista: c.a[0] }), ok: c.n, no, c };
+        },
+        album: (c) => {
+          if (!c.al || norm(c.al) === norm(c.n) || /single|compilation/i.test(c.alTipo || "")) return null;
+          const no = otros(albumes.filter((x) => norm(x) !== norm(c.n)), [c.al], 3);
+          return no.length < 3 ? null : { q: llenar(t("fono.q.album"), { cancion: c.n }), ok: c.al, no, c };
+        },
+        ano: (c) => {
+          if (anoDudoso(c)) return null;
+          const hoy = new Date().getFullYear();
+          const no = mezclar(anos.filter((y) => y !== c.y && Math.abs(y - c.y) <= 15)).slice(0, 3);
+          mezclar([-4, -3, -2, -1, 1, 2, 3, 4, 5, -5]).map((x) => c.y + x).forEach((y) => { if (no.length < 3 && y <= hoy && y !== c.y && !no.includes(y)) no.push(y); });
+          return { q: llenar(t("fono.q.ano"), { cancion: c.n }), ok: String(c.y), no: no.map(String), c };
+        },
+        decada: (c) => {
+          if (anoDudoso(c)) return null;
+          const d = Math.floor(c.y / 10) * 10, nom = (x) => (x >= 2000 ? String(x) : String(x).slice(2)) + "s";
+          const no = mezclar([-30, -20, -10, 10, 20].map((x) => d + x).filter((x) => x >= 1950 && x <= new Date().getFullYear())).slice(0, 3).map(nom);
+          return no.length < 3 ? null : { q: llenar(t("fono.q.decada"), { cancion: c.n }), ok: nom(d), no, c };
+        }
+      };
+      const orden = mezclar(["artista", "ano", "cancion", "album", "decada", "artista", "ano", "cancion"]);
+      const qs = mezclar(propias).slice(0, 2).map((p) => ({ q: p.q, ok: p.ok, no: p.no.slice(0, 3), dato: p.dato }));
+      const usadas = new Set();
+      let k = 0;
+      for (const c of mezclar(canciones)) {
+        if (qs.length >= RONDA) break;
+        if (usadas.has(norm(c.n))) continue;
+        for (let intento = 0; intento < orden.length; intento++) {
+          const q = tipos[orden[(k + intento) % orden.length]](c);
+          if (q) { qs.push(q); usadas.add(norm(c.n)); k += intento + 1; break; }
+        }
+      }
+      return mezclar(qs).map((q) => Object.assign(q, { opciones: mezclar([q.ok].concat(q.no)) }));
+    }
+
+    let ronda = [], i = 0, puntos = 0;
+    const pintarInicio = () => {
+      caja.innerHTML = '<p class="trivia-sub">' + esc(t("fono.jugar.sub")) + "</p>" +
+        '<p class="trivia-acciones"><button class="btn trivia-jugar" type="button" data-trivia-jugar lang="en">' + esc(t("fono.jugar")) + "</button>" +
+        '<span class="fono-mano trivia-animo">' + esc(t("fono.animo")) + " ☺</span></p>";
+    };
+    const pintarPregunta = (enfocar) => {
+      const q = ronda[i], ultima = i === ronda.length - 1;
+      caja.innerHTML = '<p class="trivia-num">' + esc(llenar(t("fono.pregunta"), { n: i + 1, total: ronda.length })) + "</p>" +
+        '<h3 class="trivia-q" tabindex="-1">' + esc(q.q) + "</h3>" +
+        '<fieldset class="trivia-opciones"><legend class="sr-only">' + esc(q.q) + "</legend>" +
+        q.opciones.map((o, n) => '<label class="trivia-op"><input type="radio" name="trivia-op" value="' + n + '"><span class="trivia-letra">' + "ABCD"[n] + ".</span> <span>" + esc(o) + "</span></label>").join("") +
+        "</fieldset>" +
+        '<p class="trivia-acciones"><button class="btn" type="button" data-trivia-comprobar>' + esc(t("fono.comprobar")) + "</button>" +
+        '<button class="btn" type="button" data-trivia-siguiente hidden>' + esc(t(ultima ? "fono.resultado" : "fono.siguiente")) + "</button></p>" +
+        '<div class="trivia-feedback" role="status"></div>';
+      if (enfocar) $(".trivia-q", caja).focus();
+    };
+    const comprobar = () => {
+      const q = ronda[i];
+      const elegida = $("input[name=trivia-op]:checked", caja);
+      const fb = $(".trivia-feedback", caja);
+      if (!elegida) { fb.innerHTML = '<p class="trivia-aviso">' + esc(t("fono.elige")) + "</p>"; return; }
+      const acerto = q.opciones[Number(elegida.value)] === q.ok;
+      if (acerto) puntos++;
+      $$(".trivia-op", caja).forEach((l) => {
+        const inp = $("input", l), txt = q.opciones[Number(inp.value)];
+        inp.disabled = true;
+        if (txt === q.ok) l.classList.add("es-correcta");
+        else if (inp === elegida) l.classList.add("es-mal");
+      });
+      fb.innerHTML = '<p class="trivia-veredicto ' + (acerto ? "bien" : "mal") + '">' + esc(acerto ? unaDe("fono.bien") : unaDe("fono.mal", { ok: q.ok })) + "</p>" +
+        (q.dato ? '<p class="trivia-dato">' + esc(q.dato) + "</p>" : "") +
+        (q.c ? '<p class="trivia-cancion">' + tapa(q.c, "fono-tapa-mini") + "<span><b>" + esc(q.c.n) + "</b> · " + esc(artistas(q.c)) + (q.c.y ? " (" + q.c.y + ")" : "") + "</span>" +
+          '<button class="fono-mini-btn" type="button" data-trivia-tocar>▶ ' + esc(t("fono.escuchar")) + "</button></p>" : "");
+      $("[data-trivia-comprobar]", caja).hidden = true;
+      const sig = $("[data-trivia-siguiente]", caja);
+      sig.hidden = false;
+      sig.focus();
+    };
+    const pintarFin = () => {
+      const total = ronda.length;
+      const clave = puntos === total ? "fono.fin.5" : puntos >= total - 1 && total >= 4 ? "fono.fin.4" : puntos >= Math.ceil(total / 2) ? "fono.fin.2" : "fono.fin.0";
+      caja.innerHTML = '<div class="trivia-fin"><span class="fono-vinilo trivia-disco" aria-hidden="true"></span>' +
+        '<p class="trivia-puntos">' + esc(llenar(t("fono.puntos"), { p: puntos, total })) + "</p>" +
+        '<h3 class="trivia-q" tabindex="-1"' + (clave === "fono.fin.5" ? ' lang="en"' : "") + ">" + esc(t(clave)) + "</h3>" +
+        '<p class="trivia-acciones"><button class="btn" type="button" data-trivia-jugar>' + esc(t("fono.otra")) + "</button></p></div>";
+      $(".trivia-q", caja).focus();
+    };
+    const empezar = () => {
+      ronda = armarRonda();
+      i = 0; puntos = 0;
+      if (ronda.length < 3) { caja.innerHTML = '<p class="trivia-sub">' + esc(t("fono.afinando")) + "</p>"; return; }
+      pintarPregunta(true);
+    };
+    caja.addEventListener("click", (e) => {
+      if (e.target.closest("[data-trivia-jugar]")) return empezar();
+      if (e.target.closest("[data-trivia-comprobar]")) return comprobar();
+      if (e.target.closest("[data-trivia-tocar]")) return tocar(ronda[i] && ronda[i].c, true);
+      if (e.target.closest("[data-trivia-siguiente]")) { i++; return i < ronda.length ? pintarPregunta(true) : pintarFin(); }
+    });
+    if (armarRonda().length < 3) caja.innerHTML = '<p class="trivia-sub">' + esc(t("fono.afinando")) + "</p>";
+    else pintarInicio();
+  };
+
   /* ---------------- Muy pronto (loading.html): el botón del sonido ----------------
      Los navegadores no dejan que una página suene sola al abrirla: el sonido
      arranca cuando la persona toca el botón. */

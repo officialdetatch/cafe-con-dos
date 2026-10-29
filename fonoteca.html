@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>try{var t=localStorage.getItem("ccd-tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <title>La Fonoteca | Café Con Dos</title>
+  <meta name="description" content="La Fonoteca de Café Con Dos: playlists para cada mood, la canción de la semana y una trivia musical para ver si tú sí sabes o tú solo cantas.">
+  <meta name="theme-color" content="#E9CAB0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#221415" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="images/favicon-48.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Café Con Dos">
+  <meta property="og:locale" content="es_DO">
+  <meta property="og:title" content="La Fonoteca | Café Con Dos">
+  <meta property="og:description" content="La Fonoteca de Café Con Dos: playlists para cada mood, la canción de la semana y una trivia musical para ver si tú sí sabes o tú solo cantas.">
+  <meta property="og:image" content="https://cafecondos.com/images/og-cafe-con-dos.jpg?v=2">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="alternate" type="application/rss+xml" title="Café Con Dos" href="feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400..700&family=Caveat:wght@500..700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="fonoteca" class="pagina-fonoteca">
+  <!-- parte: encabezado (se edita en partes/encabezado.html) -->
+  <header class="site-header" id="site-header">
+    <a class="skip" href="#main">Saltar al contenido</a>
+    <div class="wrap">
+      <a class="logo" href="index.html" aria-label="Café Con Dos, Inicio">
+        <img class="logo-oscuro" src="images/logo.png" alt="Café Con Dos" width="334" height="258">
+        <img class="logo-claro" src="images/logo-claro.png" alt="" width="334" height="258">
+      </a>
+      <button class="btn-menu" type="button" aria-expanded="false" aria-controls="nav-principal" aria-label="Menú" data-abrir="Menú" data-cerrar="Cerrar menú">
+        <!-- Tres rayitas separadas para que se vuelvan una X al abrir (styles.css, "encabezado") -->
+        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"><path class="raya-1" d="M4 7h16"/><path class="raya-2" d="M4 12h16"/><path class="raya-3" d="M4 17h10"/></svg>
+      </button>
+      <!-- El menú. data-nav marca el link de la página en la que estás. -->
+      <nav class="nav" id="nav-principal" aria-label="Principal">
+        <a href="index.html" data-nav="inicio">Inicio</a>
+        <a href="enportada.html" data-nav="enportada">En Portada</a>
+        <a href="episodios.html" data-nav="episodios">Episodios</a>
+        <a href="sobremesa.html" data-nav="sobremesa" translate="no">Sobremesa</a>
+        <a href="fonoteca.html" data-nav="fonoteca">Fonoteca</a>
+        <a href="tienda.html" data-nav="tienda">Tienda</a>
+        <a href="nosotros.html" data-nav="nosotros">Nosotros</a>
+        <a href="contacto.html" data-nav="contacto">Contacto</a>
+        <a class="btn solo-movil" href="#suscribete" data-ir-boletin>Suscríbete</a>
+      </nav>
+      <div class="header-acciones">
+        <a class="btn-redondo btn-buscar" href="enportada.html#buscar" aria-label="Buscar" title="Buscar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </a>
+        <button class="btn-redondo btn-tema" type="button" aria-label="Cambiar a dark mode" data-a-oscuro="Cambiar a dark mode" data-a-claro="Cambiar a light mode">
+          <svg class="ico-luna" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <svg class="ico-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <a class="btn" href="#suscribete" data-ir-boletin>Suscríbete</a>
+      </div>
+    </div>
+  </header>
+  <!-- /parte: encabezado -->
+
+  <main id="main">
+    <!-- ====== La Fonoteca ======
+         Los textos fijos están aquí. Lo que cambia (la canción de la semana, los
+         "¿Sabías que…?", las preguntas propias y la playlist) se edita en el editor,
+         pestaña "Fonoteca". Las canciones salen de la playlist de Spotify (las lee
+         scripts/fonoteca.js al publicar). Los textos de la trivia están en textos.js. -->
+    <section class="fono-hero">
+      <div class="wrap fono-hero-in">
+        <p class="fono-papelito" aria-hidden="true">Buena música, mejores momentos. <span>♡</span></p>
+        <div class="fono-hero-texto">
+          <p class="kicker">Biblioteca de sonidos</p>
+          <h1>La Fonoteca <svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></h1>
+          <p class="fono-mano fono-hero-sub">Playlists, trivia y más.</p>
+          <p class="lead">Tu internet era mejor con música de fondo.</p>
+          <p>Un poquito de nostalgia, muchas canciones y cero vergüenza por tener una playlist para cada situación emocional. Dale play, pon a prueba tu memoria musical y quédate un rato. Aquí vivimos entre CDs quemados, canciones en <i lang="en">repeat</i> y ese temazo que te sabes de principio a fin aunque hayan pasado 20 años.</p>
+        </div>
+        <div class="fono-hero-arte" aria-hidden="true">
+          <!-- Un casete dibujado (sus colores salen de styles.css) -->
+          <svg class="fono-casete" viewBox="0 0 320 210">
+            <rect class="c-cuerpo" x="8" y="8" width="304" height="194" rx="16"/>
+            <rect class="c-etiqueta" x="30" y="28" width="260" height="104" rx="8"/>
+            <path class="c-renglon" d="M48 54h150M48 70h110"/>
+            <text class="c-texto" x="48" y="50">Café Con Dos · mixtape</text>
+            <rect class="c-ventana" x="78" y="80" width="164" height="40" rx="20"/>
+            <g class="c-rueda c-rueda--1"><circle cx="106" cy="100" r="15"/><path d="M106 88v24M94 100h24M97.5 91.5l17 17M114.5 91.5l-17 17"/></g>
+            <g class="c-rueda c-rueda--2"><circle cx="214" cy="100" r="15"/><path d="M214 88v24M202 100h24M205.5 91.5l17 17M222.5 91.5l-17 17"/></g>
+            <path class="c-base" d="M70 202l14-40h152l14 40"/>
+            <circle class="c-tornillo" cx="22" cy="22" r="3.5"/><circle class="c-tornillo" cx="298" cy="22" r="3.5"/><circle class="c-tornillo" cx="22" cy="188" r="3.5"/><circle class="c-tornillo" cx="298" cy="188" r="3.5"/>
+          </svg>
+          <p class="fono-mano fono-hero-nota">La vida también se escucha. <span>♡</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="fono-tablero">
+      <div class="wrap fono-grid">
+
+        <!-- El reproductor: la playlist de Spotify dentro de un "equipo" retro. -->
+        <article class="fono-card fono-card--player" id="fono-player" aria-labelledby="fono-player-titulo">
+          <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> <span lang="en">Now Playing…</span></p>
+          <h2 id="fono-player-titulo">Mixtapes para cada <span lang="en">mood</span></h2>
+          <p class="fono-intro">Dale play a nuestra selección y viaja por todas las décadas.</p>
+          <div class="deck" data-deck>
+            <div class="deck-barra">
+              <span class="deck-luz" aria-hidden="true"></span>
+              <span class="deck-marca">Café Con Dos · Fonoteca</span>
+              <span class="deck-luz deck-luz--2" aria-hidden="true"></span>
+            </div>
+            <div class="deck-lcd" aria-live="polite">
+              <span class="deck-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="deck-tiempo" data-deck-tiempo>00:00</span>
+              <span class="deck-titulo"><span data-deck-titulo lang="en">Currently obsessed</span></span>
+            </div>
+            <div class="deck-pantalla" id="fono-spotify"><p class="deck-cargando">Poniendo el casete…</p></div>
+            <div class="deck-pie">
+              <button class="deck-volver" type="button" data-deck-volver hidden>← Volver a la playlist</button>
+              <a class="deck-spotify" data-deck-abrir href="https://open.spotify.com/" target="_blank" rel="noopener">Abrir en Spotify ↗</a>
+            </div>
+          </div>
+          <p class="fono-mano fono-nota-pie"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm11-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg> Toca una canción, deja que suene y que el tiempo se detenga un rato. <span>♡</span></p>
+          <p class="fono-aviso">¿Solo suenan 30 segundos? Spotify deja escuchar las canciones completas si tienes la sesión abierta en este navegador; si no, toca "Abrir en Spotify".</p>
+        </article>
+
+        <!-- La trivia (la arma app.js con las canciones de la playlist). -->
+        <article class="fono-card fono-card--trivia" id="fono-trivia" aria-labelledby="fono-trivia-titulo">
+          <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Trivia musical</p>
+          <h2 id="fono-trivia-titulo">¿Tú sí sabes o tú solo cantas?</h2>
+          <div class="trivia" data-trivia aria-live="polite"></div>
+          <aside class="fono-sabias" data-sabias hidden>
+            <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> ¿Sabías que…?</p>
+            <p data-sabias-texto></p>
+          </aside>
+        </article>
+
+        <!-- La canción de la semana (se cambia en el editor, pestaña "Fonoteca"). -->
+        <article class="fono-card fono-card--semana" id="fono-semana" aria-labelledby="fono-semana-titulo" hidden>
+          <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Canción de la semana</p>
+          <h2 id="fono-semana-titulo" lang="en">This week’s jam <span class="fono-corazon" aria-hidden="true">♡</span></h2>
+          <div data-semana></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Explora por década: sale de los años de las canciones de la playlist. -->
+    <section class="fono-decadas" id="fono-decadas" aria-labelledby="fono-decadas-titulo" hidden>
+      <div class="wrap">
+        <div class="fono-decadas-cabeza">
+          <h2 id="fono-decadas-titulo" class="fono-mano">Explora por década <span aria-hidden="true">→</span></h2>
+          <div class="fono-decadas-chips" role="group" aria-label="Décadas" data-decadas></div>
+          <p class="fono-mano fono-decadas-nota">¡Hay una canción para cada época! <span>♡</span></p>
+        </div>
+        <div class="fono-decada-lista" data-decada-lista aria-live="polite"></div>
+      </div>
+    </section>
+
+    <p class="fono-despedida fono-mano">BRB, cambiando la canción. <span>♡</span></p>
+
+    <!-- parte: boletin (se edita en partes/boletin.html) -->
+    <section class="seccion seccion--boletin" id="suscribete" data-boletin>
+      <div class="wrap">
+        <div class="burbuja burbuja--naranja boletin">
+          <div>
+            <img class="taza" src="images/taza.png" alt="" width="92">
+            <h2>Café para llevar</h2>
+            <p>Te llega un email cuando publicamos algo nuevo: historias, opiniones, Sobremesa o un episodio. Cero spam.</p>
+          </div>
+          <form class="form-boletin" novalidate>
+            <div class="campos">
+              <div class="campo">
+                <label class="sr-only" for="bol-nombre">Nombre</label>
+                <input type="text" id="bol-nombre" name="nombre" autocomplete="given-name" placeholder="Nombre">
+              </div>
+              <div class="campo">
+                <label class="sr-only" for="bol-email">Email</label>
+                <input type="email" id="bol-email" name="email" autocomplete="email" required placeholder="Email">
+              </div>
+            </div>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">
+            <button class="btn" type="submit">Suscribirme</button>
+            <p class="aviso" role="status" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- /parte: boletin -->
+  </main>
+
+  <!-- parte: pie (se edita en partes/pie.html) -->
+  <footer class="site-footer" id="site-footer">
+    <div class="wrap">
+      <img class="logo-pie" src="images/logo-claro.png" alt="Café Con Dos" width="334" height="258">
+      <p class="pie-lema" lang="en"><span>Stories worth</span> <span>sharing.</span></p>
+
+      <p class="pie-siguenos">Síguenos y escucha en:</p>
+      <ul class="redes">
+        <li><a href="https://www.youtube.com/@Caf%C3%A9ConDos" target="_blank" rel="noopener" aria-label="YouTube"><img src="images/socials/youtube.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://open.spotify.com/show/6z0g9lFACFnK2sxIhj7EOn" target="_blank" rel="noopener" aria-label="Spotify"><img src="images/socials/spotify.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.instagram.com/cafecondos" target="_blank" rel="noopener" aria-label="Instagram"><img src="images/socials/instagram.webp" alt="" width="22" height="22"></a></li>
+        <li><a href="https://www.tiktok.com/@cafecondos" target="_blank" rel="noopener" aria-label="TikTok"><img src="images/socials/tiktok.webp" alt="" width="22" height="22"></a></li>
+      </ul>
+
+      <nav aria-label="Menú del pie">
+        <ul class="pie-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="enportada.html">En Portada</a></li>
+          <li><a href="episodios.html">Episodios</a></li>
+          <li><a href="sobremesa.html" translate="no">Sobremesa</a></li>
+          <li><a href="fonoteca.html">Fonoteca</a></li>
+          <li><a href="tienda.html">Tienda</a></li>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+          <li><a href="#suscribete" data-ir-boletin>Café para llevar</a></li>
+        </ul>
+      </nav>
+
+      <!-- El año (data-ano) se actualiza solo cada enero. -->
+      <p class="pie-final">
+        <span>Independiente por naturaleza.</span>
+        <span>© <span data-ano>2026</span> <span translate="no">Café Con Dos</span></span>
+      </p>
+    </div>
+  </footer>
+  <!-- /parte: pie -->
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/textos.js"></script>
+  <script src="data/articulos.js"></script>
+  <script src="data/episodios.js"></script>
+  <script src="data/fonoteca.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

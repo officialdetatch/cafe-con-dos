@@ -5,8 +5,9 @@ import {structureTool} from 'sanity/structure'
 import {esESLocale} from '@sanity/locale-es-es'
 import sitio from './generado/sitio.js'
 import {tiposDeEsquema} from './esquemas/index.js'
-import {estructura, estructuraBoletin, documentoBoletin, documentoArticulo} from './estructura.js'
+import {estructura, estructuraBoletin, estructuraFonoteca, documentoBoletin, documentoArticulo} from './estructura.js'
 import {boletin, IconoBoletin} from './esquemas/boletin.js'
+import {fonoteca, IconoFonoteca} from './esquemas/fonoteca.js'
 import {publicarConFecha, publicarBoletin, VerEnLaPagina} from './acciones.js'
 import {Comentarios} from './herramientas/Comentarios.jsx'
 
@@ -62,6 +63,8 @@ export default defineConfig({
     structureTool({title: 'Artículos', structure: estructura, defaultDocumentNode: documentoArticulo}),
     // La pestaña del boletín semanal (se manda por correo, no sale en el sitio).
     structureTool({name: 'boletin', title: 'Boletín', icon: IconoBoletin, structure: estructuraBoletin, defaultDocumentNode: documentoBoletin}),
+    // La página La Fonoteca: canción de la semana, datos curiosos, preguntas y la playlist.
+    structureTool({name: 'fonoteca', title: 'Fonoteca', icon: IconoFonoteca, structure: estructuraFonoteca}),
     esESLocale(),
   ],
 
@@ -70,13 +73,19 @@ export default defineConfig({
 
   schema: {
     // El boletín se agrega aquí también, por si esquemas/index.js quedó sin actualizar.
-    types: tiposDeEsquema.some((tipo) => tipo.name === 'boletin') ? tiposDeEsquema : [...tiposDeEsquema, boletin],
+    types: [boletin, fonoteca].reduce((tipos, extra) => (tipos.some((tipo) => tipo.name === extra.name) ? tipos : [...tipos, extra]), tiposDeEsquema),
+    // La Fonoteca es una sola: no sale en "Crear nuevo".
+    templates: (anteriores) => anteriores.filter((plantilla) => plantilla.schemaType !== 'fonoteca'),
   },
 
   document: {
     actions: (anteriores, contexto) => {
       if (contexto.schemaType === 'boletin') {
         return anteriores.map((accion) => (accion.action === 'publish' ? publicarBoletin(accion) : accion))
+      }
+      if (contexto.schemaType === 'fonoteca') {
+        // Una sola Fonoteca: no se borra ni se duplica.
+        return anteriores.filter((accion) => !['delete', 'duplicate', 'unpublish'].includes(accion.action))
       }
       if (contexto.schemaType !== 'articulo') return anteriores
       return [

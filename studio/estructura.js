@@ -58,6 +58,17 @@ export const estructuraBoletin = (S) =>
         .child(S.documentTypeList('boletin').title('Boletines').defaultOrdering([{field: 'fechaEnvio', direction: 'desc'}])),
     ])
 
+// La pestaña "Fonoteca": un solo documento (la página cafecondos.com/fonoteca).
+export const estructuraFonoteca = (S) =>
+  S.list()
+    .title('La Fonoteca')
+    .items([
+      S.listItem()
+        .title('La Fonoteca')
+        .id('fonoteca')
+        .child(S.document().schemaType('fonoteca').documentId('fonoteca').title('La Fonoteca')),
+    ])
+
 // Al abrir un boletín: el formulario y, al lado, la vista previa del correo.
 export const documentoBoletin = (S, {schemaType}) =>
   schemaType === 'boletin'

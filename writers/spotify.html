@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>try{var t=localStorage.getItem("ccd-tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Conectar Spotify | Café Con Dos</title>
+  <link rel="icon" type="image/png" href="../images/favicon-48.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400..700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="writer.css">
+  <style>
+    .sp { max-width: 720px; margin: 0 auto; padding: 32px var(--gutter) 80px; }
+    .sp h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0 0 10px; }
+    .sp .paso { background: var(--surface); border: 1px solid var(--linea); border-radius: 18px; padding: 22px 22px 24px; margin: 22px 0; }
+    .sp .paso[hidden] { display: none; }
+    .sp label { display: block; font-family: var(--f-display); font-size: 1.05rem; margin: 16px 0 6px; color: var(--ink); }
+    .sp input, .sp textarea { width: 100%; font: inherit; font-size: 1rem; padding: 10px 12px; border-radius: var(--r-campo); border: 1px solid var(--campo-borde); background: var(--campo-bg); color: var(--ink); }
+    .sp textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85rem; min-height: 96px; resize: vertical; word-break: break-all; }
+    .sp .ayuda { font-size: .92rem; color: var(--ink-soft); margin: 6px 0 0; }
+    .sp .acciones { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .sp .estado { margin: 14px 0 0; font-size: 1rem; }
+    .sp .estado.mal { color: var(--peligro); }
+    .sp .estado.bien { color: var(--accent-text); font-weight: 600; }
+    .sp ol { padding-left: 1.3em; } .sp li { margin-bottom: 8px; }
+    .sp .ojo { border-left: 4px solid var(--naranja); padding: 4px 0 4px 14px; margin: 16px 0 0; font-size: .98rem; }
+  </style>
+</head>
+<body class="writer" data-base="../">
+  <header class="w-top">
+    <div class="wrap">
+      <a href="../index.html" class="logo"><img class="logo-oscuro" src="../images/logo.png" alt="Café Con Dos"><img class="logo-claro" src="../images/logo-claro.png" alt=""></a>
+      <h1>Conectar Spotify</h1>
+      <nav aria-label="Writers"><a href="../fonoteca.html" target="_blank" rel="noopener">Ver La Fonoteca</a></nav>
+    </div>
+  </header>
+
+  <!-- Herramienta interna (no sale en Google ni en el menú). Se usa UNA vez, para que
+       la publicación del sitio pueda leer la playlist de la cuenta de Spotify de ella.
+       Nada de lo que se escribe aquí se guarda ni se manda a otro lado que no sea Spotify. -->
+  <main class="sp">
+    <h2>La Fonoteca ↔ Spotify</h2>
+    <p>Para que la trivia y "Explora por década" lean las canciones de la playlist, Spotify pide permiso una sola vez. Esto se hace con <b>la cuenta de Spotify dueña de la playlist</b> (la misma que creó la app en developer.spotify.com).</p>
+
+    <section class="paso" id="paso-1">
+      <h3>Paso 1 · Darle permiso</h3>
+      <label for="cliente">Client ID de la app</label>
+      <input id="cliente" autocomplete="off" spellcheck="false" value="35589065ae264f04a52b83fb60ea77b1">
+      <p class="ayuda">developer.spotify.com → Dashboard → la app → Settings. Ya viene puesto.</p>
+      <div class="acciones">
+        <button class="w-btn w-btn--primario w-btn--grande" type="button" id="conectar">Conectar con Spotify</button>
+      </div>
+      <p class="ayuda">Te lleva a Spotify: entra con su cuenta y toca <b>Aceptar</b>. Vuelves aquí solito.</p>
+    </section>
+
+    <section class="paso" id="paso-2" hidden>
+      <h3>Paso 2 · Crear la llave</h3>
+      <p>Spotify ya dio permiso. Ahora pega el <b>Client Secret</b> de la app (developer.spotify.com → la app → Settings → <i>View client secret</i>). No se guarda: solo se usa para pedirle la llave a Spotify.</p>
+      <label for="secreto">Client Secret</label>
+      <input id="secreto" type="password" autocomplete="off" spellcheck="false">
+      <label for="playlist">Playlist para probar (opcional)</label>
+      <input id="playlist" autocomplete="off" spellcheck="false" value="https://open.spotify.com/playlist/66UBUcdUkCxOODZoOprWd2">
+      <div class="acciones">
+        <button class="w-btn w-btn--primario w-btn--grande" type="button" id="crear">Crear la llave</button>
+      </div>
+      <p class="estado" id="estado-2" role="status"></p>
+    </section>
+
+    <section class="paso" id="paso-3" hidden>
+      <h3>Paso 3 · Guardarla en GitHub</h3>
+      <p class="estado bien" id="prueba" role="status"></p>
+      <label for="llave">La llave (refresh token)</label>
+      <textarea id="llave" readonly></textarea>
+      <div class="acciones">
+        <button class="w-btn w-btn--primario" type="button" id="copiar">Copiar la llave</button>
+        <span id="copiado" class="ayuda" role="status"></span>
+      </div>
+      <ol>
+        <li>En GitHub, abre el repo <b>cafe-con-dos</b> → <b>Settings</b> → <b>Secrets and variables</b> → <b>Actions</b>.</li>
+        <li>En la pestaña <b>Secrets</b>, toca <b>New repository secret</b>. Name: <code>SPOTIFY_REFRESH_TOKEN</code>, Secret: pega la llave. Guarda.</li>
+        <li>Otro <b>New repository secret</b>. Name: <code>SPOTIFY_CLIENT_SECRET</code>, Secret: el Client Secret de la app. Guarda.</li>
+        <li>Ve a <b>Actions</b> → <b>Publicar sitio</b> → <b>Run workflow</b>. En un par de minutos, La Fonoteca ya tiene trivia.</li>
+      </ol>
+      <p class="ojo">Trata la llave como una contraseña: no la mandes por chat ni la pegues en otro lado. Si algún día se filtra, en developer.spotify.com cambia el Client Secret ("Rotate") y vuelve a hacer estos pasos.</p>
+    </section>
+
+    <section class="paso" id="paso-error" hidden>
+      <h3>No se pudo</h3>
+      <p class="estado mal" id="error"></p>
+      <div class="acciones"><a class="w-btn" href="spotify.html">Empezar otra vez</a></div>
+    </section>
+  </main>
+
+  <script>
+  (function () {
+    "use strict";
+    // Tiene que ser EXACTAMENTE la misma que está en la app de Spotify (Settings → Redirect URIs).
+    var VOLVER = "https://cafecondos.com/writers/spotify.html";
+    var PERMISOS = "playlist-read-private playlist-read-collaborative";
+    var $ = function (id) { return document.getElementById(id); };
+    var ver = function (id) { ["paso-1", "paso-2", "paso-3", "paso-error"].forEach(function (p) { $(p).hidden = p !== id; }); };
+    var guardar = function (k, v) { try { if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} };
+    var leer = function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } };
+    var fallar = function (msg) { $("error").textContent = msg; ver("paso-error"); };
+
+    var q = new URLSearchParams(location.search);
+    var codigo = q.get("code"), estadoUrl = q.get("state"), errorUrl = q.get("error");
+    // El código no se queda en la barra de direcciones.
+    if (codigo || errorUrl) { try { history.replaceState(null, "", location.pathname); } catch (e) {} }
+
+    if (errorUrl) {
+      fallar(errorUrl === "access_denied" ? "En Spotify se tocó \"Cancelar\". Empieza otra vez y toca Aceptar." : "Spotify dijo: " + errorUrl);
+      return;
+    }
+    if (codigo) {
+      if (!estadoUrl || estadoUrl !== leer("ccd-sp-estado")) { fallar("Este permiso no salió de esta página (o ya se usó). Empieza otra vez."); return; }
+      ver("paso-2");
+      $("secreto").focus();
+    }
+
+    $("conectar").addEventListener("click", function () {
+      var id = $("cliente").value.trim();
+      if (!/^[a-f0-9]{32}$/i.test(id)) { alertaCampo($("cliente"), "Ese Client ID no se ve bien (son 32 letras y números)."); return; }
+      var estado = Array.from(crypto.getRandomValues(new Uint8Array(16)), function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+      guardar("ccd-sp-estado", estado);
+      guardar("ccd-sp-cliente", id);
+      location.href = "https://accounts.spotify.com/authorize?" + new URLSearchParams({
+        client_id: id, response_type: "code", redirect_uri: VOLVER, scope: PERMISOS, state: estado, show_dialog: "true"
+      }).toString();
+    });
+
+    function alertaCampo(campo, msg) {
+      campo.setCustomValidity(msg); campo.reportValidity();
+      campo.addEventListener("input", function () { campo.setCustomValidity(""); }, { once: true });
+    }
+
+    $("crear").addEventListener("click", function () {
+      var secreto = $("secreto").value.trim();
+      var cliente = leer("ccd-sp-cliente") || $("cliente").value.trim();
+      if (!/^[a-f0-9]{32}$/i.test(secreto)) { alertaCampo($("secreto"), "El Client Secret son 32 letras y números."); return; }
+      var boton = this; boton.disabled = true;
+      $("estado-2").className = "estado"; $("estado-2").textContent = "Pidiéndole la llave a Spotify…";
+      pedirLlave(cliente, secreto)
+        .then(function (res) {
+          if (!res.ok || !res.j.refresh_token) {
+            var e = res.j && (res.j.error_description || res.j.error) || "";
+            throw new Error(/invalid_client/i.test(e) || /client secret/i.test(e) ? "El Client Secret no coincide con esa app. Revísalo en developer.spotify.com." :
+              /invalid_grant|expired|code/i.test(e) ? "El permiso ya se venció o ya se usó. Empieza otra vez (es rapidito)." : "Spotify no dio la llave: " + e);
+          }
+          guardar("ccd-sp-estado", null);
+          $("secreto").value = "";
+          $("llave").value = res.j.refresh_token;
+          ver("paso-3");
+          return probar(res.j.access_token);
+        })
+        .catch(function (e) {
+          boton.disabled = false;
+          $("estado-2").className = "estado mal";
+          $("estado-2").textContent = e.message || "No se pudo hablar con Spotify. Revisa el internet y prueba otra vez.";
+        });
+    });
+
+    // Le pide la llave a Spotify. Primero con el Client ID y el Secret en el cuerpo; si
+    // Spotify no lo acepta así, otra vez con el encabezado "Authorization: Basic".
+    function pedirLlave(cliente, secreto) {
+      var url = "https://accounts.spotify.com/api/token";
+      var datos = { grant_type: "authorization_code", code: codigo, redirect_uri: VOLVER };
+      var leerRes = function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); };
+      var conEncabezado = function () {
+        return fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded", Authorization: "Basic " + btoa(cliente + ":" + secreto) },
+          body: new URLSearchParams(datos).toString()
+        }).then(leerRes);
+      };
+      return fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(Object.assign({ client_id: cliente, client_secret: secreto }, datos)).toString()
+      }).then(leerRes).then(function (res) {
+        return res.ok || (res.j && res.j.error === "invalid_grant") ? res : conEncabezado();
+      }, conEncabezado);
+    }
+
+    // Prueba que de verdad puede leer la playlist (sin guardar nada).
+    function probar(llave) {
+      var m = /playlist\/([A-Za-z0-9]+)/.exec($("playlist").value) || [];
+      if (!m[1]) { $("prueba").textContent = "¡Conectado! Ya puedes guardar la llave en GitHub."; return; }
+      var h = { headers: { Authorization: "Bearer " + llave } };
+      return Promise.all([
+        fetch("https://api.spotify.com/v1/playlists/" + m[1] + "?fields=name", h).then(function (r) { return r.json(); }),
+        fetch("https://api.spotify.com/v1/playlists/" + m[1] + "/items?limit=50", h).then(function (r) { return r.json(); })
+      ]).then(function (x) {
+        var nombre = x[0] && x[0].name, items = x[1] && x[1].items;
+        if (!Array.isArray(items)) throw new Error("sin canciones");
+        var total = typeof x[1].total === "number" ? x[1].total : items.length;
+        $("prueba").textContent = "¡Conectado! Puedo leer \"" + (nombre || "la playlist") + "\" (" + total + " canciones). Ya puedes guardar la llave en GitHub.";
+      }).catch(function () {
+        $("prueba").className = "estado";
+        $("prueba").textContent = "Conectado, pero no pude leer las canciones de esa playlist. ¿Es de esta misma cuenta? Spotify solo deja leer las playlists propias. La llave sirve igual: guárdala y revisa la playlist.";
+      });
+    }
+
+    $("copiar").addEventListener("click", function () {
+      var t = $("llave");
+      t.select();
+      (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject())
+        .catch(function () { document.execCommand("copy"); })
+        .then(function () { $("copiado").textContent = "Copiada."; });
+    });
+  })();
+  </script>
+</body>
+</html>

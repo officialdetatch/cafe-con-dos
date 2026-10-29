@@ -21,6 +21,8 @@ entrada.html?id=…     One article (any section), editorial layout: cover on to
                       photo credits); on phones it comes after the article. BlogPosting data
 sobremesa.html        Sobremesa, its own section page, with topic chips
 tienda.html           The shop: products read LIVE from Fourthwall (see "Shop (Fourthwall)")
+fonoteca.html         La Fonoteca: her Spotify playlist in a retro player, the song of the week,
+                      a music trivia and "Explora por década" (see "La Fonoteca")
 episodios.html        The podcast archive: search, topic chips, series filter, sort
 episodio.html?id=…    One episode: YouTube video (or Spotify player), buttons, show notes, timestamps
 nosotros.html         Story, what the name evokes, purpose and promise, formats, who's behind it
@@ -160,6 +162,30 @@ When an article or an episode is published, the site emails the Brevo list once:
 - `send`: emails the whole list. Check "force" to resend one that already went out.
 
 **To turn it on at launch:** add the variable `AVISOS_DESDE` with the launch moment in UTC, for example `2026-11-01T10:00:00Z` (6:00 am Nov 1 in the DR, when the home page goes up). Articles published from then on are emailed automatically. To turn it off, delete the variable.
+
+## La Fonoteca (playlist, song of the week, trivia)
+
+`fonoteca.html` (menu: **Fonoteca**): her Spotify playlist inside a retro "equipo" (with a little LCD that shows the time and what's playing), **This week's jam**, the trivia **¿Tú sí sabes o tú solo cantas?** with a random **¿Sabías que…?**, and **Explora por década**.
+
+**What she edits, in the Studio → tab "Fonoteca"** (one single document, then **Publicar**):
+- *Canción de la semana*: paste the song's Spotify link (••• → Compartir → Copiar link de la canción), write why, and an optional handwritten note. The cover, name, artist and year come from Spotify by themselves.
+- *¿Sabías que…?*: music facts; one shows at random. (She checks they're true.)
+- *Preguntas propias* (optional): her own questions (question, right answer, 3 wrong ones, optional fact). They're mixed with the automatic ones.
+- *Link de la playlist*: the playlist that plays and feeds the trivia. It must be **hers** (her account) and **public**. Until she sets one, the page uses `PLAYLIST_POR_DEFECTO` at the top of `scripts/fonoteca.js`.
+
+**The playlist itself is edited in Spotify.** Every publish (6:00 am daily, and every Sanity change) `scripts/fonoteca.js` reads it with her account and writes `data/fonoteca.js` (songs: name, artists, album, year, cover). The trivia is built in the browser (`app.js`, "La Fonoteca") from that: *who sings it*, *what year*, *which album*, *which of these songs is by…*, *which decade*, 5 per round, wrong answers taken from the other songs in the playlist. It skips year questions for remasters and compilations (Spotify gives the year of *that* release). The trivia needs at least ~8 songs with different artists; with fewer it shows "La trivia está afinando…". Texts of the trivia: `fono.*` in `textos.js`.
+
+**If Spotify or Sanity fail, the site still publishes**: the page shows the player, without trivia and decades, and the run's summary in Actions says why.
+
+**About playback:** Spotify only plays full songs for visitors signed in to Spotify in that browser; others hear 30-second previews (common on iPhone/Safari). The page says so and offers "Abrir en Spotify". Music plays only while on this page.
+
+### Connecting Spotify (one time)
+Spotify (since February 2026) only lets an app read a playlist's songs with the **owner's** permission, and the app's owner needs **Premium**.
+1. Her app at developer.spotify.com → Settings: Redirect URI **`https://cafecondos.com/writers/spotify.html`**, API: Web API. (Client ID `35589065ae264f04a52b83fb60ea77b1`, already in `deploy.yml`; can be overridden with a repository variable `SPOTIFY_CLIENT_ID`.)
+2. She opens **cafecondos.com/writers/spotify.html** (signed in to her Spotify), taps **Conectar con Spotify** → Aceptar, then pastes the app's **Client Secret** and taps **Crear la llave**. The page checks it can read the playlist.
+3. GitHub → Settings → Secrets and variables → Actions → **Secrets**: `SPOTIFY_REFRESH_TOKEN` (the key the page shows) and `SPOTIFY_CLIENT_SECRET`. Then Actions → "Publicar sitio" → Run workflow.
+- If one day the log says "Spotify no aceptó la llave" (she changed the Client Secret or removed the app's access in her Spotify account), repeat step 2–3.
+- The Sanity webhook filter must include the Fonoteca: `_type in ["articulo", "boletin", "fonoteca"]`, so publishing the song of the week updates the site right away (otherwise it shows up at the next 6:00 am run).
 
 ## Shop (Fourthwall)
 

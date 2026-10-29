@@ -96,7 +96,7 @@
   function buildSitemap(cfg, episodios, entradas) {
     const site = String(cfg.siteUrl || "").replace(/\/$/, "");
     const urls = [
-      ["/", hoy()], ["/enportada", hoy()], ["/episodios", hoy()], ["/sobremesa", hoy()], ["/tienda", hoy()], ["/nosotros"], ["/contacto"]
+      ["/", hoy()], ["/enportada", hoy()], ["/episodios", hoy()], ["/sobremesa", hoy()], ["/fonoteca", hoy()], ["/tienda", hoy()], ["/nosotros"], ["/contacto"]
     ];
     publicables(episodios).forEach((e) => urls.push(["/episodio?id=" + encodeURIComponent(e.id), e.fecha]));
     publicables(entradas).forEach((p) => urls.push(["/entrada?id=" + encodeURIComponent(p.id), p.fecha]));
