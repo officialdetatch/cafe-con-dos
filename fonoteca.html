@@ -128,23 +128,25 @@
           <p class="fono-aviso">¿Solo suenan 30 segundos? Spotify deja escuchar las canciones completas si tienes la sesión abierta en este navegador; si no, toca "Abrir en Spotify".</p>
         </article>
 
-        <!-- La trivia (la arma app.js con las canciones de la playlist). -->
-        <article class="fono-card fono-card--trivia" id="fono-trivia" aria-labelledby="fono-trivia-titulo">
-          <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Trivia musical</p>
-          <h2 id="fono-trivia-titulo">¿Tú sí sabes o tú solo cantas?</h2>
-          <div class="trivia" data-trivia aria-live="polite"></div>
+        <!-- La canción de la semana (se cambia en el editor, pestaña "Fonoteca"). -->
+        <article class="fono-card fono-card--semana" id="fono-semana" aria-labelledby="fono-semana-titulo" hidden>
+          <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Canción de la semana</p>
+          <h2 id="fono-semana-titulo" lang="en">This week’s jam <span class="fono-corazon" aria-hidden="true">♡</span></h2>
+          <div data-semana></div>
           <aside class="fono-sabias" data-sabias hidden>
             <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> ¿Sabías que…?</p>
             <p data-sabias-texto></p>
           </aside>
         </article>
 
-        <!-- La canción de la semana (se cambia en el editor, pestaña "Fonoteca"). -->
-        <article class="fono-card fono-card--semana" id="fono-semana" aria-labelledby="fono-semana-titulo" hidden>
-          <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Canción de la semana</p>
-          <h2 id="fono-semana-titulo" lang="en">This week’s jam <span class="fono-corazon" aria-hidden="true">♡</span></h2>
-          <div data-semana></div>
+        <!-- La trivia (la arma app.js con las canciones de la playlist). -->
+        <article class="fono-card fono-card--trivia" id="fono-trivia" aria-labelledby="fono-trivia-titulo">
+          <p class="fono-etiqueta"><svg class="fono-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.6 6 6.5.6-4.9 4.3 1.5 6.4L12 16.8 6.3 20.1l1.5-6.4L2.9 9.4l6.5-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Trivia musical</p>
+          <h2 id="fono-trivia-titulo">Challenge tu conocimiento</h2>
+          <div class="trivia" data-trivia aria-live="polite"></div>
         </article>
+
+        
       </div>
     </section>
 
