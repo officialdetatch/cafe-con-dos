@@ -36,7 +36,7 @@ const raiz = path.resolve(__dirname, "..");
 const API = (process.env.BREVO_API_URL || "https://api.brevo.com/v3").replace(/\/$/, "");
 const API_VERSION = "2024-01-01";
 const env = (k) => String(process.env[k] || "").trim();
-const MODE = (env("MODE") || "dry-run").toLowerCase();
+const MODE = (env("MODE") || "send").toLowerCase();
 const FORCE = /^true$/i.test(env("FORCE"));
 const VENTANA_MS = 3 * 24 * 60 * 60 * 1000;
 
@@ -151,7 +151,7 @@ async function main() {
       "Por seguridad no se manda nada. Mándalos uno por uno: Actions > 'Boletín por correo' > Run workflow.");
   }
 
-  if (MODE !== "send") {
+  if (MODE !== "dry-run") {
     if (!env("BREVO_API_KEY")) throw new Error("Falta el secreto BREVO_API_KEY.");
     if (!env("SENDER_EMAIL")) throw new Error("Falta la variable SENDER_EMAIL (p. ej. newsletter@cafecondos.com).");
     if (MODE === "send" && !/^\d+$/.test(env("BREVO_LIST_ID"))) throw new Error("Falta la variable BREVO_LIST_ID (el número de la lista en Brevo).");
