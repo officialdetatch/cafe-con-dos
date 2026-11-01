@@ -31,6 +31,8 @@ window.CCD_CONFIG = {
     youtube: "https://www.youtube.com/@Caf%C3%A9ConDos",
     spotify: "https://open.spotify.com/show/6z0g9lFACFnK2sxIhj7EOn",
     tiktok: "https://www.tiktok.com/@cafecondos",
+    X: "https://x.com/cafecondos_", // antes Twitter
+    facebook: "https://www.facebook.com/cafecondos",
     discord: "" // déjalo vacío para que no aparezca
   },
 
