@@ -36,7 +36,7 @@ const raiz = path.resolve(__dirname, "..");
 const API = (process.env.BREVO_API_URL || "https://api.brevo.com/v3").replace(/\/$/, "");
 const API_VERSION = "2024-01-01";
 const env = (k) => String(process.env[k] || "").trim();
-const MODE = (env("MODE") || "send").toLowerCase();
+const MODE = (env("MODE") || "dry-run").toLowerCase();
 const FORCE = /^true$/i.test(env("FORCE"));
 const VENTANA_MS = 3 * 24 * 60 * 60 * 1000;
 
