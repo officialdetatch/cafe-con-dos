@@ -25,6 +25,9 @@
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const params = new URLSearchParams(location.search);
+  // La pieza que se está viendo: en /leer/<id> y /escuchar/<id> el id viene en la página
+  // (window.CCD_ID, lo pone scripts/paginas-compartir.js); en entrada?id=… viene del link.
+  const idPagina = () => window.CCD_ID || params.get("id");
 
   function store(key, val) {
     try {
@@ -91,8 +94,18 @@
     .filter(publicado).sort(porFecha);
   const POSTS = ARTS.filter((a) => a.seccion === "sobremesa");
 
-  const epUrl = (ep) => BASE + "episodio.html?id=" + encodeURIComponent(ep.id);
-  const postUrl = (p) => BASE + "entrada.html?id=" + encodeURIComponent(p.id);
+  // En el sitio publicado, cada artículo y episodio tiene su dirección con vista previa propia al
+  // compartir (cafecondos.com/leer/<id> y /escuchar/<id>: las arma scripts/paginas-compartir.js).
+  // En la computadora (archivo o localhost) esas páginas no existen y se usa el link de siempre.
+  const EN_VIVO = /^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  const epUrl = (ep) => (EN_VIVO && !ep.ejemplo ? "/escuchar/" + encodeURIComponent(ep.id) : BASE + "episodio.html?id=" + encodeURIComponent(ep.id));
+  const postUrl = (p) => (EN_VIVO && !p.ejemplo ? "/leer/" + encodeURIComponent(p.id) : BASE + "entrada.html?id=" + encodeURIComponent(p.id));
+  // Si alguien llega por un link viejo (entrada?id=…), la barra de direcciones pasa a la nueva sin
+  // recargar: así lo que se copia de ahí también sale con su vista previa.
+  function direccionCompartible(carpeta, id, ejemplo) {
+    if (!EN_VIVO || ejemplo || !/^\/(entrada|episodio)(\.html)?\/?$/.test(location.pathname)) return;
+    try { history.replaceState(history.state, "", "/" + carpeta + "/" + encodeURIComponent(id) + location.hash); } catch (e) { /* nada */ }
+  }
   // Una serie no tiene página propia: se enlaza a la lista de episodios filtrada.
   const serieUrl = (s) => BASE + "episodios.html?serie=" + encodeURIComponent(s.id);
 
@@ -317,7 +330,7 @@
     // El link de la página actual queda subrayado.
     let activo = { episodio: "episodios" }[page] || page;
     if (page === "entrada") {
-      const a = ARTS.find((x) => x.id === params.get("id"));
+      const a = ARTS.find((x) => x.id === idPagina());
       activo = a && a.seccion === "sobremesa" ? "sobremesa" : "enportada";
     }
     $$("[data-nav]", el).forEach((a) => { if (a.dataset.nav === activo) a.setAttribute("aria-current", "page"); });
@@ -975,10 +988,11 @@
 
   PAGES.episodio = function () {
     const root = $("#episodio");
-    const id = params.get("id");
+    const id = idPagina();
     const ep = EPS.find((e) => e.id === id);
-    if (!ep) { noEncontrado(root, t("ep.noencontrado"), t("ep.noencontrado.sub"), "episodios.html", t("lista.titulo")); setMeta(t("ep.noencontrado")); return; }
+    if (!ep) { noEncontrado(root, t("ep.noencontrado"), t("ep.noencontrado.sub"), BASE + "episodios.html", t("lista.titulo")); setMeta(t("ep.noencontrado")); return; }
     setMeta(loc(ep, "titulo"), loc(ep, "resumen"));
+    direccionCompartible("escuchar", ep.id, ep.ejemplo);
     const s = ep.serie && serieDe(ep.serie);
     const idx = EPS.indexOf(ep);
     const nuevo = EPS[idx - 1], viejo = EPS[idx + 1];
@@ -1004,7 +1018,7 @@
       "</section>" : "";
 
     root.innerHTML = '<div class="wrap">' +
-      '<nav class="migas" aria-label="Migas"><a href="episodios.html">' + t("nav.episodios") + "</a><span aria-hidden=\"true\">/</span>" +
+      '<nav class="migas" aria-label="Migas"><a href="' + BASE + 'episodios.html">' + t("nav.episodios") + "</a><span aria-hidden=\"true\">/</span>" +
       (s ? '<a href="' + serieUrl(s) + '">' + esc(s.nombre) + "</a>" : "<span>" + esc(numeroEp(ep) || "") + "</span>") + "</nav>" +
       '<header class="ep-cabeza">' + metaEp(ep) + "<h1>" + esc(loc(ep, "titulo")) + "</h1>" +
       (loc(ep, "resumen") ? '<p class="lead">' + esc(loc(ep, "resumen")) + "</p>" : "") + "</header>" +
@@ -1054,9 +1068,10 @@
 
   PAGES.entrada = function () {
     const root = $("#entrada");
-    const p = ARTS.find((x) => x.id === params.get("id"));
-    if (!p) { noEncontrado(root, t("art.noencontrado"), "", "enportada.html", t("art.volver")); setMeta(t("art.noencontrado")); return; }
+    const p = ARTS.find((x) => x.id === idPagina());
+    if (!p) { noEncontrado(root, t("art.noencontrado"), "", BASE + "enportada.html", t("art.volver")); setMeta(t("art.noencontrado")); return; }
     setMeta(p.titulo, p.resumen);
+    if (!PREVIA_ACTIVA) direccionCompartible("leer", p.id, p.ejemplo);
     const s = seccionDe(p.seccion);
     const esSob = p.seccion === "sobremesa";
     const a = autorDe(p.autor);
@@ -1122,8 +1137,8 @@
 
     root.innerHTML = '<article class="wrap entrada">' +
       '<nav class="migas" aria-label="Migas">' +
-      (esSob ? '<a href="sobremesa.html" translate="no">' + t("sob.titulo") + "</a>"
-        : '<a href="enportada.html">' + t("nav.enportada") + "</a>" + (s ? '<span aria-hidden="true">/</span><a href="' + seccionUrl(s.id) + '">' + esc(s.nombre) + "</a>" : "")) +
+      (esSob ? '<a href="' + BASE + 'sobremesa.html" translate="no">' + t("sob.titulo") + "</a>"
+        : '<a href="' + BASE + 'enportada.html">' + t("nav.enportada") + "</a>" + (s ? '<span aria-hidden="true">/</span><a href="' + seccionUrl(s.id) + '">' + esc(s.nombre) + "</a>" : "")) +
       "</nav>" +
       '<div class="entrada-grid"><div class="entrada-main">' +
       portada +
@@ -1182,7 +1197,7 @@
       image: p.portada ? (/^https?:/.test(p.portada) ? p.portada : site + "/" + p.portada) : site + "/images/og-cafe-con-dos.jpg?v=2",
       author: a ? { "@type": "Person", name: a.nombre } : { "@type": "Organization", name: "Café Con Dos" },
       publisher: { "@type": "Organization", name: "Café Con Dos", logo: { "@type": "ImageObject", url: site + "/images/logo.png" } },
-      mainEntityOfPage: site + "/entrada.html?id=" + encodeURIComponent(p.id)
+      mainEntityOfPage: site + "/leer/" + encodeURIComponent(p.id)
     });
   };
 

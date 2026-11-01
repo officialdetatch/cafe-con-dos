@@ -97,6 +97,15 @@ jobs:
       - name: Direcciones sin .html
         run: node scripts/urls-limpias.js _site
 
+      # Una página para compartir por cada artículo y episodio (cafecondos.com/leer/<id> y
+      # cafecondos.com/escuchar/<id>), con su propia foto, título y resumen en la vista previa de
+      # WhatsApp, iMessage, Facebook, etc. Va DESPUÉS de "Direcciones sin .html" para heredar los
+      # links limpios. Si falla, el sitio se publica igual (esos links caen en la versión de siempre
+      # gracias a 404.html). Ver scripts/paginas-compartir.js.
+      - name: Páginas para compartir (vista previa de cada artículo y episodio)
+        run: node scripts/paginas-compartir.js _site
+        continue-on-error: true
+
       - name: Generar feed.xml y sitemap.xml
         run: node scripts/build-feed.js _site
 

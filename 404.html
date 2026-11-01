@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <script>try{var t=localStorage.getItem("ccd-tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script>
+    // /leer/<id> y /escuchar/<id> son las páginas para compartir (scripts/paginas-compartir.js).
+    // Si alguna todavía no existe (por ejemplo, en el minuto en que algo programado sale a las 6:00 am),
+    // se abre la versión de siempre en vez de mostrar el error.
+    (function () {
+      var m = location.pathname.match(/^\/(leer|escuchar)\/([^\/]+?)(?:\.html)?\/?$/);
+      if (m) location.replace("/" + (m[1] === "leer" ? "entrada" : "episodio") + "?id=" + m[2] + location.hash);
+    })();
+  </script>
   <title>Página no encontrada | Café Con Dos</title>
   <meta name="description" content="Café Con Dos es una plataforma independiente que explora la cultura, la creatividad, las personas y las ideas a través de historias, conversaciones y nuevas perspectivas.">
   <meta name="theme-color" content="#E9CAB0" media="(prefers-color-scheme: light)">

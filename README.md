@@ -56,6 +56,7 @@ writers/              The writers (internal tools, noindex + blocked in robots.t
 firestore.rules       Security rules for the comments (paste into Firebase)
 scripts/              partes.js: copies partes/ into every page (see below)
                       contenido-sanity.js: pulls the editor's articles into the site
+                      paginas-compartir.js: one preview page per article/episode (/leer/<id>, /escuchar/<id>)
                       build-feed.js + feed.js: build feed.xml and sitemap.xml
                       aviso-correo.js: emails the Brevo list about a new article or episode
                       boletin-html.mjs + boletin-correo.js: the weekly newsletter email (template + sender)
@@ -109,6 +110,19 @@ On the live site the addresses look like `cafecondos.com/enportada`, `cafecondos
 The picture is `images/og-cafe-con-dos.jpg` (1200×630): the logo, "Stories worth sharing." and "PLATAFORMA EDITORIAL INDEPENDIENTE". Every page points to it as `og-cafe-con-dos.jpg?v=2`; if the picture changes again, replace the file and bump the number (`?v=3`) in every page (search the repo for `og-cafe-con-dos.jpg`), or apps keep showing the old one. The home page preview reads "Café Con Dos | Plataforma Editorial Independiente" / "Café Con Dos: un espacio para la cultura, la creatividad, las personas y las ideas. Descubre lo que te mueve." (in the `<head>` of `index.html`). Apps like WhatsApp also remember a link's preview for a while, so a chat where the link was already shared may keep the old one; new shares get the new one.
 
 The slogan is **"Stories worth sharing."**: `lema` in `config.js` (emails), the home page title (`index.html`, in two voices: "Stories worth" / "sharing.") and the footer (`partes/pie.html`).
+
+## Link previews for each article and episode (`/leer/…` and `/escuchar/…`)
+
+WhatsApp, iMessage, Facebook, X and friends don't run JavaScript, and GitHub Pages ignores everything after the `?`, so `entrada?id=…` always showed the generic site preview. Now every published article and episode also has its own small static page with its own picture, title and summary in the preview:
+
+- Articles and Sobremesa: `cafecondos.com/leer/<id>`. Episodes: `cafecondos.com/escuchar/<id>`. (A folder called `entrada/` would clash with `entrada.html`, which is why they have their own names.)
+- **How:** the deploy step "Páginas para compartir" (`scripts/paginas-compartir.js`) runs after "Direcciones sin .html". It copies the published `entrada.html` / `episodio.html`, swaps the preview tags (`og:*`, `twitter:*`, `canonical`), makes the links absolute (same trick as `404.html`: `data-base="/"`) and sets `window.CCD_ID`, which `app.js` reads instead of `?id=`. The page then looks and works exactly like the normal one.
+- **Picture:** article with a cover from the editor → that photo cropped to 1200×630 as a JPG, respecting the focus point she marked; article with a cover in the repo → that photo; episode → its `portada`, or the big YouTube thumbnail; no picture → `images/og-cafe-con-dos.jpg` (the one in "Link preview" above, still the site-wide image).
+- **Text:** title, `resumen` (if an article has none, the first lines of its text), section and date.
+- **Which links use it:** on the live site every card, "Leer otro", related article, share button, `sitemap.xml`, `feed.xml` and the new-article emails point to `/leer/…` or `/escuchar/…`. Old `entrada?id=…` / `episodio?id=…` links still open, and `app.js` quietly changes the address bar to the new one (so copying from the bar also gives a preview). On your computer (file or localhost) nothing changes: the old links are used because these pages only exist in the published copy.
+- **Only what is published has a page:** scheduled items (future `fecha`) and samples (`ejemplo`) get theirs on their day, with the 6:00 am run. If someone opens a `/leer/…` or `/escuchar/…` address that doesn't exist yet, `404.html` sends them to the old `entrada?id=…` / `episodio?id=…` page instead of showing an error.
+- **If the step fails,** the site still publishes (the step is `continue-on-error`); the run shows a yellow warning and everything falls back to the old links.
+- **Test it:** after a publish, open `https://cafecondos.com/leer/<id>` and View Source: the `og:image` should be the article's picture. Apps remember previews for a while: for a link that was already shared in a chat, add `?v=2` to test, or use Facebook's Sharing Debugger (developers.facebook.com/tools/debug). To rebuild by hand: `node scripts/paginas-compartir.js _site` after the other deploy steps.
 
 ## Pre-launch page and maintenance mode
 
@@ -355,7 +369,7 @@ A visitor sees at most one interruption per visit: on the home page, the newslet
 
 - Each page has its own title and description; the home page carries Organization + WebSite (with site search) structured data, the archive carries PodcastSeries, and each article adds BlogPosting data when it loads.
 - `sitemap.xml` lists every page, article and episode (except samples and scheduled items).
-- Articles and episodes render with JavaScript from `?id=`. Google indexes these fine, but link previews on WhatsApp/Instagram use the site-wide share image (`images/og-cafe-con-dos.jpg`, with the tagline) and description. If per-article previews become important, the next step is having the Action also generate a small static HTML page per article (it already has all the data at that point).
+- Articles and episodes render with JavaScript from `?id=`. Google indexes these fine, but link previews on WhatsApp/Instagram use the site-wide share image (`images/og-cafe-con-dos.jpg`, with the tagline) and description. Per-article previews are handled by the static pages in "Link previews for each article and episode" (`/leer/<id>`, `/escuchar/<id>`).
 
 ## Notes
 
