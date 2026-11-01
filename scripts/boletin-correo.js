@@ -151,7 +151,7 @@ async function main() {
       "Por seguridad no se manda nada. Mándalos uno por uno: Actions > 'Boletín por correo' > Run workflow.");
   }
 
-  if (MODE !== "dry-run") {
+  if (MODE !== "send") {
     if (!env("BREVO_API_KEY")) throw new Error("Falta el secreto BREVO_API_KEY.");
     if (!env("SENDER_EMAIL")) throw new Error("Falta la variable SENDER_EMAIL (p. ej. newsletter@cafecondos.com).");
     if (MODE === "send" && !/^\d+$/.test(env("BREVO_LIST_ID"))) throw new Error("Falta la variable BREVO_LIST_ID (el número de la lista en Brevo).");
