@@ -74,6 +74,8 @@ window.CCD_CONFIG = {
       descripcion: "Entretenimiento, tendencias, proyectos creativos y temas que vale la pena explorar." },
     { id: "opiniones", nombre: "Opiniones y perspectivas", corto: "Perspectivas",
       descripcion: "Miradas pensadas sobre temas culturales y cotidianos que invitan a reflexionar y a conversar." },
+    { id: "corresponda", nombre: "A Quien Corresponda", corto: "Corresponda",
+      descripcion: "Una columna para hablar sin demasiados rodeos, poner algunas cosas sobre la mesa y dejar que cada quien tome lo que le corresponda." },
     { id: "sobremesa", nombre: "Sobremesa", corto: "Sobremesa",
       descripcion: "Las conversaciones más personales, las reflexiones y el contenido más libre." }
   ],
