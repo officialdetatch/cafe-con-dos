@@ -747,6 +747,55 @@
     });
   }
 
+  /* El carrusel de la portada: cambia cada pocos segundos, se detiene al pasar el mouse o al enfocar,
+     se mueve con los puntitos o deslizando el dedo, y tiene botón de pausa. Con "reducir movimiento"
+     activado en el equipo no avanza solo. */
+  function carruselPortada(fig) {
+    const cajas = $(".hero-slides", fig);
+    const diapos = $$(".hero-slide", fig);
+    const puntos = $$(".hero-punto", fig);
+    const pausa = $(".hero-pausa", fig);
+    const SEGUNDOS = 6.5;
+    let actual = 0, reloj = null, pausado = window.matchMedia("(prefers-reduced-motion: reduce)").matches, encima = false;
+
+    const ir = (n) => {
+      actual = (n + diapos.length) % diapos.length;
+      diapos.forEach((d, i) => d.classList.toggle("es-activa", i === actual));
+      puntos.forEach((p, i) => p.setAttribute("aria-current", i === actual ? "true" : "false"));
+    };
+    const parar = () => { clearInterval(reloj); reloj = null; cajas.setAttribute("aria-live", "polite"); };
+    const seguir = () => {
+      parar();
+      if (pausado || encima || document.hidden) return;
+      cajas.setAttribute("aria-live", "off");
+      reloj = setInterval(() => ir(actual + 1), SEGUNDOS * 1000);
+    };
+    const pintarPausa = () => {
+      pausa.setAttribute("aria-pressed", pausado ? "true" : "false");
+      pausa.setAttribute("aria-label", t(pausado ? "hero.reanudar" : "hero.pausar"));
+    };
+
+    puntos.forEach((p, i) => p.addEventListener("click", () => { ir(i); seguir(); }));
+    pausa.addEventListener("click", () => { pausado = !pausado; pintarPausa(); seguir(); });
+    // Solo el mouse la detiene al pasar por encima (en el celular un toque no debe frenarla para siempre)
+    fig.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { encima = true; seguir(); } });
+    fig.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") { encima = false; seguir(); } });
+    fig.addEventListener("focusin", () => { encima = true; seguir(); });
+    fig.addEventListener("focusout", () => { encima = false; seguir(); });
+    document.addEventListener("visibilitychange", seguir);
+    let x0 = null;
+    fig.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    fig.addEventListener("touchend", (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      x0 = null;
+      if (Math.abs(dx) > 40) { ir(actual + (dx < 0 ? 1 : -1)); seguir(); }
+    }, { passive: true });
+
+    pintarPausa();
+    seguir();
+  }
+
   /* ================= PÁGINAS ================= */
 
   const PAGES = {};
@@ -758,9 +807,26 @@
     const destacado = ARTS.find((a) => a.destacado) || ARTS[0];
     const fig = $("[data-destacado]");
     if (fig && destacado) {
-      fig.innerHTML = '<a class="art-img" href="' + postUrl(destacado) + '" tabindex="-1" aria-hidden="true">' + artPortada(destacado, { prioridad: true, marca: true }) + "</a>" +
-        '<figcaption><span class="kicker">' + t("hero.destacado") + " · " + esc((seccionDe(destacado.seccion) || {}).nombre || "") + "</span>" +
-        '<a href="' + postUrl(destacado) + '"' + langAttr(destacado) + ">" + esc(destacado.titulo) + "</a></figcaption>";
+      // Las últimas historias (En Portada y Sobremesa): la destacada primero y después las más nuevas.
+      // Con más de una, la burbuja va rotando sola (ver carruselPortada).
+      const ultimas = [destacado].concat(ARTS.filter((a) => a !== destacado)).slice(0, 3);
+      const diapositiva = (a, i) => '<div class="hero-slide' + (i === 0 ? " es-activa" : "") + '" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + " / " + ultimas.length + '">' +
+        '<a class="art-img" href="' + postUrl(a) + '" tabindex="-1" aria-hidden="true">' + artPortada(a, { prioridad: i === 0, marca: true }) + "</a>" +
+        '<figcaption><span class="kicker">' + (i === 0 ? t("hero.destacado") + " · " : "") + esc((seccionDe(a.seccion) || {}).nombre || "") + "</span>" +
+        '<a href="' + postUrl(a) + '"' + langAttr(a) + ">" + esc(a.titulo) + "</a></figcaption></div>";
+      fig.innerHTML = '<div class="hero-slides">' + ultimas.map(diapositiva).join("") + "</div>" +
+        (ultimas.length > 1
+          ? '<div class="hero-puntos">' + ultimas.map((a, i) => '<button type="button" class="hero-punto" aria-label="' + t("hero.ir") + " " + (i + 1) + " / " + ultimas.length + '"' + (i === 0 ? ' aria-current="true"' : "") + "></button>").join("") +
+            '<button type="button" class="hero-pausa" aria-pressed="false" aria-label="' + t("hero.pausar") + '">' +
+            '<svg class="i-pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>' +
+            '<svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2v13.6L19.5 12z" fill="currentColor"/></svg></button></div>'
+          : "");
+      if (ultimas.length > 1) {
+        fig.setAttribute("role", "group");
+        fig.setAttribute("aria-roledescription", "carousel");
+        fig.setAttribute("aria-label", t("hero.carrusel"));
+        carruselPortada(fig);
+      }
     }
 
     // Empieza a explorar: cada tarjeta lleva la foto del artículo más nuevo de su

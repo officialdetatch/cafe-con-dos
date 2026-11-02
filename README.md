@@ -357,6 +357,14 @@ The idea: *café con dos* is a conversation between two, so the design leans on 
 - **Motion** (end of `styles.css`, "Movimiento"): the home tagline arrives in two voices and steam rises off the featured story; the pre-launch title does the same. Everything else only answers the visitor: the menu icon turns into an X, links and filters underline, pages cross-fade when you change page, the reading bar fills as you scroll an article, and the theme switch opens the new palette in a circle from the button (`app.js`, theme button). With "reduce motion" turned on, all of it is off.
 - The menu icon in `partes/encabezado.html` is three separate lines (`raya-1`…`raya-3`) so it can turn into an X; keep them if you edit the header.
 
+## Color bands (home hero and Nosotros)
+
+The start of a page is separated from the rest by a dark café band, like La Fonoteca's header (`--tarjeta-oscura` plus the paper grain). Both are in the last block of `styles.css`.
+
+- **Home (`.hero`)**: the whole opening (tagline + featured story) sits on the dark band, so it no longer blends with the menu bar or with "Empieza a explorar". In dark mode the band is a shade lighter than the page so it still reads as a band.
+- **Latest stories carousel:** the orange bubble on the right rotates through up to 3 stories (En Portada and Sobremesa): the one marked "Destacar en la portada" first (or the newest), then the next newest. It changes every 6.5 s (`SEGUNDOS` in `carruselPortada`, `app.js`), pauses on mouse-over or keyboard focus, has dots, a pause button and swipe on phones, and does not move by itself when the device has "reduce motion" on. With only one story there are no dots; with none, the cup from `index.html` stays. Its screen-reader labels are the `hero.*` keys in `textos.js`.
+- **Nosotros (`.nos-hero`)**: the title and the two intro paragraphs live in a dark band (with the faint logo cup in the corner); the rest of the page is unchanged. The markup is at the top of `nosotros.html`.
+
 ## Language
 
 Page text lives in each `.html` file and in `partes/`; the texts JavaScript needs (filters, form messages, pop-ups) are in `assets/js/textos.js`. Everything is in Spanish with the everyday Spanglish the brand uses (host, email, link, show notes, timestamps, collab…). The tagline stays in English on purpose. `lang="es"` is set on every page, the tagline and English articles carry `lang="en"`, so screen readers pronounce them correctly and Chrome/Safari offer translation sensibly. Brand names (Café Con Dos, Sobremesa, Entre Elementos) are marked `translate="no"`.

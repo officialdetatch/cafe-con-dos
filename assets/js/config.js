@@ -70,12 +70,14 @@ window.CCD_CONFIG = {
   // Si cambias un id, los artículos que ya lo usan dejan de encontrarlo.
   // (Las tarjetas de "Empieza a explorar" de Inicio están en la página de inicio.)
   secciones: [
-    { id: "historias", nombre: "Historias y entrevistas", corto: "Personas",
+    { id: "historias", nombre: "Historias y Entrevistas", corto: "Entrevistas",
       descripcion: "Perfiles de creadores, historias personales y conversaciones que muestran lo que pasa detrás del trabajo." },
-    { id: "cultura", nombre: "Cultura y descubrimientos", corto: "Cultura",
+    { id: "cultura", nombre: "Cultura y Descubrimientos", corto: "Cultura",
       descripcion: "Entretenimiento, tendencias, proyectos creativos y temas que vale la pena explorar." },
-    { id: "opiniones", nombre: "Opiniones y perspectivas", corto: "Perspectivas",
+    { id: "opiniones", nombre: "Opiniones y Perspectivas", corto: "Opiniones",
       descripcion: "Miradas pensadas sobre temas culturales y cotidianos que invitan a reflexionar y a conversar." },
+    { id: "investigaciones", nombre: "Investigaciones Y Análisis", corto: "Investigaciones",
+      descripcion: "Investigaciones y análisis sobre historias, personajes y acontecimientos que merecen una mirada más profunda." },
     { id: "corresponda", nombre: "A Quien Corresponda", corto: "Corresponda",
       descripcion: "Una columna para hablar sin demasiados rodeos, poner algunas cosas sobre la mesa y dejar que cada quien tome lo que le corresponda." },
     { id: "sobremesa", nombre: "Sobremesa", corto: "Sobremesa",

@@ -363,10 +363,10 @@ a.logo:hover img { transform: rotate(-4deg); }
   color: var(--accent-text); margin: 0 0 10px; line-height: 1.35;
 }
 .kicker > span + span { margin-left: 10px; }
-.cabeza > .kicker, .page-head .kicker, .pronto-texto > .kicker, .tarjeta-oscura > .kicker, .archivo-texto > .kicker {
+.cabeza > .kicker, .page-head .kicker, .nos-hero .kicker, .pronto-texto > .kicker, .tarjeta-oscura > .kicker, .archivo-texto > .kicker {
   display: flex; align-items: center; gap: 10px;
 }
-.cabeza > .kicker::before, .page-head .kicker::before, .pronto-texto > .kicker::before, .tarjeta-oscura > .kicker::before, .archivo-texto > .kicker::before {
+.cabeza > .kicker::before, .page-head .kicker::before, .nos-hero .kicker::before, .pronto-texto > .kicker::before, .tarjeta-oscura > .kicker::before, .archivo-texto > .kicker::before {
   content: ""; flex: none; width: 13px; height: 11px; border-radius: 7px 7px 7px 1.5px; background: var(--naranja);
 }
 .tag-idioma {
@@ -402,14 +402,14 @@ a.logo:hover img { transform: rotate(-4deg); }
 .hero-figura { position: relative; margin: clamp(56px, 7vw, 96px) 0 0; display: grid; gap: 40px; isolation: isolate; }
 .hero-figura .art-portada { aspect-ratio: 5 / 4; border-radius: 18px 18px 18px 4px; }
 /* La historia destacada se sirve en la burbuja naranja del logo (con su colita)… */
-.hero-figura > .art-img, .hero-figura > .art-portada { position: relative; }
-.hero-figura > .art-img { padding: 12px; background: var(--naranja); border-radius: var(--r-burbuja); }
-.hero-figura > .art-img::before {
+.hero-figura > .art-img, .hero-figura > .art-portada, .hero-slide > .art-img { position: relative; }
+.hero-figura > .art-img, .hero-slide > .art-img { padding: 12px; background: var(--naranja); border-radius: var(--r-burbuja); }
+.hero-figura > .art-img::before, .hero-slide > .art-img::before {
   content: ""; position: absolute; left: 34px; bottom: -28px; width: 44px; height: 30px;
   background: var(--naranja); clip-path: polygon(0 0, 100% 0, 8% 100%);
 }
 .hero-figura > .art-portada { box-shadow: 0 0 0 12px var(--naranja); }
-.hero-figura:not(:has(> .art-img))::before {
+.hero-figura:not(:has(.art-img))::before {
   content: ""; position: absolute; left: 34px; top: calc(100% + 10px); width: 44px; height: 30px;
   background: var(--naranja); clip-path: polygon(0 0, 100% 0, 8% 100%);
 }
@@ -439,7 +439,7 @@ a.logo:hover img { transform: rotate(-4deg); }
   .vapor { height: 86px; width: 56px; }
 }
 @media (max-width: 600px) {
-  .hero-figura > .art-img { padding: 9px; }
+  .hero-figura > .art-img, .hero-slide > .art-img { padding: 9px; }
   .hero-figura > .art-portada { box-shadow: 0 0 0 9px var(--naranja); }
   .hero-figura .art-portada { border-radius: 16px 16px 16px 4px; }
 }
@@ -1810,3 +1810,73 @@ span.fono-tapa-mini.fono-vinilo { border-radius: 50%; }
 .fono-tema-play svg { width: 16px; height: 16px; }
 .fono-despedida { text-align: center; font-size: 1.8rem; color: var(--ink-soft); margin: clamp(18px, 3vw, 30px) auto clamp(8px, 2vw, 16px); padding: 0 var(--gutter); max-width: 100%; transform: rotate(-2deg); }
 .pagina-fonoteca main { overflow-x: clip; } /* las notitas giradas no empujan la página hacia los lados */
+
+
+/* ==========================================================================
+   Franjas de color que separan el arranque de cada página del resto
+   (como La Fonoteca): la portada de Inicio y la entrada de Nosotros.
+   ========================================================================== */
+
+/* ---------- Inicio: la portada en café oscuro + las últimas historias ---------- */
+.hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: var(--tarjeta-oscura) var(--textura-grano); color: var(--crema);
+  padding-bottom: clamp(52px, 6.5vw, 92px);
+}
+.hero .kicker { color: var(--naranja-claro); }
+.hero-lema { color: var(--crema); }
+.hero-lema .lema-2 { color: var(--naranja-claro); }
+.hero .lead { color: #E2C9B8; }
+.hero .btn { --btn-bg: var(--naranja); --btn-borde: var(--naranja); --btn-ink: var(--espresso); }
+.hero :focus-visible { outline-color: var(--naranja-claro); }
+.hero-figura::after { background: var(--naranja-claro); }          /* el vapor, claro sobre el fondo oscuro */
+.hero-figura figcaption a { color: var(--crema); }
+/* Lo que sigue a la portada ya no hereda su espacio de abajo */
+.hero + .seccion--linea { padding-top: clamp(56px, 7vw, 96px); }
+
+/* El carrusel: la historia destacada y las más nuevas, una a la vez */
+.hero-figura:has(.hero-puntos) { gap: 22px; }
+.hero-slides { display: grid; }
+.hero-slide { grid-area: 1 / 1; display: grid; gap: 40px; align-content: start; opacity: 0; visibility: hidden; }
+.hero-slide.es-activa { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-slide { transition: opacity .8s var(--ease), visibility 0s linear .8s; }
+  .hero-slide.es-activa { transition: opacity .8s var(--ease), visibility 0s; }
+}
+.hero-puntos { display: flex; align-items: center; gap: 10px; }
+.hero-punto {
+  position: relative; width: 12px; height: 12px; padding: 0; border: 0; border-radius: 99px; cursor: pointer;
+  background: rgba(245, 228, 213, .38); transition: width .35s var(--ease), background-color .2s ease;
+}
+.hero-punto::after { content: ""; position: absolute; inset: -14px -5px; }   /* zona para el dedo */
+.hero-punto:hover { background: rgba(245, 228, 213, .7); }
+.hero-punto[aria-current="true"] { width: 34px; background: var(--naranja); }
+.hero-pausa {
+  display: grid; place-items: center; width: 30px; height: 30px; margin-left: 6px; padding: 0; border-radius: 50%;
+  border: 1.5px solid rgba(245, 228, 213, .45); background: transparent; color: var(--crema); cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+.hero-pausa:hover { background: rgba(245, 228, 213, .14); border-color: var(--crema); }
+.hero-pausa svg { width: 14px; height: 14px; }
+.hero-pausa .i-play { display: none; }
+.hero-pausa[aria-pressed="true"] .i-pausa { display: none; }
+.hero-pausa[aria-pressed="true"] .i-play { display: block; }
+
+/* ---------- Nosotros: la entrada en café oscuro ---------- */
+.nos-hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: var(--tarjeta-oscura) var(--textura-grano); color: var(--crema);
+  padding: clamp(40px, 6vw, 84px) 0 clamp(48px, 6.5vw, 92px);
+}
+/* la taza del logo, grande y apenas visible, en la esquina (igual que en las tarjetas oscuras) */
+.nos-hero::after {
+  content: ""; position: absolute; z-index: -1; right: clamp(-60px, -3vw, -20px); bottom: -70px;
+  width: clamp(220px, 30vw, 380px); aspect-ratio: 463 / 600;
+  background: url("../../images/taza-clara.png") no-repeat center / contain; opacity: .07; transform: rotate(-10deg);
+  pointer-events: none;
+}
+.nos-hero .kicker { color: var(--naranja-claro); margin-bottom: 14px; }
+.nos-hero h1 { color: var(--crema); font-size: clamp(3.1rem, 7.4vw, 6rem); margin-bottom: clamp(22px, 3vw, 36px); }
+.nos-hero .lead { color: var(--crema); max-width: 60ch; }
+.nos-hero .lead + .lead { margin-top: 0; color: #E2C9B8; }
+.nos-hero :focus-visible { outline-color: var(--naranja-claro); }

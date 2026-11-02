@@ -15,6 +15,11 @@ window.CCD_TEXTOS = {
 
   // Inicio: la etiqueta del artículo destacado
   "hero.destacado": "Destacado",
+  // Inicio: el carrusel de las últimas historias (lo que lee un lector de pantalla)
+  "hero.carrusel": "Últimas historias",
+  "hero.ir": "Ver la historia",
+  "hero.pausar": "Pausar el carrusel",
+  "hero.reanudar": "Reanudar el carrusel",
 
   // En redes (sección opcional de Inicio): tarjetas de seguir
   "redes.ig.seguir": "Seguir en Instagram",
