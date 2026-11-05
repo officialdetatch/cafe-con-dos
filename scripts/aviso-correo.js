@@ -214,10 +214,6 @@ async function main() {
   }
 
   if (!porAvisar.length) { console.log("No hay artículos ni episodios nuevos para avisar."); return; }
-  if (!manual && porAvisar.length > MAX_NUEVOS) {
-    throw new Error("Hay " + porAvisar.length + " artículos o episodios por avisar de golpe (" + porAvisar.map((a) => a.id).join(", ") + ").\n" +
-      "Por seguridad no se manda nada. Avísalos uno por uno: Actions > 'Aviso por correo' > Run workflow.");
-  }
 
   if (MODE !== "dry-run") {
     if (!env("BREVO_API_KEY")) throw new Error("Falta el secreto BREVO_API_KEY.");
@@ -227,6 +223,22 @@ async function main() {
   }
 
   const existentes = MODE === "send" ? await campanasExistentes() : [];
+
+  // Lo que ya se avisó antes (campaña ya enviada en Brevo) no cuenta para el tope de abajo ni se vuelve a mandar.
+  // Sin esto, todo lo publicado desde AVISOS_DESDE sumaba al tope aunque ya hubiera salido y el aviso se bloqueaba.
+  if (MODE === "send" && !manual && !FORCE) {
+    const yaAvisado = (a) => existentes.some((c) => (c.name === nombreCampana(a) || (c.name || "").startsWith(nombreCampana(a) + " (reenv")) && c.status !== "draft");
+    const antes = porAvisar.filter(yaAvisado);
+    if (antes.length) console.log("Ya se avisó antes (se omite): " + antes.map((a) => a.id).join(", ") + ".");
+    porAvisar = porAvisar.filter((a) => !yaAvisado(a));
+    if (!porAvisar.length) { console.log("No hay artículos ni episodios nuevos para avisar."); return; }
+  }
+
+  if (!manual && porAvisar.length > MAX_NUEVOS) {
+    throw new Error("Hay " + porAvisar.length + " artículos o episodios por avisar de golpe (" + porAvisar.map((a) => a.id).join(", ") + ").\n" +
+      "Por seguridad no se manda nada. Avísalos uno por uno: Actions > 'Aviso por correo' > Run workflow.");
+  }
+
   const remitente = { name: env("SENDER_NAME") || cfg.nombre || "Café Con Dos", email: env("SENDER_EMAIL") || "newsletter@example.com" };
   // En la API de campañas de Brevo, replyTo es solo el correo (texto), no un objeto como sender.
   const respuesta = env("REPLY_TO") || undefined;
