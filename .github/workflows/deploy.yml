@@ -106,6 +106,14 @@ jobs:
         run: node scripts/paginas-compartir.js _site
         continue-on-error: true
 
+      # Con MANTENIMIENTO = si, TODO el sitio manda a la página de espera ("Volvemos enseguida"), no solo la
+      # portada. Va al final, cuando ya están todas las páginas. Con la variable apagada no hace nada.
+      # El equipo entra por cafecondos.com/cafenotready.html. Ver scripts/mantenimiento.js.
+      - name: Modo mantenimiento (cerrar el resto del sitio)
+        run: node scripts/mantenimiento.js _site
+        env:
+          MANTENIMIENTO: ${{ vars.MANTENIMIENTO }}
+
       - name: Generar feed.xml y sitemap.xml
         run: node scripts/build-feed.js _site
 
