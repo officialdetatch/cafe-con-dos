@@ -146,11 +146,6 @@ async function main() {
   }
 
   if (!porMandar.length) { console.log("No hay boletines por mandar."); return; }
-  if (!manual && porMandar.length > 1) {
-    throw new Error("Hay " + porMandar.length + " boletines por mandar de golpe (" + porMandar.map(etiqueta).join(", ") + ").\n" +
-      "Por seguridad no se manda nada. Mándalos uno por uno: Actions > 'Boletín por correo' > Run workflow.");
-  }
-
   if (MODE !== "dry-run") {
     if (!env("BREVO_API_KEY")) throw new Error("Falta el secreto BREVO_API_KEY.");
     if (!env("SENDER_EMAIL")) throw new Error("Falta la variable SENDER_EMAIL (p. ej. newsletter@cafecondos.com).");
@@ -159,6 +154,22 @@ async function main() {
   }
 
   const existentes = MODE === "send" ? await campanasExistentes() : [];
+
+  // Un boletín que ya salió (campaña ya enviada en Brevo) no cuenta para el tope de abajo ni se vuelve a mandar.
+  // Sin esto, todo lo que cae en la ventana de 3 días sumaba al tope aunque ya hubiera salido y el envío se bloqueaba.
+  if (MODE === "send" && !manual && !FORCE) {
+    const yaSalio = (b) => existentes.some((c) => (c.name || "").includes(codigo(b)) && c.status !== "draft");
+    const antes = porMandar.filter(yaSalio);
+    if (antes.length) console.log("Ya se mandó antes (se omite): " + antes.map(etiqueta).join(", ") + ".");
+    porMandar = porMandar.filter((b) => !yaSalio(b));
+    if (!porMandar.length) { console.log("No hay boletines por mandar."); return; }
+  }
+
+  if (!manual && porMandar.length > 1) {
+    throw new Error("Hay " + porMandar.length + " boletines por mandar de golpe (" + porMandar.map(etiqueta).join(", ") + ").\n" +
+      "Por seguridad no se manda nada. Mándalos uno por uno: Actions > 'Boletín por correo' > Run workflow.");
+  }
+
   const remitente = { name: env("SENDER_NAME") || cfg.nombre || "Café Con Dos", email: env("SENDER_EMAIL") || "newsletter@example.com" };
   const respuesta = env("REPLY_TO") || undefined; // en campañas, replyTo es solo el correo (texto)
 

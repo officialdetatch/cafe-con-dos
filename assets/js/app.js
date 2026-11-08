@@ -100,12 +100,11 @@
   const EN_VIVO = /^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const epUrl = (ep) => (EN_VIVO && !ep.ejemplo ? "/escuchar/" + encodeURIComponent(ep.id) : BASE + "episodio.html?id=" + encodeURIComponent(ep.id));
   const postUrl = (p) => (EN_VIVO && !p.ejemplo ? "/leer/" + encodeURIComponent(p.id) : BASE + "entrada.html?id=" + encodeURIComponent(p.id));
-  // Si alguien llega por un link viejo (entrada?id=…), la barra de direcciones pasa a la nueva sin
-  // recargar: así lo que se copia de ahí también sale con su vista previa.
-  function direccionCompartible(carpeta, id, ejemplo) {
-    if (!EN_VIVO || ejemplo || !/^\/(entrada|episodio)(\.html)?\/?$/.test(location.pathname)) return;
-    try { history.replaceState(history.state, "", "/" + carpeta + "/" + encodeURIComponent(id) + location.hash); } catch (e) { /* nada */ }
-  }
+  // Dirección que se comparte de una pieza (WhatsApp, copiar link, compartir del celular): la que tiene vista previa propia.
+  // La barra de direcciones NO se cambia: si se reescribe a /leer/…, los links y fotos relativos de la página (menú, autora…)
+  // pasan a buscarse dentro de /leer/ y se rompen.
+  let URL_COMPARTIR = null;
+  const urlCompartible = (carpeta, x) => (EN_VIVO && !x.ejemplo ? location.origin + "/" + carpeta + "/" + encodeURIComponent(x.id) : null);
   // Una serie no tiene página propia: se enlaza a la lista de episodios filtrada.
   const serieUrl = (s) => BASE + "episodios.html?serie=" + encodeURIComponent(s.id);
 
@@ -503,7 +502,7 @@
 
   /* ---------------- compartir ---------------- */
   function compartirHTML(titulo) {
-    const url = location.href.split("#")[0];
+    const url = URL_COMPARTIR || location.href.split("#")[0];
     const u = encodeURIComponent(url), tt = encodeURIComponent(titulo + " · Café Con Dos");
     return '<div class="compartir" aria-label="' + t("comp.titulo") + '">' +
       '<a class="chip chip--sm" target="_blank" rel="noopener" href="https://wa.me/?text=' + tt + "%20" + u + '">WhatsApp</a>' +
@@ -522,7 +521,7 @@
   };
   const svgIco = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICO[k] + "</svg>";
   function compartirIconos(p) {
-    const url = location.href.split("#")[0];
+    const url = URL_COMPARTIR || location.href.split("#")[0];
     const u = encodeURIComponent(url), tt = encodeURIComponent(p.titulo + " · Café Con Dos");
     const site = String(CFG.siteUrl || "").replace(/\/$/, "");
     const img = p.portada ? (/^https?:/.test(p.portada) ? p.portada : site + "/" + p.portada) : site + "/images/og-cafe-con-dos.jpg?v=2";
@@ -1058,7 +1057,7 @@
     const ep = EPS.find((e) => e.id === id);
     if (!ep) { noEncontrado(root, t("ep.noencontrado"), t("ep.noencontrado.sub"), BASE + "episodios.html", t("lista.titulo")); setMeta(t("ep.noencontrado")); return; }
     setMeta(loc(ep, "titulo"), loc(ep, "resumen"));
-    direccionCompartible("escuchar", ep.id, ep.ejemplo);
+    URL_COMPARTIR = urlCompartible("escuchar", ep);
     const s = ep.serie && serieDe(ep.serie);
     const idx = EPS.indexOf(ep);
     const nuevo = EPS[idx - 1], viejo = EPS[idx + 1];
@@ -1137,7 +1136,7 @@
     const p = ARTS.find((x) => x.id === idPagina());
     if (!p) { noEncontrado(root, t("art.noencontrado"), "", BASE + "enportada.html", t("art.volver")); setMeta(t("art.noencontrado")); return; }
     setMeta(p.titulo, p.resumen);
-    if (!PREVIA_ACTIVA) direccionCompartible("leer", p.id, p.ejemplo);
+    if (!PREVIA_ACTIVA) URL_COMPARTIR = urlCompartible("leer", p);
     const s = seccionDe(p.seccion);
     const esSob = p.seccion === "sobremesa";
     const a = autorDe(p.autor);
@@ -1250,7 +1249,7 @@
     const nativo = $(".comp-nativo", root);
     if (nativo && navigator.share && matchMedia("(pointer: coarse)").matches) {
       nativo.hidden = false;
-      nativo.addEventListener("click", () => navigator.share({ title: p.titulo, text: p.resumen || "", url: location.href.split("#")[0] }).catch(() => {}));
+      nativo.addEventListener("click", () => navigator.share({ title: p.titulo, text: p.resumen || "", url: URL_COMPARTIR || location.href.split("#")[0] }).catch(() => {}));
     }
 
     // Datos estructurados para Google (BlogPosting). (No en la vista previa del editor.)
